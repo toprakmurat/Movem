@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from src.config.database import db
 from src.models.models import Person, MovieCast, Movie
 
@@ -10,16 +10,10 @@ def get_actors():
     """Get all actors/people"""
     try:
         actors = Person.query.all()
-        return jsonify({
-            'success': True,
-            'data': [actor.to_dict() for actor in actors],
-            'count': len(actors)
-        })
+        return render_template('actors.html', actors=actors)
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        # In case of error, still render the template with empty actors list
+        return render_template('actors.html', actors=[])
 
 
 @actors_bp.route('/<int:actor_id>', methods=['GET'])
