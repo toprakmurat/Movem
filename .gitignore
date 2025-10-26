@@ -88,12 +88,6 @@ pip-delete-this-directory.txt
 # Flask-specific
 flask_session/
 
-# Configuration files with sensitive data
-config.py
-settings.py
-secrets.py
-.secrets
-
 # Windows-specific
 *.stackdump
 [Dd]esktop.ini
