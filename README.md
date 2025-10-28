@@ -10,19 +10,6 @@ A Flask web application for managing movies and actors database.
    cd Movem
    ```
 
-2. **Create a virtual environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On macOS/Linux
-   # or
-   venv\Scripts\activate     # On Windows
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
 ## Configuration
 
 1. **Create a `.env` file** in the root directory with your database configuration:
@@ -60,40 +47,56 @@ A Flask web application for managing movies and actors database.
 
 ### Prerequisites
 
-Before running the application, ensure you have:
-- A PostgreSQL service running in the background
-- A database user configured with appropriate permissions
+Before you begin, ensure you have the following installed on your system:
 
-### Database Setup
+* Docker
+* Docker Compose
 
-1. **Create database user and database:**
-   ```bash
-   # Connect to PostgreSQL as superuser
-   psql postgres
-   ```
+### Running the Application
 
-2. **In the PostgreSQL prompt, execute:**
-   ```sql
-   CREATE USER movem_user WITH PASSWORD 'your_password';
-   CREATE DATABASE movem OWNER movem_user;
-   GRANT ALL PRIVILEGES ON DATABASE movem TO movem_user;
-   \q
-   ```
+1. **Build and start the services:**  
+Run this command from the root directory (where your `docker-compose.yml` is):
 
-### Starting the Application
+```bash
+docker-compose up --build
+```
 
-1. **Activate your virtual environment** (if not already activated):
-   ```bash
-   source venv/bin/activate  # On macOS/Linux
-   # or
-   venv\Scripts\activate     # On Windows
-   ```
+- `--build` tells Docker Compose to build the image from your Dockerfile.  
+- You can add the `-d` flag (`docker-compose up --build -d`) to run the containers in detached (background) mode.
 
-2. **Run the application:**
-   ```bash
-   python app.py
-   ```
+2. **Access the application:**  
+The application will be available at: [http://127.0.0.1:5050](http://127.0.0.1:5050)
 
-3. **Access the application:**
-   
-   The application will be available at `http://localhost:5000`
+3. **Stop the services:**  
+
+```bash
+docker compose down
+```
+
+> This stops and removes the containers, but volumes remain intact.
+
+You can also use:
+
+```bash
+docker compose stop    # Stop containers without removing
+docker compose start   # Start stopped containers
+```
+
+### Testing the Application
+
+1. **Check running containers:**
+
+```bash
+docker compose ps
+```
+
+It should show 2 services named `movem-flask-app-1` and `movem-postgres-1`.
+
+2. **Connect to PostgreSQL while containers are running:**
+
+```bash
+docker exec -it movem-postgres-1 psql -U <DB_USER> -d <DB_NAME>
+```
+
+> Replace `<DB_USER>` and `<DB_NAME>` with the actual values from your `.env` file.  
+> Once inside, you can use normal PostgreSQL commands like `\l` to list databases or `\dt` to list tables.
