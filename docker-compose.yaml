@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - pgdata:/var/lib/postgresql/data
+
+  flask-app:
+    build: .
+    ports:
+      - "5050:5050"
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      FLASK_APP: ${FLASK_APP}
+      FLASK_ENV: ${FLASK_ENV}
+      SECRET_KEY: ${SECRET_KEY}
+      DB_MIN_CONNECTIONS: ${DB_MIN_CONNECTIONS}
+      DB_MAX_CONNECTIONS: ${DB_MAX_CONNECTIONS}
+    volumes:
+      - ./images:/app/images 
+
+
+volumes:
+  pgdata:
