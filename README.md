@@ -20,7 +20,7 @@ A Flask web application for managing movies and actors database.
    SECRET_KEY=<secret_key>
 
    # PostgreSQL Database Configuration
-   DB_HOST=localhost
+   DB_HOST=postgres
    DB_PORT=5432
    DB_NAME=movem
    DB_USER=<username>
@@ -58,7 +58,7 @@ Before you begin, ensure you have the following installed on your system:
 Run this command from the root directory (where your `docker-compose.yml` is):
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 - `--build` tells Docker Compose to build the image from your Dockerfile.  
