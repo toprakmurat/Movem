@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS movies(
     tagline  VARCHAR(256),
     release_date DATE,
     poster_url VARCHAR(100),
-    platform_id INTEGER,
+    platform_id INTEGER REFERENCES platforms(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 
