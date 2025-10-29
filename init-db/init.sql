@@ -4,6 +4,15 @@
 
 
 ------------------------------------------------------------
+-- platforms table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS platforms (
+    id SERIAL PRIMARY KEY,
+    platform_name VARCHAR(100),
+    logo_path VARCHAR(256)
+);
+
+------------------------------------------------------------
 -- movies table 
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies(
@@ -43,4 +52,18 @@ CREATE TABLE IF NOT EXISTS favorites (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+------------------------------------------------------------
+-- comments table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    rating INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    comment_likes INTEGER,
+    comment_dislikes INTEGER
 );
