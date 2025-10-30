@@ -27,6 +27,29 @@ CREATE TABLE IF NOT EXISTS movies(
 );
 
 ------------------------------------------------------------
+-- people table (actors, directors)
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS people (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    biography TEXT,
+    birth_date DATE,
+    photo_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+------------------------------------------------------------
+-- movie_cast table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS movie_cast (
+    id SERIAL PRIMARY KEY,
+    movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
+    person_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
+    role VARCHAR(100),
+    character_name VARCHAR(255)
+);
+
+------------------------------------------------------------
 -- genres table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS genres (
@@ -42,7 +65,6 @@ CREATE TABLE IF NOT EXISTS movies_genres (
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
     genre_id INTEGER REFERENCES genres(id) ON DELETE CASCADE
 );
-
 
 ------------------------------------------------------------
 -- favorites table
