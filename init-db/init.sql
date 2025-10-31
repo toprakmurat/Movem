@@ -89,3 +89,11 @@ CREATE TABLE IF NOT EXISTS comments (
     comment_likes INTEGER,
     comment_dislikes INTEGER
 );
+
+------------------------------------------------------------
+-- statistics table 
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS statistics (
+    id SERIAL PRIMARY KEY,
+    
+)
