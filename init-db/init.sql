@@ -91,9 +91,26 @@ CREATE TABLE IF NOT EXISTS comments (
 );
 
 ------------------------------------------------------------
--- statistics table 
+-- statistic table 
 ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS statistics (
+CREATE TABLE IF NOT EXISTS statistic (
     id SERIAL PRIMARY KEY,
-    
-)
+    movie_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
+    revenue BIGINT,
+    runtime INTEGER,
+    vote_avg NUMERIC(4,1), -- to store ratings avg from 0,0 to 10,0
+    vote_count INTEGER,
+    budget BIGINT
+);
+
+------------------------------------------------------------
+-- game_question table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS game_questions (
+    id SERIAL PRIMARY KEY,
+    question_type VARCHAR(50),   -- 'higher_budget', 'more_awards'
+    entity_type VARCHAR(50),     -- 'movie', 'actor'
+    entity1_id INTEGER,
+    entity2_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
