@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS statistic (
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movie_question (
     id SERIAL PRIMARY KEY,
-    question_type VARCHAR(50),   -- 'higher_budget', 'more_awards' etc
+    question_type INTEGER REFERENCES question_types(id) ON DELETE CASCADE,   -- 'higher_budget', 'more_awards' etc
     movie1_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
     movie2_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -119,8 +119,33 @@ CREATE TABLE IF NOT EXISTS movie_question (
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS people_question (
     id SERIAL PRIMARY KEY,
-    question_type VARCHAR(50),   -- 'has more movie', 'age' etc
+    question_type INTEGER REFERENCES question_types(id) ON DELETE CASCADE,   -- 'has more movie', 'age' etc
     actor1_id INTEGER UNIQUE REFERENCES people(id) ON DELETE CASCADE,
     actor2_id INTEGER UNIQUE REFERENCES people(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+------------------------------------------------------------
+-- users table
+------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    birth_date DATE,
+    password_hash VARCHAR(128) NOT NULL,
+    role VARCHAR(50) DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    game_score INTEGER
+);
+
+------------------------------------------------------------
+-- question_types table
+------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS question_types (
+    id SERIAL PRIMARY KEY,
+    question_type_name VARCHAR(50)
 );
