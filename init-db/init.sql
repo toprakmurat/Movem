@@ -2,7 +2,30 @@
 -- so we can directly connect to and use the 'movem' database
 \c movem
 
+------------------------------------------------------------
+-- users table
+------------------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    birth_date DATE,
+    password_hash VARCHAR(128) NOT NULL,
+    role VARCHAR(50) DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    game_score INTEGER
+);
+
+------------------------------------------------------------
+-- question_types table
+------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS question_types (
+    id SERIAL PRIMARY KEY,
+    question_type_name VARCHAR(50)
+);
 ------------------------------------------------------------
 -- platforms table
 ------------------------------------------------------------
@@ -125,27 +148,3 @@ CREATE TABLE IF NOT EXISTS people_question (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-------------------------------------------------------------
--- users table
-------------------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(50) UNIQUE NOT NULL,
-    birth_date DATE,
-    password_hash VARCHAR(128) NOT NULL,
-    role VARCHAR(50) DEFAULT 'user',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    game_score INTEGER
-);
-
-------------------------------------------------------------
--- question_types table
-------------------------------------------------------------
-
-CREATE TABLE IF NOT EXISTS question_types (
-    id SERIAL PRIMARY KEY,
-    question_type_name VARCHAR(50)
-);
