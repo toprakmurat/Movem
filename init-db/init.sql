@@ -104,13 +104,23 @@ CREATE TABLE IF NOT EXISTS statistic (
 );
 
 ------------------------------------------------------------
--- game_question table
+-- movie_question table
 ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS game_questions (
+CREATE TABLE IF NOT EXISTS movie_question (
     id SERIAL PRIMARY KEY,
-    question_type VARCHAR(50),   -- 'higher_budget', 'more_awards'
-    entity_type VARCHAR(50),     -- 'movie', 'actor'
-    entity1_id INTEGER,
-    entity2_id INTEGER,
+    question_type VARCHAR(50),   -- 'higher_budget', 'more_awards' etc
+    movie1_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
+    movie2_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+------------------------------------------------------------
+-- people_question table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS people_question (
+    id SERIAL PRIMARY KEY,
+    question_type VARCHAR(50),   -- 'has more movie', 'age' etc
+    actor1_id INTEGER UNIQUE REFERENCES people(id) ON DELETE CASCADE,
+    actor2_id INTEGER UNIQUE REFERENCES people(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
