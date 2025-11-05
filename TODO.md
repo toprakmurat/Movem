@@ -1,7 +1,8 @@
 # TODO
 
 ## High Priority
-- [ ] Create/Update API endpoints
+- [ ] SQL queries' creation logic must be determined. Inline or modular?
+- [ ] Update/Create API endpoints
 
 ## Medium Priority
 - [ ] Organize folder structure for config.py and src/config/database.py
