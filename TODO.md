@@ -1,13 +1,15 @@
 # TODO
 
 ## High Priority
-- [ ] Add table definition queries for PostgreSQL
+- [ ] Create/Update API endpoints
 
 ## Medium Priority
 - [ ] Organize folder structure for config.py and src/config/database.py
 
 ## Low Priority
-- [ ] Decide on the PostgreSQL version (using: version 15, available: version 18)
+- [ ] Build a simple front-end to make testing easier
 
 ## Completed
-- [x] Update/Create README.md to be more detailed (Murat)
+- [x] Update/Create README.md to be more detailed
+- [x] Decide on the PostgreSQL version (using: version 15, available: version 18) -- Decided to use version 17 for better stability
+- [x] Add table definition queries for PostgreSQL
