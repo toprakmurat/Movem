@@ -5,7 +5,7 @@ DELIMITER ','
 CSV HEADER;
 
 -- Movies 
-\copy movies(id, title, overview, tagline, release_date, poster_file, banner_file platform_id) 
+\copy movies(id, title, overview, tagline, release_date, poster_file, banner_file, platform_id) 
 FROM '/docker-entrypoint-initdb.d/db_movies.csv' 
 DELIMITER ',' 
 CSV HEADER;
