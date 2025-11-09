@@ -7,9 +7,6 @@
 -- platforms
 \copy platforms(id, platform_name, logo_path) FROM '/docker-entrypoint-initdb.d/db_platforms.csv' DELIMITER ',' CSV HEADER
 
--- movie_platforms
-\copy movie_platforms(movie_id, platform_id) FROM '/docker-entrypoint-initdb.d/movie_platforms.csv' DELIMITER ',' CSV HEADER
-
 -- Movies 
 \copy movies(id, title, overview, tagline, release_date, poster_file, banner_file, platform_id) FROM '/docker-entrypoint-initdb.d/db_movies.csv' DELIMITER ',' CSV HEADER
 
