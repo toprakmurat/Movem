@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS statistic (
     id SERIAL PRIMARY KEY,
     movie_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
     revenue BIGINT,
-    runtime INTEGER,
+    runtime NUMERIC,
     vote_avg NUMERIC(4,1), -- to store ratings avg from 0,0 to 10,0
     vote_count INTEGER,
     budget BIGINT
@@ -133,8 +133,8 @@ CREATE TABLE IF NOT EXISTS statistic (
 CREATE TABLE IF NOT EXISTS movie_question (
     id SERIAL PRIMARY KEY,
     question_type INTEGER REFERENCES question_types(id) ON DELETE CASCADE,   -- 'higher_budget', 'more_awards' etc
-    movie1_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
-    movie2_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
+    movie1_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
+    movie2_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -144,8 +144,8 @@ CREATE TABLE IF NOT EXISTS movie_question (
 CREATE TABLE IF NOT EXISTS people_question (
     id SERIAL PRIMARY KEY,
     question_type INTEGER REFERENCES question_types(id) ON DELETE CASCADE,   -- 'has more movie', 'age' etc
-    actor1_id INTEGER UNIQUE REFERENCES people(id) ON DELETE CASCADE,
-    actor2_id INTEGER UNIQUE REFERENCES people(id) ON DELETE CASCADE,
+    actor1_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
+    actor2_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
