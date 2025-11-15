@@ -7,8 +7,8 @@ def get_db_connection():
     """Get a database connection from the pool"""
     if 'db_conn' not in g:
         g.db_conn = current_app.db_pool.getconn()
-    return g.db_conn
 
+    return g.db_conn
 
 def close_db_connection():
     """Return connection to the pool"""
@@ -22,16 +22,24 @@ def execute_query(query, params=None, fetch=False):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     
+    result = None 
+    
     try:
         cursor.execute(query, params)
+        is_select_query = query.strip().upper().startswith("SELECT")
+        
+        if not is_select_query:
+            conn.commit()
+                        
         if fetch:
             result = cursor.fetchall()
-            return result
         else:
-            conn.commit()
-            return cursor.rowcount
-    except Exception as e:
-        conn.rollback()
-        raise e
+            result = cursor.rowcount 
+            
+    except psycopg2.Error as e: 
+            conn.rollback() 
+            raise e 
     finally:
-        cursor.close()
+            cursor.close()
+        
+    return result

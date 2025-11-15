@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS question_types (
 -- platforms table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS platforms (
-    id SERIAL PRIMARY KEY,
+    id PRIMARY KEY,
     platform_name VARCHAR(100),
     logo_path VARCHAR(256)
 );
