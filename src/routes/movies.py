@@ -74,7 +74,7 @@ def delete_movie(id):
 
 
 @movies_bp.route("/genre/<int:genre_id>", methods=["GET"])
-def movies_by_genre(genre_id):
+def get_movies_by_genre(genre_id):
     """Get movie by genre_id"""
     movies, err = get_movies_by_genre_id(genre_id)
     if err:
