@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS question_types (
 -- platforms table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS platforms (
-    id SERIAL PRIMARY KEY,
+    id PRIMARY KEY,
     platform_name VARCHAR(100),
     logo_path VARCHAR(256)
 );
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS platforms (
 -- movies table 
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies(
-    id SERIAL PRIMARY KEY,
+    id PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     overview TEXT,
     tagline  VARCHAR(256),
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS movie_cast (
 -- genres table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS genres (
-    id SERIAL PRIMARY KEY,
+    id PRIMARY KEY,
     genre_name VARCHAR(50) UNIQUE NOT NULL
 );
 

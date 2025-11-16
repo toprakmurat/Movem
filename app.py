@@ -6,6 +6,7 @@ from config import config
 from src.routes.home import home_bp
 from src.routes.movies import movies_bp
 from src.routes.actors import actors_bp
+from src.routes.comments import comments_bp
 
 def create_app(config_name=None):
     app = Flask(__name__)
@@ -30,6 +31,7 @@ def create_app(config_name=None):
     app.register_blueprint(home_bp)
     app.register_blueprint(movies_bp, url_prefix='/movies')
     app.register_blueprint(actors_bp, url_prefix='/actors')
+    app.register_blueprint(comments_bp, url_prefix='/comments')
     
     return app
 
