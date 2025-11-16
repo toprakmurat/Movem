@@ -1,157 +1,72 @@
 from flask import Blueprint, jsonify, request
-from src.config.database import execute_query
+from src.services.platforms_service import (
+    get_platforms,
+    get_platform_by_id,
+    create_platform,
+    update_platform,
+    delete_platform_by_id
+)
 
 platforms_bp = Blueprint('platforms', __name__)
 
 @platforms_bp.route('/', methods=['GET'])
-def get_all_platforms():
+def get_all_platforms_route():
     """Gets all platforms"""
-    try:
-        platforms = execute_query(
-            """
-            SELECT id, platform_name, logo_path 
-            FROM platforms 
-            ORDER BY platform_name ASC
-            """,
-            fetch=True
-        )
-        return jsonify([dict(platform) for platform in platforms])
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    platforms, err = get_platforms()
+    if err:
+        return jsonify({"error": err}), 500
+    return jsonify([dict(p) for p in platforms]), 200
 
 
 @platforms_bp.route('/<int:platform_id>', methods=['GET'])
-def get_platform(platform_id):
+def get_platform_route(platform_id):
     """Gets a single platform by its ID"""
-    try:
-        platform = execute_query(
-            """
-            SELECT id, platform_name, logo_path 
-            FROM platforms 
-            WHERE id = %s
-            """,
-            (platform_id,),
-            fetch=True
-        )
-        
-        if platform:
-            return jsonify(dict(platform[0]))
-            
-        return jsonify({'error': 'Platform not found'}), 404
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    platform, err = get_platform_by_id(platform_id)
+    if err:
+        if err == "Platform not found":
+            return jsonify({"message": err}), 404
+        return jsonify({"error": err}), 500
+    return jsonify(dict(platform)), 200
 
 
 @platforms_bp.route('/', methods=['POST'])
-def create_platform():
+def create_platform_route():
     """Creates a new platform"""
-    try:
-        data = request.get_json()
+    data = request.get_json()
+    if not data or 'platform_name' not in data:
+        return jsonify({'error': 'platform_name is required'}), 400
         
-        if not data or 'platform_name' not in data:
-            return jsonify({'error': 'platform_name is required'}), 400
-        
-        platform_name = data['platform_name']
-        logo_path = data.get('logo_path', None) 
-        
-        new_platform = execute_query(
-            """
-            INSERT INTO platforms (platform_name, logo_path)
-            VALUES (%s, %s)
-            RETURNING *
-            """,
-            (platform_name, logo_path),
-            fetch=True 
-        )
-        
-        if new_platform:
-            return jsonify(dict(new_platform[0])), 201
-            
-        return jsonify({'error': 'Failed to create platform'}), 500
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    new_platform, err = create_platform(data)
+    if err:
+        return jsonify({"error": err}), 400
+    return jsonify(dict(new_platform)), 201
 
 
 @platforms_bp.route('/<int:platform_id>', methods=['PUT', 'PATCH'])
-def update_platform(platform_id):
+def update_platform_route(platform_id):
     """Updates an existing platform"""
-    try:
-        data = request.get_json()
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
         
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
+    updated, err = update_platform(platform_id, data)
+    
+    if err:
+        if err == "Platform not found":
+            return jsonify({"message": err}), 404
+        return jsonify({"error": err}), 400
         
-        platform_check = execute_query(
-            "SELECT id FROM platforms WHERE id = %s",
-            (platform_id,),
-            fetch=True
-        )
-        
-        if not platform_check:
-            return jsonify({'error': 'Platform not found'}), 404
-            
-        update_fields = []
-        params = []
-        
-        if 'platform_name' in data:
-            update_fields.append("platform_name = %s")
-            params.append(data['platform_name'])
-        if 'logo_path' in data:
-            update_fields.append("logo_path = %s")
-            params.append(data['logo_path'])
-            
-        if not update_fields:
-            return jsonify({'error': 'No valid fields to update (platform_name or logo_path)'}), 400
-            
-        params.append(platform_id) 
-        
-        query = f"""
-            UPDATE platforms
-            SET {', '.join(update_fields)}
-            WHERE id = %s
-            RETURNING *
-        """
-        
-        updated_platform = execute_query(
-            query,
-            tuple(params),
-            fetch=True
-        )
-        
-        if updated_platform:
-            return jsonify(dict(updated_platform[0]))
-            
-        return jsonify({'error': 'Failed to update platform'}), 500
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    return jsonify(dict(updated)), 200
 
 
 @platforms_bp.route('/<int:platform_id>', methods=['DELETE'])
-def delete_platform(platform_id):
+def delete_platform_route(platform_id):
     """Deletes a platform"""
-    try:
-        platform = execute_query(
-            "SELECT * FROM platforms WHERE id = %s",
-            (platform_id,),
-            fetch=True
-        )
+    deleted, err = delete_platform_by_id(platform_id)
+    
+    if err:
+        if err == "Platform not found":
+            return jsonify({"message": err}), 404
+        return jsonify({"error": err}), 500
         
-        if not platform:
-            return jsonify({'error': 'Platform not found'}), 404
-            
-        execute_query(
-            "DELETE FROM platforms WHERE id = %s",
-            (platform_id,)
-        )
-        
-        return jsonify({
-            'message': 'Platform deleted successfully',
-            'platform': dict(platform[0])
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    return jsonify(dict(deleted)), 200
