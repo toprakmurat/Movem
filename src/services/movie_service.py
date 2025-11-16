@@ -1,6 +1,6 @@
 from src.config.database import execute_query
 
-def get_movies():
+def get_movies_db():
     """Get all movies"""
     try:
         movies = execute_query(
@@ -16,7 +16,7 @@ def get_movies():
         return None, str(e)
 
 
-def get_movie_by_id(id: int):
+def get_movie_by_id_db(id: int):
     """Get movie by id"""
     try:
         movies = execute_query(
@@ -35,7 +35,7 @@ def get_movie_by_id(id: int):
         return None, str(e)
 
 
-def create_movie(movie_data: dict):
+def create_movie_db(movie_data: dict):
     """Create a new movie"""
     try:
         new_movie = execute_query(
@@ -63,7 +63,7 @@ def create_movie(movie_data: dict):
         return None, str(e)
 
 
-def update_movie(id: int, movie_data: dict):
+def update_movie_db(id: int, movie_data: dict):
     """Update the movie with given id and return updated one"""
     try:
         existing_movie, err = get_movie_by_id(id)
@@ -101,7 +101,7 @@ def update_movie(id: int, movie_data: dict):
         return None, str(e)
 
 
-def delete_movie_by_id(id: int):
+def delete_movie_db(id: int):
     """Delete a movie by id"""
     try:
         deleted_movie = execute_query(
@@ -139,7 +139,7 @@ def get_genres_by_id(id:int):
     except Exception as e:
         return None, str(e)
     
-def get_movies_by_genre_id(genre_id: int):
+def get_movies_by_genre_db(genre_id: int):
     """Get movies by genre ID"""
     try:
         genre, err = get_genres_by_id(genre_id)
