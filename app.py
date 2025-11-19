@@ -33,8 +33,12 @@ def create_app(config_name=None):
     app.register_blueprint(actors_bp, url_prefix='/actors')
     app.register_blueprint(comments_bp, url_prefix='/comments')
     
+    @app.teardown_appcontext
+    def teardown_db(exception):
+        from src.config.database import close_db_connection
+        close_db_connection()
+    
     return app
-
 
 if __name__ == '__main__':
     app = create_app()
