@@ -1,5 +1,5 @@
 -- Users
-\copy users(id, username, email, birth_date, password_hash, role, created_at, updated_at, game_score) FROM '/docker-entrypoint-initdb.d/db_genres.csv' DELIMITER ',' CSV HEADER
+\copy users(id, username, email, birth_date, password_hash, role, created_at, updated_at, game_score) FROM '/docker-entrypoint-initdb.d/db_users.csv' DELIMITER ',' CSV HEADER
 
 -- Genres
 \copy genres(id, genre_name) FROM '/docker-entrypoint-initdb.d/db_genres.csv' DELIMITER ',' CSV HEADER
