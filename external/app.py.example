@@ -1,0 +1,376 @@
+#Look frontend independent from backend
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from types import SimpleNamespace
+from typing import Any, Iterable, List
+
+from flask import Blueprint, Flask, redirect, render_template, request, url_for
+
+app = Flask(__name__)
+app.secret_key = "dev-key"
+
+
+@dataclass
+class Pagination:
+    items: List[Any]
+    page: int = 1
+    per_page: int = 8
+
+    @property
+    def total(self) -> int:
+        return len(self.items)
+
+    def start_index(self) -> int:
+        if not self.items:
+            return 0
+        return (self.page - 1) * self.per_page + 1
+
+    def end_index(self) -> int:
+        return min(self.page * self.per_page, self.total)
+
+    @property
+    def has_prev(self) -> bool:
+        return self.page > 1
+
+    @property
+    def has_next(self) -> bool:
+        return self.end_index() < self.total
+
+    @property
+    def prev_num(self) -> int:
+        return max(1, self.page - 1)
+
+    @property
+    def next_num(self) -> int:
+        return self.page + 1
+
+
+def seed_movies() -> list[dict[str, Any]]:
+    base_image = url_for("static", filename="img/placeholder_poster.svg")
+    movies = []
+    for idx in range(1, 9):
+        movies.append(
+            {
+                "id": idx,
+                "title": f"Sample Movie {idx}",
+                "release_date": f"20{10 + idx}-05-03",
+                "genre_list": ["Drama", "Sci-Fi" if idx % 2 else "Action"],
+                "poster_url": base_image,
+                "backdrop_url": base_image,
+                "overview": "A captivating adventure through cinematic space.",
+                "tagline": "Adventure awaits",
+                "rating": 8.2,
+                "runtime": 124,
+            }
+        )
+    return movies
+
+
+def seed_people() -> list[dict[str, Any]]:
+    avatar = url_for("static", filename="img/placeholder_avatar.svg")
+    people = []
+    roles = ["Actor", "Director", "Writer"]
+    for idx in range(1, 9):
+        people.append(
+            {
+                "id": idx,
+                "name": f"Person {idx}",
+                "profile_url": avatar,
+                "role": roles[idx % len(roles)],
+                "birth_date": f"19{70 + idx}-04-15",
+                "birth_place": "London, UK",
+                "known_for": ["Sample Film", "Another Film"],
+                "biography": "An award-winning talent celebrated for bold storytelling and captivating performances.",
+            }
+        )
+    return people
+
+
+@app.context_processor
+def inject_globals() -> dict[str, Any]:
+    dummy_user = SimpleNamespace(
+        is_authenticated=True,
+        first_name="Ada",
+        last_name="Lovelace",
+        username="cinephile42",
+        avatar=url_for("static", filename="img/placeholder_avatar.svg"),
+        bio="Film historian and trivia geek.",
+    )
+    return {"current_user": dummy_user, "current_year": 2025}
+
+
+@app.route("/")
+def home() -> str:
+    data = {
+        "trending_movies": seed_movies()[:3],
+        "featured_movies": seed_movies(),
+        "genres": [
+            {"id": 1, "name": "Action"},
+            {"id": 2, "name": "Adventure"},
+            {"id": 3, "name": "Comedy"},
+            {"id": 4, "name": "Drama"},
+        ],
+        "featured_collections": [
+            {"id": 1, "title": "Award Winners", "count": 12},
+            {"id": 2, "title": "Family Night", "count": 8},
+        ],
+    }
+    return render_template("home.html", **data)
+
+
+@app.route("/movies")
+def movies() -> str:
+    page = request.args.get("page", default=1, type=int)
+    pagination = Pagination(seed_movies(), page=page)
+    genres = [{"id": 1, "name": "Action"}, {"id": 2, "name": "Drama"}]
+    return render_template("movies.html", movies=pagination, genres=genres)
+
+
+@app.route("/movies/<int:movie_id>")
+def movie_detail(movie_id: int) -> str:
+    movie = seed_movies()[movie_id - 1]
+    movie.update(
+        {
+            "budget": "$120M",
+            "revenue": "$550M",
+            "status": "Released",
+            "languages": ["English", "Spanish"],
+            "studios": ["MoveM Studios", "Lunar Pictures"],
+            "countries": ["USA", "Canada"],
+            "is_favorite": False,
+            "synopsis": "When an explorer uncovers an ancient signal, the crew must decide between loyalty and destiny.",
+            "metrics": [
+                {"label": "Audience score", "value": "92%", "help_text": "4.5K ratings"},
+                {"label": "Critics score", "value": "88%", "help_text": "Certified Fresh"},
+                {"label": "Box office", "value": "$550M", "help_text": "Worldwide gross"},
+                {"label": "Streaming", "value": "Now", "help_text": "Available globally"},
+            ],
+        }
+    )
+    cast = [
+        {
+            "name": "Actor One",
+            "character": "Hero",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+        },
+        {
+            "name": "Actor Two",
+            "character": "Villain",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+        },
+    ]
+    providers = [
+        {"name": "MoveM+"},
+        {"name": "Netflix"},
+        {"name": "Prime Video"},
+    ]
+    watch_options = [
+        {"type": "Stream", "providers": ["MoveM+"], "price": "Included"},
+        {"type": "Rent HD", "providers": ["Prime Video"], "price": "$5.99"},
+        {"type": "Buy UHD", "providers": ["Apple TV"], "price": "$14.99"},
+    ]
+    reviews = [
+        {"author": "cinefan", "rating": 9.0, "comment": "Loved the pacing."},
+        {"author": "critic101", "rating": 7.5, "comment": "Great visuals."},
+    ]
+    return render_template(
+        "movie_detail.html",
+        movie=movie,
+        cast=cast,
+        reviews=reviews,
+        providers=providers,
+        watch_options=watch_options,
+    )
+
+
+@app.route("/people")
+def people() -> str:
+    roles = ["Actor", "Director", "Writer"]
+    entries = seed_people()
+    pagination = Pagination(entries)
+    return render_template("people.html", people=pagination, roles=roles)
+
+
+@app.route("/people/<int:person_id>")
+def person_detail(person_id: int) -> str:
+    people = seed_people()
+    person = next((p for p in people if p["id"] == person_id), people[0])
+    base_movies = seed_movies()
+    filmography = [
+        {
+            "movie_id": movie["id"],
+            "title": movie["title"],
+            "year": movie["release_date"].split("-")[0],
+            "role": "Lead",
+            "type": "Feature",
+            "poster_url": movie["poster_url"],
+            "summary": "A pivotal role that reshaped the franchise.",
+            "rating": movie["rating"],
+            "runtime": movie["runtime"],
+        }
+        for movie in base_movies[:5]
+    ]
+    awards = [
+        {"title": "Best Actress", "year": 2023, "body": "Global Film Awards"},
+        {"title": "Critics Choice", "year": 2021, "body": "CineGuild"},
+    ]
+    quotes = [
+        {"text": "Stories matter when they reveal truth.", "source": "Press junket"},
+        {"text": "Every scene is a chance to surprise myself.", "source": "MoveM Podcast"},
+    ]
+    return render_template(
+        "person_detail.html",
+        person=person,
+        filmography=filmography,
+        awards=awards,
+        quotes=quotes,
+        related_movies=base_movies[:4],
+    )
+
+
+@app.route("/game", methods=["GET", "POST"])
+def game() -> str:
+    options = [
+        {
+            "id": 1,
+            "title": "Movie Alpha",
+            "subtitle": "2015 · Sci-Fi",
+            "fact": "Won 3 Academy Awards",
+            "image": url_for("static", filename="img/placeholder_poster.svg"),
+        },
+        {
+            "id": 2,
+            "title": "Movie Beta",
+            "subtitle": "2019 · Adventure",
+            "fact": "Highest grossing of 2019",
+            "image": url_for("static", filename="img/placeholder_poster.svg"),
+        },
+    ]
+    result = None
+    if request.method == "POST":
+        selection = request.form.get("selection")
+        result = {
+            "correct": selection == "1",
+            "message": "Correct!" if selection == "1" else "Try again",
+            "detail": "Movie Alpha edged out Beta at the box office.",
+        }
+    return render_template(
+        "game.html",
+        prompt="Which film grossed more worldwide?",
+        options=options,
+        streak=5,
+        result=result,
+    )
+
+
+@app.route("/game/skip", methods=["POST", "GET"])
+def game_skip() -> Any:
+    return redirect(url_for("game"))
+
+
+@app.route("/leaderboard")
+def leaderboard() -> str:
+    leaderboard_data = [
+        {
+            "username": "cinefan",
+            "avatar": url_for("static", filename="img/placeholder_avatar.svg"),
+            "country": "USA",
+            "score": 1520,
+            "best_streak": 12,
+            "games_played": 48,
+        },
+        {
+            "username": "filmnerd",
+            "avatar": url_for("static", filename="img/placeholder_avatar.svg"),
+            "country": "UK",
+            "score": 1430,
+            "best_streak": 10,
+            "games_played": 44,
+        },
+    ]
+    return render_template("leaderboard.html", leaderboard=leaderboard_data)
+
+
+@app.route("/account", methods=["GET", "POST"])
+def account() -> str:
+    favorites = seed_movies()[:2]
+    stats = {
+        "score": 1980,
+        "best_streak": 14,
+        "games_played": 62,
+        "accuracy": 86,
+    }
+    sessions = [
+        {"title": "Finished Sample Movie 2", "timestamp": "Today • 10:24 PM", "status": "Completed"},
+        {"title": "Started Sample Movie 5", "timestamp": "Yesterday • 8:12 PM", "status": "In progress"},
+    ]
+    if request.method == "POST":
+        # Persist profile changes with your data layer
+        pass
+    return render_template("account.html", favorites=favorites, stats=stats, sessions=sessions)
+
+
+@app.route("/account/settings")
+def account_settings() -> Any:
+    return redirect(url_for("account"))
+
+
+@app.route("/search")
+def search_movies() -> Any:
+    return redirect(url_for("movies", q=request.args.get("q")))
+
+
+@app.route("/movies/<int:movie_id>/favorite", methods=["POST"])
+def toggle_favorite(movie_id: int) -> Any:
+    # Persist favorite state here
+    return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+@app.route("/movies/<int:movie_id>/reviews", methods=["POST"])
+def add_review(movie_id: int) -> Any:
+    # Save review to database
+    return redirect(url_for("movie_detail", movie_id=movie_id))
+
+
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+@auth_bp.route("/login", methods=["GET", "POST"])
+def login() -> str:
+    return render_template("auth/login.html", form=None)
+
+
+@auth_bp.route("/register", methods=["GET", "POST"])
+def register() -> str:
+    return render_template("auth/register.html", form=None)
+
+
+@auth_bp.route("/forgot-password")
+def forgot_password() -> Any:
+    return redirect(url_for("auth.login"))
+
+
+app.register_blueprint(auth_bp)
+
+
+@app.route("/logout")
+def logout() -> Any:
+    # Add logout logic here (e.g., session clear)
+    return redirect(url_for("home"))
+
+
+@app.route("/collections/<int:collection_id>")
+def collection_detail(collection_id: int) -> str:
+    collection = {
+        "id": collection_id,
+        "title": f"Collection {collection_id}",
+        "description": "Curated picks from our editors.",
+        "movies": seed_movies()[:4],
+    }
+    return render_template("movies.html", movies=Pagination(collection["movies"]), genres=[])
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
