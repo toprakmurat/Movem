@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}People • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl space-y-8">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Spotlight</p>
+      <h1 class="mt-2 text-3xl font-semibold">People</h1>
+      <p class="text-slate-400">Explore actors, directors, writers, and crew members.</p>
+    </div>
+    <form class="flex flex-wrap gap-3 text-sm">
+      <input type="search" name="q" placeholder="Search names" value="{{ request.args.get('q', '') }}" class="form-field w-60" />
+      <select name="role" class="form-field w-56">
+        <option value="">Any role</option>
+        {% for role in roles %}
+        <option value="{{ role }}" {% if role == request.args.get('role') %}selected{% endif %}>{{ role }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn-secondary">Filter</button>
+    </form>
+  </div>
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for person in people.items %}
+      {% set person = person %}
+      {% include 'partials/person_card.html' with context %}
+    {% else %}
+    <p class="text-slate-400">No people match your filters.</p>
+    {% endfor %}
+  </div>
+  <div class="flex items-center justify-between text-sm text-slate-400">
+    <span>Showing {{ people.start_index() }} – {{ people.end_index() }} of {{ people.total }} people</span>
+    <div class="flex gap-3">
+      {% if people.has_prev %}
+      <a href="{{ url_for('people', page=people.prev_num, **request.args) }}" class="btn-secondary">Previous</a>
+      {% endif %}
+      {% if people.has_next %}
+      <a href="{{ url_for('people', page=people.next_num, **request.args) }}" class="btn-primary">Next</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

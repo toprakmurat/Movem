@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% from 'partials/form_fields.html' import input, password %}
+{% block title %}Register • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl rounded-3xl border border-slate-800 bg-slate-900/60 p-8">
+  <h1 class="text-3xl font-semibold">Create your MoveM ID</h1>
+  <p class="mt-2 text-slate-400">Complete the form below to personalize your movie universe.</p>
+  <form method="post" class="mt-8 grid gap-6 md:grid-cols-2" novalidate>
+    {{ input('first_name', 'First name', 'text', 'Ada', request.form.first_name, form.first_name.errors if form else []) }}
+    {{ input('last_name', 'Last name', 'text', 'Lovelace', request.form.last_name, form.last_name.errors if form else []) }}
+    {{ input('username', 'Username', 'text', 'cinephile42', request.form.username, form.username.errors if form else []) }}
+    {{ input('email', 'Email address', 'email', 'you@example.com', request.form.email, form.email.errors if form else []) }}
+    {{ password('password', 'Password', 'Create a strong password', form.password.errors if form else []) }}
+    {{ password('confirm_password', 'Confirm password', 'Repeat password', form.confirm_password.errors if form else []) }}
+    <div class="md:col-span-2">
+      <label class="flex items-start gap-3 text-sm text-slate-300">
+        <input type="checkbox" required class="mt-1 rounded border-slate-700 bg-slate-900 text-brand-400 focus:ring-brand-400" />
+        I agree to the <a href="#" class="ml-1 text-brand-300">Terms of Service</a> and <a href="#" class="ml-1 text-brand-300">Privacy Policy</a>.
+      </label>
+    </div>
+    <button class="btn-primary md:col-span-2">Create account</button>
+  </form>
+</section>
+{% endblock %}

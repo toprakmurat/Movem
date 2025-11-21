@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Leaderboard • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl space-y-8">
+  <header class="text-center">
+    <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Competitive</p>
+    <h1 class="mt-2 text-3xl font-semibold">Leaderboard</h1>
+    <p class="mt-2 text-slate-400">Top players ranked by accuracy, streaks, and total score.</p>
+  </header>
+  <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60">
+    <table class="min-w-full divide-y divide-slate-800 text-sm">
+      <thead class="bg-slate-900 text-slate-400">
+        <tr>
+          <th class="px-4 py-3 text-left">Rank</th>
+          <th class="px-4 py-3 text-left">Player</th>
+          <th class="px-4 py-3 text-right">Score</th>
+          <th class="px-4 py-3 text-right">Best streak</th>
+          <th class="px-4 py-3 text-right">Games played</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800">
+        {% for user in leaderboard %}
+        <tr class="transition hover:bg-slate-900/80">
+          <td class="px-4 py-4 font-semibold text-brand-200">#{{ loop.index }}</td>
+          <td class="px-4 py-4">
+            <div class="flex items-center gap-3">
+              <img src="{{ user.avatar or url_for('static', filename='img/placeholder_avatar.svg') }}" class="h-10 w-10 rounded-full object-cover" alt="{{ user.username }} avatar" />
+              <div>
+                <p class="font-semibold text-white">{{ user.username }}</p>
+                <p class="text-xs text-slate-400">{{ user.country or 'Global' }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-4 text-right text-lg font-semibold text-brand-300">{{ user.score }}</td>
+          <td class="px-4 py-4 text-right">{{ user.best_streak }}</td>
+          <td class="px-4 py-4 text-right text-slate-400">{{ user.games_played }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="px-4 py-6 text-center text-slate-400">No players yet. Play a game to appear here!</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

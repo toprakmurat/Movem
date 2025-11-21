@@ -1,0 +1,14 @@
+<a href="{{ url_for('person_detail', person_id=person.id) }}">
+  <article class="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60">
+    <div class="relative">
+      <img src="{{ person.profile_url or url_for('static', filename='img/placeholder_avatar.svg') }}" alt="{{ person.name }} portrait" class="h-56 w-full rounded-xl object-cover" />
+      <span class="absolute top-3 right-3 rounded-full bg-black/60 px-3 py-1 text-xs text-slate-100">{{ person.role }}</span>
+    </div>
+    <div>
+      <h3 class="text-lg font-semibold text-white">{{ person.name }}</h3>
+      <p class="text-sm text-slate-400">Born {{ person.birth_date }}</p>
+      <p class="mt-2 text-sm text-slate-300">Known for: {{ person.known_for | join(', ') }}</p>
+    </div>
+  </article>
+  </a>
+  

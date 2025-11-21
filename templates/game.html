@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Game • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-5xl space-y-10">
+  <header class="text-center">
+    <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Play</p>
+    <h1 class="mt-2 text-3xl font-semibold">Who ranks higher?</h1>
+    <p class="mt-2 text-slate-400">Choose the movie or person that fits the prompt. Earn points for streaks!</p>
+  </header>
+  <form method="post" class="space-y-6" data-game-form>
+    <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
+      <p class="text-sm font-semibold text-brand-200">Prompt</p>
+      <h2 class="mt-2 text-2xl text-white">{{ prompt }}</h2>
+      <p class="text-sm text-slate-400">Example: Higher box office, older release, more awards, etc.</p>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+      {% for option in options %}
+      <button type="button" data-choice data-choice-label="{{ option.title or option.name }}" class="flex flex-col gap-4 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-left transition hover:border-brand-400">
+        <div class="flex items-center gap-4">
+          <img src="{{ option.image or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ option.title or option.name }}" class="h-32 w-24 rounded-2xl object-cover" />
+          <div>
+            <p class="text-lg font-semibold text-white">{{ option.title or option.name }}</p>
+            <p class="text-sm text-slate-400">{{ option.subtitle }}</p>
+          </div>
+        </div>
+        <p class="text-sm text-slate-300">{{ option.fact }}</p>
+        <input type="radio" name="selection" value="{{ option.id }}" class="sr-only" />
+      </button>
+      {% endfor %}
+    </div>
+    <p data-feedback class="hidden rounded-2xl bg-slate-900/60 px-4 py-3 text-sm text-brand-200">You picked option A. Submit to lock it in.</p>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-slate-400">Current streak</p>
+        <p class="text-3xl font-display text-brand-300">{{ streak }}</p>
+      </div>
+      <div class="flex gap-3">
+        <button class="btn-secondary" formaction="{{ url_for('game_skip') }}">Skip</button>
+        <button class="btn-primary" type="submit">Submit answer</button>
+      </div>
+    </div>
+    {% if result %}
+    <div class="rounded-3xl border border-{{ 'brand-400' if result.correct else 'red-400' }}/40 bg-slate-900/70 p-6">
+      <p class="text-lg font-semibold text-white">{{ result.message }}</p>
+      <p class="text-sm text-slate-300">{{ result.detail }}</p>
+    </div>
+    {% endif %}
+  </form>
+</section>
+{% endblock %}
