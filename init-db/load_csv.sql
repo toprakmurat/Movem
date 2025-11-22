@@ -10,6 +10,12 @@
 -- Movies 
 \copy movies(id, title, overview, tagline, release_date, poster_file, banner_file, platform_id) FROM '/docker-entrypoint-initdb.d/db_movies.csv' DELIMITER ',' CSV HEADER
 
+-- people
+\copy people(id, name, biography, birth_date, photo_url, created_at) FROM '/docker-entrypoint-initdb.d/db_people.csv' DELIMITER ',' CSV HEADER
+
+-- movie_cast
+\copy movie_cast(id, movie_id, person_id, role, character_name) FROM '/docker-entrypoint-initdb.d/db_movie_cast.csv' DELIMITER ',' CSV HEADER
+
 -- Movies_Genres
 \copy movies_genres(movie_id, genre_id) FROM '/docker-entrypoint-initdb.d/db_movies_genres.csv' DELIMITER ',' CSV HEADER
 

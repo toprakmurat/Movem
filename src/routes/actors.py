@@ -44,6 +44,50 @@ def get_actor(actor_id):
         return jsonify({'error': str(e)}), 500
 
 
+@actors_bp.route('/<int:actor_id>/movies', methods=['GET'])
+def get_actor_movies(actor_id):
+    """Get all movies for an actor"""
+    try:
+        # First check if actor exists
+        actor = execute_query(
+            "SELECT id, name FROM people WHERE id = %s",
+            (actor_id,),
+            fetch=True
+        )
+        
+        if not actor:
+            return jsonify({'error': 'Actor not found'}), 404
+        
+        # Get movies with role and character information
+        movies = execute_query(
+            """
+            SELECT 
+                m.id,
+                m.title,
+                m.overview,
+                m.tagline,
+                m.release_date,
+                m.poster_url,
+                mc.role,
+                mc.character_name
+            FROM movies m
+            INNER JOIN movie_cast mc ON m.id = mc.movie_id
+            WHERE mc.person_id = %s
+            ORDER BY m.release_date DESC
+            """,
+            (actor_id,),
+            fetch=True
+        )
+        
+        return jsonify({
+            'actor': dict(actor[0]),
+            'movies': [dict(movie) for movie in movies],
+            'total_movies': len(movies)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @actors_bp.route('/', methods=['POST'])
 def create_actor():
     """Create a new actor"""
