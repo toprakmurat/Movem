@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS question_types (
 -- platforms table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS platforms (
-    id PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     platform_name VARCHAR(100),
     logo_path VARCHAR(256)
 );
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS movies(
 -- people table (actors, directors)
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS people (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     biography TEXT,
     birth_date DATE,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS movie_cast (
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
     person_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
     role VARCHAR(100),
-    character_name VARCHAR(255)
+    character_name VARCHAR(1024)
 );
 
 ------------------------------------------------------------
