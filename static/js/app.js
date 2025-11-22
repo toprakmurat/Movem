@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRailControls();
 });
 
+/* -------------------- CAROUSEL -------------------- */
 function initCarousel() {
   const carousel = document.querySelector('[data-carousel]');
   if (!carousel) return;
@@ -39,9 +40,15 @@ function initCarousel() {
     autoPlay = setInterval(() => showSlide(index + 1), 6000);
   });
 
+  const prevBtn = carousel.querySelector('[data-carousel-prev]');
+  const nextBtn = carousel.querySelector('[data-carousel-next]');
+  if (prevBtn) prevBtn.addEventListener('click', () => showSlide(index - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => showSlide(index + 1));
+
   showSlide(0);
 }
 
+/* -------------------- MOBILE NAV -------------------- */
 function initMobileNav() {
   const toggle = document.querySelector('[data-mobile-toggle]');
   const menu = document.querySelector('[data-mobile-menu]');
@@ -52,6 +59,7 @@ function initMobileNav() {
   });
 }
 
+/* -------------------- GAME SELECTION -------------------- */
 function initGameSelections() {
   const compareForm = document.querySelector('[data-game-form]');
   if (!compareForm) return;
@@ -69,6 +77,7 @@ function initGameSelections() {
   });
 }
 
+/* -------------------- RAIL CONTROLS -------------------- */
 function initRailControls() {
   document.querySelectorAll('[data-rail-nav]').forEach((button) => {
     const direction = button.dataset.direction === 'next' ? 1 : -1;
@@ -78,9 +87,16 @@ function initRailControls() {
       const rail = document.querySelector(`[data-rail="${target}"]`);
       if (!rail) return;
 
-      const card = rail.querySelector('.rail-card');
-      const offset = card ? card.getBoundingClientRect().width + 16 : rail.clientWidth * 0.8;
-      rail.scrollBy({ left: direction * offset, behavior: 'smooth' });
+      // Look for article elements (movie cards) or fall back to rail-card
+      const card = rail.querySelector('article') || rail.querySelector('.rail-card');
+      if (!card) return;
+
+      // Calculate one card width + gap (1.5rem = 24px)
+      const cardWidth = card.getBoundingClientRect().width;
+      const gap = 24; // 1.5rem gap
+      const scrollAmount = cardWidth + gap;
+
+      rail.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
     });
   });
 }

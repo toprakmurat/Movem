@@ -4,14 +4,12 @@
   font-weight: 400;
   src: local('Bebas Neue'), url('https://fonts.gstatic.com/s/bebasneue/v10/JTUSjIg69CK48gW7PXoo9Wlhyw.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
   src: local('Inter'), url('https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK4us6FZk-j-0Dg.woff2') format('woff2');
 }
-
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -26,17 +24,14 @@
   box-shadow: 0 15px 30px rgb(229 9 20 / 0.25);
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
-
 .btn-primary:hover {
   background-color: #f40612;
   transform: translateY(-1px);
 }
-
 .btn-primary:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
-
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -51,18 +46,15 @@
   background: rgba(0, 0, 0, 0.4);
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
-
 .btn-secondary:hover {
   border-color: #fff;
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-1px);
 }
-
 .btn-secondary:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
-
 .btn-icon {
   width: 2.75rem;
   height: 2.75rem;
@@ -75,18 +67,15 @@
   color: #fff;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
-
 .btn-icon:hover {
   border-color: #fff;
   transform: translateY(-1px);
 }
-
 .nav-link {
   position: relative;
   color: rgba(255, 255, 255, 0.75);
   transition: color 0.2s ease;
 }
-
 .nav-link::after {
   content: '';
   position: absolute;
@@ -99,16 +88,13 @@
   transform: scaleX(0.5);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
-
 .nav-link:hover {
   color: #fff;
 }
-
 .nav-link:hover::after {
   opacity: 1;
   transform: scaleX(1);
 }
-
 .form-field {
   width: 100%;
   border-radius: 0.5rem;
@@ -119,32 +105,55 @@
   color: #fff;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
-
 .form-field::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
-
 .form-field:focus {
   border-color: #7dd3fc;
   background: rgba(0, 0, 0, 0.85);
   outline: none;
 }
-
 .rail-scroll {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(180px, 1fr);
-  gap: 1rem;
+  display: flex;
+  gap: 1.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem; 
+  margin-right: -1.5rem;
+  margin-top: -0.5rem; 
 }
-
 .rail-scroll::-webkit-scrollbar {
+  height: 8px;
   display: none;
 }
-
+.rail-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+.rail-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.rail-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.rail-scroll > article {
+  flex: 0 0 calc((100% - 4.5rem) / 4);
+  scroll-snap-align: start;
+  max-width: 300px;
+}
+@media (max-width: 1280px) {
+  .rail-scroll > article {
+    flex: 0 0 calc((100% - 3rem) / 3);
+  }
+}
+@media (max-width: 768px) {
+  .rail-scroll > article {
+    flex: 0 0 calc((100% - 1.5rem) / 2);
+  }
+}
 .rail-card {
   position: relative;
   overflow: hidden;
@@ -152,27 +161,23 @@
   scroll-snap-align: start;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .rail-card:hover {
   transform: scale(1.05);
   z-index: 5;
   box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6);
 }
-
 .rail-card img {
   width: 100%;
   height: 260px;
   object-fit: cover;
   display: block;
 }
-
 .rail-card::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.85) 100%);
 }
-
 .rail-card-content {
   position: absolute;
   bottom: 0.75rem;
@@ -182,4 +187,38 @@
   z-index: 1;
   font-size: 0.85rem;
   font-weight: 600;
+}
+[data-slide-nav] {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s, transform 0.3s;
+}
+[data-slide-nav][aria-current="true"] {
+  background-color: #f59e0b;
+  transform: scale(1.2);
+}
+
+.rail-scroll[data-rail="reviewers"] > article {
+  flex: 0 0 calc((100% - 7.5rem) / 6);
+  max-width: 200px;
+}
+
+@media (max-width: 1280px) {
+  .rail-scroll[data-rail="reviewers"] > article {
+    flex: 0 0 calc((100% - 6rem) / 5);
+  }
+}
+
+@media (max-width: 1024px) {
+  .rail-scroll[data-rail="reviewers"] > article {
+    flex: 0 0 calc((100% - 4.5rem) / 4);
+  }
+}
+
+@media (max-width: 768px) {
+  .rail-scroll[data-rail="reviewers"] > article {
+    flex: 0 0 calc((100% - 3rem) / 3);
+  }
 }

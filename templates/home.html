@@ -1,162 +1,106 @@
-{% extends 'base.html' %}
-{% block title %}Home • MoveM{% endblock %}
+{% extends 'base.html' %}  
+{% block title %}Home • MoveM{% endblock %}  
 {% block content %}
-{% set hero = trending_movies[0] if trending_movies else None %}
-<section class="mx-auto max-w-6xl space-y-10">
-  <div class="relative h-[70vh] overflow-hidden rounded-[40px] border border-white/10 bg-black/60">
-    {% if hero %}
-    <img src="{{ hero.backdrop_url or hero.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ hero.title }} backdrop" class="absolute inset-0 h-full w-full object-cover opacity-70" />
-    {% endif %}
-    <div class="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
-    <div class="relative z-10 flex h-full flex-col justify-center gap-5 p-8 sm:p-12 lg:p-16">
-      <p class="text-sm font-semibold uppercase tracking-[0.4em] text-brand-400">Now streaming</p>
-      <h1 class="max-w-3xl text-5xl font-display uppercase tracking-[0.08em] text-white sm:text-6xl lg:text-7xl">
-        {{ hero.title if hero else "Cinematic Worlds Await" }}
-      </h1>
-      <p class="max-w-2xl text-lg text-zinc-200 sm:text-xl">
-        {{ hero.overview if hero else "Queue up gripping dramas, sci-fi epics, and new originals tailored for you." }}
-      </p>
-      <div class="flex flex-wrap gap-4">
-        <a href="{{ url_for('movie_detail', movie_id=hero.id) if hero else url_for('movies') }}" class="btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          Play
-        </a>
-        <a href="{{ url_for('movies') }}" class="btn-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9v6m3.75-6v6M5 5l1.5 14h11L19 5H5z" />
-          </svg>
-          More info
-        </a>
-      </div>
-      {% if hero %}
-      <div class="flex flex-wrap gap-4 text-sm text-zinc-300">
-        <span class="rounded border border-white/20 px-3 py-1 text-xs uppercase tracking-widest">Exclusive</span>
-        <span>{{ hero.release_date }}</span>
-        <span>{{ hero.genre_list | join(' • ') }}</span>
-      </div>
-      {% endif %}
-    </div>
-  </div>
+<section class="mb-12 space-y-10 mx-auto max-w-6xl">
 
-  <div class="rounded-3xl border border-white/10 bg-black/50 p-6 sm:p-8">
-    <form action="{{ url_for('search_movies') }}" method="get" class="flex flex-col gap-4 lg:flex-row lg:items-end">
-      <div class="flex-1">
-        <label for="query" class="text-xs uppercase tracking-widest text-zinc-400">Search the catalog</label>
-        <input type="search" id="query" name="q" placeholder="Find titles, people, or keywords" class="form-field mt-2" />
+  {# -------------------- HERO SECTION SLIDER -------------------- #}
+  <div data-carousel class="relative h-[70vh] overflow-hidden rounded-[40px] border border-white/10 bg-black/60">
+
+    {% for movie in trending_movies %}
+    <div data-slide class="absolute inset-0 transition-all duration-700 {% if loop.first %}opacity-100 translate-x-0 pointer-events-auto{% else %}opacity-0 -translate-x-4 pointer-events-none{% endif %}">
+      <img src="{{ movie.backdrop_url or movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" 
+           alt="{{ movie.title }} backdrop" 
+           class="absolute inset-0 h-full w-full object-cover opacity-70" />
+      <div class="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
+
+      <div class="relative z-10 flex h-full flex-col justify-center gap-5 p-8 sm:p-12 lg:p-16 text-white">
+        <p class="text-sm font-semibold uppercase tracking-[0.4em] text-brand-400">Now streaming</p>
+        <h1 class="max-w-3xl text-5xl font-display uppercase tracking-[0.08em]">
+          {{ movie.title }}
+        </h1>
+        <p class="max-w-2xl text-lg text-zinc-200 sm:text-xl">{{ movie.overview }}</p>
+
+        <div class="flex flex-wrap gap-4 mt-4">
+          <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="btn-primary">View Details</a>
+          <a href="{{ url_for('movies') }}" class="btn-secondary flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9v6m3.75-6v6M5 5l1.5 14h11L19 5H5z" />
+            </svg>
+            Browse Catalog
+          </a>
+        </div>
+
+        <div class="flex flex-wrap gap-4 text-sm text-zinc-300 mt-2">
+          <span class="rounded border border-white/20 px-3 py-1 text-xs uppercase tracking-widest">Exclusive</span>
+          <span>{{ movie.release_date }}</span>
+          <span>{{ movie.genre_list | join(' • ') }}</span>
+        </div>
       </div>
-      <div class="flex-1">
-        <label for="genre_home" class="text-xs uppercase tracking-widest text-zinc-400">Filter by genre</label>
-        <select id="genre_home" name="genre" class="form-field mt-2">
-          <option value="">All genres</option>
-          {% for genre in genres %}
-          <option value="{{ genre.id }}">{{ genre.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <button class="btn-primary w-full lg:w-auto">Explore</button>
-    </form>
-    <div class="mt-6 flex flex-wrap gap-2">
-      {% for genre in genres %}
-      <a href="{{ url_for('movies', genre=genre.id) }}" class="rounded-full border border-white/10 px-4 py-1 text-xs tracking-widest text-white/80 hover:border-white/60">
-        {{ genre.name }}
-      </a>
+    </div>
+    {% endfor %}
+
+    <button data-carousel-prev
+          class="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white text-3xl font-bold opacity-70 hover:opacity-100">
+    &#8592;
+    </button>
+    <button data-carousel-next
+            class="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white text-3xl font-bold opacity-70 hover:opacity-100">
+      &#8594;
+    </button>
+
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      {% for movie in trending_movies %}
+      <button data-slide-nav="{{ loop.index0 }}" class="w-3 h-3 rounded-full bg-white/50" aria-current="{% if loop.first %}true{% else %}false{% endif %}"></button>
       {% endfor %}
     </div>
+
   </div>
 
-  <div class="space-y-12">
-    <section>
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Trending Now</h2>
-        <div class="flex gap-3">
-          <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="trending">
-            <span aria-hidden="true">&larr;</span>
-            <span class="sr-only">Previous trending titles</span>
-          </button>
-          <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="trending">
-            <span aria-hidden="true">&rarr;</span>
-            <span class="sr-only">Next trending titles</span>
-          </button>
-        </div>
-      </div>
-      <div class="rail-scroll" data-rail="trending">
-        {% for movie in trending_movies %}
-        <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="rail-card">
-          <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ movie.title }} poster" />
-          <div class="rail-card-content">
-            <p>{{ loop.index }} • {{ movie.title }}</p>
-          </div>
-        </a>
-        {% else %}
-        <p class="text-sm text-zinc-400">Trending data will appear soon.</p>
-        {% endfor %}
-      </div>
-    </section>
+</section>
 
-    <section>
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Continue Watching</h2>
-        <div class="flex gap-3">
-          <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="continue">
-            <span aria-hidden="true">&larr;</span>
-            <span class="sr-only">Previous continue watching</span>
-          </button>
-          <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="continue">
-            <span aria-hidden="true">&rarr;</span>
-            <span class="sr-only">Next continue watching</span>
-          </button>
-        </div>
+  {# -------------------- POPULAR ON MOVEM (HORIZONTAL RAIL) -------------------- #}
+  <section class="mb-12 mx-auto max-w-6xl">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Popular on MoveM</h2>
+      <div class="flex gap-3">
+        <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="popular">&larr;</button>
+        <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="popular">&rarr;</button>
       </div>
-      <div class="rail-scroll" data-rail="continue">
-        {% for movie in featured_movies[:6] %}
-        <article class="rail-card">
-          <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ movie.title }} poster" />
-          <div class="rail-card-content">
-            <p>{{ movie.title }}</p>
-            <div class="mt-1 h-1 w-full rounded-full bg-white/20">
-              <div class="h-full rounded-full bg-brand-500" style="width: {{ 30 + loop.index * 10 }}%"></div>
-            </div>
-            <span class="text-xs text-zinc-200">Resume • {{ movie.runtime }} min</span>
-          </div>
-        </article>
-        {% else %}
-        <p class="text-sm text-zinc-400">Watch history will appear once you start playing.</p>
-        {% endfor %}
-      </div>
-    </section>
+    </div>
 
-    <section>
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Popular on MoveM</h2>
-        <div class="flex gap-3">
-          <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="popular">
-            <span aria-hidden="true">&larr;</span>
-            <span class="sr-only">Previous popular titles</span>
-          </button>
-          <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="popular">
-            <span aria-hidden="true">&rarr;</span>
-            <span class="sr-only">Next popular titles</span>
-          </button>
-        </div>
-      </div>
-      <div class="rail-scroll" data-rail="popular">
-        {% for movie in featured_movies %}
-        <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="rail-card">
-          <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ movie.title }} poster" />
-          <div class="rail-card-content">
-            <p>{{ movie.title }}</p>
-          </div>
-        </a>
-        {% else %}
+    <div class="rail-scroll" data-rail="popular">
+      {% for movie in featured_movies %}
+        {% include 'partials/movie_card.html' with context %}
+      {% else %}
         <p class="text-sm text-zinc-400">Popular titles will be displayed soon.</p>
-        {% endfor %}
-      </div>
-    </section>
-  </div>
+      {% endfor %}
+    </div>
+  </section>
 
-  <section class="space-y-6">
+  {# -------------------- PEOPLE SPOTLIGHT -------------------- #}
+  <section class="mx-auto max-w-6xl space-y-6 mb-12">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">People Spotlight</h2>
+      <a href="{{ url_for('people') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">See all</a>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {% for person in featured_people %}
+      <a href="{{ url_for('person_detail', person_id=person.id) }}" class="group rounded-2xl border border-white/10 bg-black/60 p-4 transition hover:border-white/40">
+        <img src="{{ person.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
+            alt="{{ person.name }}" 
+            class="w-full h-56 object-cover rounded-xl mb-2" />
+        <p class="text-white font-semibold">{{ person.name }}</p>
+        <p class="text-sm text-zinc-400">{{ person.known_for }}</p>
+      </a>
+      {% else %}
+      <p class="text-sm text-zinc-400">No people to display yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# -------------------- COLLECTIONS SPOTLIGHT -------------------- #}
+  <section class="space-y-6 mb-12 mx-auto max-w-6xl">
     <div class="flex items-center justify-between">
       <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Collections spotlight</h2>
       <a href="{{ url_for('movies') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">Browse all</a>
@@ -166,7 +110,7 @@
       <a href="{{ url_for('collection_detail', collection_id=collection.id) }}" class="group rounded-3xl border border-white/10 bg-gradient-to-br from-black via-black/70 to-brand-800/40 p-6 transition hover:border-white/40">
         <p class="text-xs uppercase tracking-[0.4em] text-white/60">Collection</p>
         <h3 class="mt-2 text-2xl font-display tracking-widest text-white">{{ collection.title }}</h3>
-        <p a class="mt-4 text-sm text-white/70">{{ collection.count }} curated titles</p>
+        <p class="mt-4 text-sm text-white/70">{{ collection.count }} curated titles</p>
         <span class="mt-6 inline-flex items-center text-sm text-brand-400">Open <span aria-hidden="true" class="ml-1">&rarr;</span></span>
       </a>
       {% else %}
@@ -175,18 +119,57 @@
     </div>
   </section>
 
-  <section class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Featured Premieres</h2>
-      <a href="{{ url_for('movies') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">See more</a>
+  {# -------------------- GENRE SPOTLIGHT (HORIZONTAL RAILS) -------------------- #}
+  {% set genre_list = ['Action', 'Fantasy', 'Comedy', 'Drama', 'Sci-Fi'] %}
+  {% for genre_name in genre_list %}
+  <section class="mb-12 mx-auto max-w-6xl">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">{{ genre_name }} Movies</h2>
+      <div class="flex gap-3">
+        <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="genre-{{ loop.index }}">&larr;</button>
+        <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="genre-{{ loop.index }}">&rarr;</button>
+      </div>
     </div>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {% for movie in featured_movies %}
+
+    <div class="rail-scroll" data-rail="genre-{{ loop.index }}">
+      {% for movie in featured_movies if genre_name in movie.genre_list %}
         {% include 'partials/movie_card.html' with context %}
       {% else %}
-      <p class="text-sm text-zinc-400">No featured premieres yet.</p>
+        <p class="text-sm text-zinc-400">No {{ genre_name }} movies available.</p>
       {% endfor %}
     </div>
   </section>
+  {% endfor %}
+
+  {# -------------------- TOP REVIEWERS / COMMUNITY RAIL -------------------- #}
+  <section class="mb-12 mx-auto max-w-6xl">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Top Reviewers</h2>
+      <div class="flex gap-3">
+        <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="reviewers">&larr;</button>
+        <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="reviewers">&rarr;</button>
+      </div>
+    </div>
+
+    <div class="rail-scroll" data-rail="reviewers">
+      {% for reviewer in top_reviewers[:10] %}
+      <article class="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
+        <a href="{{ url_for('person_detail', person_id=reviewer.id) }}" class="absolute inset-0 z-10" aria-label="View {{ reviewer.name }}"></a>
+        <div class="aspect-[2/3] w-full overflow-hidden rounded-t-2xl">
+          <img src="{{ reviewer.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
+               alt="{{ reviewer.name }}" 
+               class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        </div>
+        <div class="flex flex-1 flex-col gap-2 p-4">
+          <h3 class="text-lg font-semibold text-white">{{ reviewer.name }}</h3>
+          <p class="text-sm text-slate-400">{{ reviewer.known_for }}</p>
+        </div>
+      </article>
+      {% else %}
+      <p class="text-sm text-zinc-400">No reviewers available.</p>
+      {% endfor %}
+    </div>
+</section>
+
 </section>
 {% endblock %}

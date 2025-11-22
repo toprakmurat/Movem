@@ -59,7 +59,7 @@ def seed_movies() -> list[dict[str, Any]]:
                 "genre_list": ["Drama", "Sci-Fi" if idx % 2 else "Action"],
                 "poster_url": base_image,
                 "backdrop_url": base_image,
-                "overview": "A captivating adventure through cinematic space.",
+                "overview": "In the 22nd century, a paraplegic Marine is dispatched to the moon Pandora on a unique mission, but becomes torn between following orders and protecting an alien civilization.",
                 "tagline": "Adventure awaits",
                 "rating": 8.2,
                 "runtime": 124,
@@ -67,6 +67,20 @@ def seed_movies() -> list[dict[str, Any]]:
         )
     return movies
 
+def seed_reviewers() -> list[dict[str, Any]]:
+    avatar = url_for("static", filename="img/placeholder_avatar.svg")
+    reviewers = []
+    for idx in range(1, 13):
+        reviewers.append(
+            {
+                "id": idx,
+                "name": f"Reviewer {idx}",
+                "profile_url": avatar,
+                "known_for": f"{5 + idx} reviews • Top critic",
+                "bio": "Passionate about film, sharing insightful reviews and recommendations.",
+            }
+        )
+    return reviewers
 
 def seed_people() -> list[dict[str, Any]]:
     avatar = url_for("static", filename="img/placeholder_avatar.svg")
@@ -116,6 +130,8 @@ def home() -> str:
             {"id": 1, "title": "Award Winners", "count": 12},
             {"id": 2, "title": "Family Night", "count": 8},
         ],
+        "featured_people": seed_people()[:4],
+        "top_reviewers": seed_reviewers()[:13],
     }
     return render_template("home.html", **data)
 
@@ -130,11 +146,12 @@ def movies() -> str:
 
 @app.route("/movies/<int:movie_id>")
 def movie_detail(movie_id: int) -> str:
+    # Get the movie from dummy seed
     movie = seed_movies()[movie_id - 1]
+    
+    # Attach movie-level details
     movie.update(
         {
-            "budget": "$120M",
-            "revenue": "$550M",
             "status": "Released",
             "languages": ["English", "Spanish"],
             "studios": ["MoveM Studios", "Lunar Pictures"],
@@ -149,6 +166,17 @@ def movie_detail(movie_id: int) -> str:
             ],
         }
     )
+    
+    # Create a separate statistic object
+    statistic = {
+        "budget": "$120M",
+        "revenue": "$550M",
+        "runtime": 124,
+        "vote_avg": 8.2,
+        "vote_count": 4521,
+    }
+
+    # Cast
     cast = [
         {
             "name": "Actor One",
@@ -161,27 +189,35 @@ def movie_detail(movie_id: int) -> str:
             "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
         },
     ]
+    
+    # Streaming providers
     providers = [
         {"name": "MoveM+"},
-        {"name": "Netflix"},
-        {"name": "Prime Video"},
     ]
+    
+    # Watch options
     watch_options = [
         {"type": "Stream", "providers": ["MoveM+"], "price": "Included"},
         {"type": "Rent HD", "providers": ["Prime Video"], "price": "$5.99"},
         {"type": "Buy UHD", "providers": ["Apple TV"], "price": "$14.99"},
     ]
+    
+    # Reviews
     reviews = [
         {"author": "cinefan", "rating": 9.0, "comment": "Loved the pacing."},
         {"author": "critic101", "rating": 7.5, "comment": "Great visuals."},
     ]
+
+    favorite_count = 123 
     return render_template(
         "movie_detail.html",
         movie=movie,
+        statistic=statistic,  
         cast=cast,
         reviews=reviews,
         providers=providers,
         watch_options=watch_options,
+        favorite_count=favorite_count
     )
 
 
