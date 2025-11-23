@@ -400,6 +400,111 @@ def leaderboard() -> str:
     return render_template("leaderboard.html", leaderboard=leaderboard_data)
 
 
+@app.route("/nexus")
+def nexus() -> str:
+    # Get movie_id from query params or use default
+    movie_id = request.args.get('movie_id', default=1, type=int)
+    all_movies = seed_movies()
+    
+    # Handle random selection
+    if request.args.get('random'):
+        movie_id = random.choice(all_movies)['id']
+    
+    # Get the selected movie
+    try:
+        movie = all_movies[movie_id - 1]
+    except IndexError:
+        movie = all_movies[0]
+    
+    movie.update({
+        "year": movie["release_date"][:4] if movie.get("release_date") else "Unknown",
+    })
+    
+    # Director node with collaboration count
+    director = {
+        "id": 101,
+        "name": "Christopher Nolan",
+        "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+        "collaborations": 3,  # Number of movies with this cast
+    }
+    
+    # Actor nodes with collaboration counts
+    actors = [
+        {
+            "id": 1,
+            "name": "Leonardo DiCaprio",
+            "character": "Cobb",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+            "collaborations": 4,  # Films with this director
+        },
+        {
+            "id": 2,
+            "name": "Marion Cotillard",
+            "character": "Mal",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+            "collaborations": 2,
+        },
+        {
+            "id": 3,
+            "name": "Tom Hardy",
+            "character": "Eames",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+            "collaborations": 3,
+        },
+        {
+            "id": 4,
+            "name": "Ellen Page",
+            "character": "Ariadne",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+            "collaborations": 1,
+        },
+        {
+            "id": 5,
+            "name": "Joseph Gordon-Levitt",
+            "character": "Arthur",
+            "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
+            "collaborations": 2,
+        },
+    ]
+    
+    # Related movies showing other collaborations
+    related_movies = [
+        {
+            "id": 2,
+            "title": "The Dark Knight",
+            "poster_url": url_for("static", filename="img/placeholder_poster.svg"),
+            "shared_people": 2,  # Director + 1 actor
+        },
+        {
+            "id": 3,
+            "title": "Interstellar",
+            "poster_url": url_for("static", filename="img/placeholder_poster.svg"),
+            "shared_people": 1,
+        },
+        {
+            "id": 4,
+            "title": "Dunkirk",
+            "poster_url": url_for("static", filename="img/placeholder_poster.svg"),
+            "shared_people": 2,
+        },
+        {
+            "id": 5,
+            "title": "The Prestige",
+            "poster_url": url_for("static", filename="img/placeholder_poster.svg"),
+            "shared_people": 1,
+        },
+    ]
+    
+    return render_template(
+        "nexus.html", 
+        movie=movie, 
+        director=director, 
+        actors=actors,
+        related_movies=related_movies,
+        available_movies=all_movies
+    )
+
+
 @app.route("/account", methods=["GET", "POST"])
 def account() -> str:
     favorites = seed_movies()[:2]
