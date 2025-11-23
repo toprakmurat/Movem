@@ -106,16 +106,19 @@ def seed_people() -> list[dict[str, Any]]:
 
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
-    dummy_user = SimpleNamespace(
-        is_authenticated=True,
-        first_name="Ada",
-        last_name="Lovelace",
-        username="cinephile42",
-        avatar=url_for("static", filename="img/placeholder_avatar.svg"),
-        bio="Film historian and trivia geek.",
-    )
-    return {"current_user": dummy_user, "current_year": 2025}
+    if 'user_id' in session:
+        current_user = SimpleNamespace(
+            is_authenticated=True,
+            first_name=session.get('name', 'Guest'),
+            username=session.get('username', 'guest'),
+            avatar=url_for("static", filename="img/placeholder_avatar.svg")
+        )
+    else:
+        current_user = SimpleNamespace(
+            is_authenticated=False
+        )
 
+    return {"current_user": current_user, "current_year": 2025}
 
 @app.route("/")
 def home() -> str:
@@ -309,7 +312,7 @@ def game() -> str:
 def game_start() -> Any:
     """Step 2: Initializes the game state (streak, modes) and redirects to play."""
 
-    session['game_modes'] = request.form.getlist('game_types') or ['1', '4'] 
+    session['game_modes'] = request.form.getlist('game_types') or ['1', '4']
     session['streak'] = 0
     return redirect(url_for("game_play"))
 
@@ -354,7 +357,7 @@ def game_play() -> str:
             message = "Correct!"
             detail = f"{movie_a['title']} was the right answer."
         else:
-            streak = 0  
+            streak = 0
             session['streak'] = 0
             message = "Wrong!"
             detail = f"The correct answer was {movie_a['title']}."
@@ -367,7 +370,7 @@ def game_play() -> str:
 
     return render_template(
         "game.html",
-        prompt="Which movie had a higher budget?",  
+        prompt="Which movie had a higher budget?",
         options=options,
         streak=streak,
         result=result,
@@ -442,9 +445,24 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-def login() -> str:
-    return render_template("auth/login.html", form=None)
+def login() -> Any:
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
 
+        if email == "you@example.com" and password == "password":
+            session['name'] = "Ada Lovelace"
+            session['user_id'] = 1
+            session['username'] = "cinephile42"
+            return redirect(url_for("home"))
+        else:
+            dummy_form = SimpleNamespace(
+                email=SimpleNamespace(errors=["Incorrect e-mail or password."]),
+                password=SimpleNamespace(errors=[])
+            )
+
+            return render_template("auth/login.html", form=dummy_form)
+    return render_template("auth/login.html", form=None)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register() -> str:
@@ -461,7 +479,7 @@ app.register_blueprint(auth_bp)
 
 @app.route("/logout")
 def logout() -> Any:
-    # Add logout logic here (e.g., session clear)
+    session.clear()
     return redirect(url_for("home"))
 
 
