@@ -119,6 +119,53 @@
     </div>
   </section>
 
+    {# -------------------- CURATED DISCOVERY SLIDER (REPLACES COLLECTIONS) -------------------- #}
+  <section class="mx-auto max-w-6xl space-y-6 mb-12">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">CineMetrics</h2>
+        <span class="text-xs uppercase tracking-[0.4em] text-white/50">Recommendation Lists</span>
+      </div>
+      <!-- Slider Controls -->
+      <div class="flex gap-3">
+        <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="curated">&larr;</button>
+        <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="curated">&rarr;</button>
+      </div>
+    </div>
+
+    <!-- The Slider (Rail) -->
+    <div class="rail-scroll" data-rail="curated">
+      {% for option in discovery_options %}
+      <a href="{{ url_for('movies', filter=option.link_param) }}" class="w-80 shrink-0 group relative flex h-80 flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-slate-900 transition-all duration-500 hover:scale-[1.02] hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-900/20">
+
+        <!-- Background Image (The "First Movie") -->
+        <img src="{{ option.image }}"
+            alt="{{ option.title }}"
+            class="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-40" />
+
+        <!-- Gradient Overlay (To make text readable) -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+
+        <!-- Text Content -->
+        <div class="relative z-10 p-6">
+          <div class="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/20 text-brand-300 backdrop-blur-md opacity-0 transition-all duration-300 group-hover:opacity-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          </div>
+
+          <p class="text-xs font-bold uppercase tracking-widest text-brand-400">{{ option.subtitle }}</p>
+          <h3 class="mt-1 text-2xl font-display font-bold uppercase tracking-widest text-white">{{ option.title }}</h3>
+
+          <!-- Fake "Button" Text -->
+          <div class="mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/60 transition-colors group-hover:text-white">
+            <span>Explore List</span>
+            <span class="transition-transform group-hover:translate-x-1">&rarr;</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
   {# -------------------- GENRE SPOTLIGHT (HORIZONTAL RAILS) -------------------- #}
   {% set genre_list = ['Action', 'Fantasy', 'Comedy', 'Drama', 'Sci-Fi'] %}
   {% for genre_name in genre_list %}

@@ -1,48 +1,63 @@
 {% extends 'base.html' %}
-{% block title %}Game • MoveM{% endblock %}
+{% block title %}Play • MoveM{% endblock %}
 {% block content %}
-<section class="mx-auto max-w-5xl space-y-10">
-  <header class="text-center">
-    <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Play</p>
-    <h1 class="mt-2 text-3xl font-semibold">Who ranks higher?</h1>
-    <p class="mt-2 text-slate-400">Choose the movie or person that fits the prompt. Earn points for streaks!</p>
-  </header>
-  <form method="post" class="space-y-6" data-game-form>
-    <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
-      <p class="text-sm font-semibold text-brand-200">Prompt</p>
-      <h2 class="mt-2 text-2xl text-white">{{ prompt }}</h2>
-      <p class="text-sm text-slate-400">Example: Higher box office, older release, more awards, etc.</p>
+<section class="mx-auto max-w-5xl space-y-8">
+  <div class="flex flex-col items-center justify-between gap-4 border-b border-slate-800 pb-6 md:flex-row">
+    <div class="text-center md:text-left">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Current Streak</p>
+      <p class="text-4xl font-display text-brand-500 animate-pulse">{{ streak }}</p>
     </div>
+
+    <div class="text-center">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brand-300">Prompt</p>
+      <h1 class="mt-1 text-2xl font-bold text-white md:text-3xl">{{ prompt }}</h1>
+    </div>
+
+    <div class="hidden w-24 md:block"></div>
+  </div>
+
+  <form method="post" class="w-full" data-game-form>
     <div class="grid gap-6 md:grid-cols-2">
       {% for option in options %}
-      <button type="button" data-choice data-choice-label="{{ option.title or option.name }}" class="flex flex-col gap-4 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-left transition hover:border-brand-400">
-        <div class="flex items-center gap-4">
-          <img src="{{ option.image or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ option.title or option.name }}" class="h-32 w-24 rounded-2xl object-cover" />
-          <div>
-            <p class="text-lg font-semibold text-white">{{ option.title or option.name }}</p>
-            <p class="text-sm text-slate-400">{{ option.subtitle }}</p>
+      <button
+        type="submit"
+        name="selection"
+        value="{{ option.id }}"
+        class="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-900/40 focus:outline-none focus:ring-2 focus:ring-brand-500"
+      >
+        <div class="relative h-96 w-full overflow-hidden bg-slate-950">
+          <img
+            src="{{ option.image or url_for('static', filename='img/placeholder_poster.svg') }}"
+            alt="{{ option.title }}"
+            class="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-110 group-hover:opacity-100"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
+          <div class="absolute bottom-4 right-4 rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase text-white backdrop-blur-sm border border-slate-700 group-hover:border-brand-500 group-hover:text-brand-300">
+            Select
           </div>
         </div>
-        <p class="text-sm text-slate-300">{{ option.fact }}</p>
-        <input type="radio" name="selection" value="{{ option.id }}" class="sr-only" />
+
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left">
+          <h2 class="text-2xl font-bold text-white drop-shadow-md group-hover:text-brand-100">{{ option.title }}</h2>
+          <p class="mt-1 text-sm text-slate-300 group-hover:text-white">{{ option.year }}</p>
+        </div>
+
+        <div class="absolute inset-0 bg-brand-500/0 transition-colors group-active:bg-brand-500/10"></div>
       </button>
       {% endfor %}
     </div>
-    <p data-feedback class="hidden rounded-2xl bg-slate-900/60 px-4 py-3 text-sm text-brand-200">You picked option A. Submit to lock it in.</p>
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <p class="text-xs uppercase tracking-wide text-slate-400">Current streak</p>
-        <p class="text-3xl font-display text-brand-300">{{ streak }}</p>
-      </div>
-      <div class="flex gap-3">
-        <button class="btn-secondary" formaction="{{ url_for('game_skip') }}">Skip</button>
-        <button class="btn-primary" type="submit">Submit answer</button>
-      </div>
-    </div>
+
     {% if result %}
-    <div class="rounded-3xl border border-{{ 'brand-400' if result.correct else 'red-400' }}/40 bg-slate-900/70 p-6">
-      <p class="text-lg font-semibold text-white">{{ result.message }}</p>
-      <p class="text-sm text-slate-300">{{ result.detail }}</p>
+    <div class="mt-8 animate-bounce-in rounded-3xl border border-{{ 'brand-500' if result.correct else 'red-500' }}/50 bg-slate-900/80 p-8 text-center backdrop-blur-md">
+      <p class="text-2xl font-bold {{ 'text-brand-400' if result.correct else 'text-red-400' }} mb-2">
+        {{ result.message }}
+      </p>
+      <p class="text-lg text-white">
+        {{ result.detail }}
+      </p>
+      <button type="submit" name="next" value="true" class="btn-secondary mt-6">
+        Next Round
+      </button>
     </div>
     {% endif %}
   </form>
