@@ -1,12 +1,13 @@
-#Look frontend independent from backend
+# Look frontend independent from backend
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any, Iterable, List
 
-from flask import Blueprint, Flask, redirect, render_template, request, url_for
+from flask import Blueprint, Flask, redirect, render_template, request, url_for, session
 
 app = Flask(__name__)
 app.secret_key = "dev-key"
@@ -67,6 +68,7 @@ def seed_movies() -> list[dict[str, Any]]:
         )
     return movies
 
+
 def seed_reviewers() -> list[dict[str, Any]]:
     avatar = url_for("static", filename="img/placeholder_avatar.svg")
     reviewers = []
@@ -81,6 +83,7 @@ def seed_reviewers() -> list[dict[str, Any]]:
             }
         )
     return reviewers
+
 
 def seed_people() -> list[dict[str, Any]]:
     avatar = url_for("static", filename="img/placeholder_avatar.svg")
@@ -101,7 +104,6 @@ def seed_people() -> list[dict[str, Any]]:
         )
     return people
 
-
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
     dummy_user = SimpleNamespace(
@@ -117,6 +119,35 @@ def inject_globals() -> dict[str, Any]:
 
 @app.route("/")
 def home() -> str:
+    all_movies = seed_movies()
+    discovery_options = [
+        {
+            "title": "Hidden Gems",
+            "subtitle": "Underrated & Loved",
+            # uses the first movie's poster as the category cover
+            "image": all_movies[0]["poster_url"],
+            "link_param": "hidden_gems"
+        },
+        {
+            "title": "Short & Sweet",
+            "subtitle": "Under 90 Minutes",
+            "image": all_movies[1]["poster_url"],
+            "link_param": "short"
+        },
+        {
+            "title": "Critics' Choice",
+            "subtitle": "90%+ Rating",
+            "image": all_movies[2]["poster_url"],
+            "link_param": "critics"
+        },
+        {
+            "title": "Box Office",
+            "subtitle": "Top Earners",
+            "image": all_movies[3]["poster_url"],
+            "link_param": "revenue"
+        }
+    ]
+
     data = {
         "trending_movies": seed_movies()[:3],
         "featured_movies": seed_movies(),
@@ -132,6 +163,8 @@ def home() -> str:
         ],
         "featured_people": seed_people()[:4],
         "top_reviewers": seed_reviewers()[:13],
+
+        "discovery_options": discovery_options
     }
     return render_template("home.html", **data)
 
@@ -148,7 +181,7 @@ def movies() -> str:
 def movie_detail(movie_id: int) -> str:
     # Get the movie from dummy seed
     movie = seed_movies()[movie_id - 1]
-    
+
     # Attach movie-level details
     movie.update(
         {
@@ -166,7 +199,7 @@ def movie_detail(movie_id: int) -> str:
             ],
         }
     )
-    
+
     # Create a separate statistic object
     statistic = {
         "budget": "$120M",
@@ -189,30 +222,30 @@ def movie_detail(movie_id: int) -> str:
             "profile_url": url_for("static", filename="img/placeholder_avatar.svg"),
         },
     ]
-    
+
     # Streaming providers
     providers = [
         {"name": "MoveM+"},
     ]
-    
+
     # Watch options
     watch_options = [
         {"type": "Stream", "providers": ["MoveM+"], "price": "Included"},
         {"type": "Rent HD", "providers": ["Prime Video"], "price": "$5.99"},
         {"type": "Buy UHD", "providers": ["Apple TV"], "price": "$14.99"},
     ]
-    
+
     # Reviews
     reviews = [
         {"author": "cinefan", "rating": 9.0, "comment": "Loved the pacing."},
         {"author": "critic101", "rating": 7.5, "comment": "Great visuals."},
     ]
 
-    favorite_count = 123 
+    favorite_count = 123
     return render_template(
         "movie_detail.html",
         movie=movie,
-        statistic=statistic,  
+        statistic=statistic,
         cast=cast,
         reviews=reviews,
         providers=providers,
@@ -266,44 +299,79 @@ def person_detail(person_id: int) -> str:
     )
 
 
-@app.route("/game", methods=["GET", "POST"])
+@app.route("/game")
 def game() -> str:
+    """Step 1: Renders the Lobby to choose game modes."""
+    return render_template("lobby.html")
+
+
+@app.route("/game/start", methods=["POST"])
+def game_start() -> Any:
+    """Step 2: Initializes the game state (streak, modes) and redirects to play."""
+
+    session['game_modes'] = request.form.getlist('game_types') or ['1', '4'] 
+    session['streak'] = 0
+    return redirect(url_for("game_play"))
+
+
+@app.route("/game/play", methods=["GET", "POST"])
+def game_play() -> str:
+    """Step 3: The actual game loop."""
+
+    all_movies = seed_movies()
+
+    movie_a, movie_b = random.sample(all_movies, 2)
+
     options = [
         {
-            "id": 1,
-            "title": "Movie Alpha",
-            "subtitle": "2015 · Sci-Fi",
-            "fact": "Won 3 Academy Awards",
-            "image": url_for("static", filename="img/placeholder_poster.svg"),
+            "id": movie_a['id'],
+            "title": movie_a['title'],
+            "year": movie_a['release_date'][:4],
+            "image": movie_a['poster_url'],
         },
         {
-            "id": 2,
-            "title": "Movie Beta",
-            "subtitle": "2019 · Adventure",
-            "fact": "Highest grossing of 2019",
-            "image": url_for("static", filename="img/placeholder_poster.svg"),
-        },
+            "id": movie_b['id'],
+            "title": movie_b['title'],
+            "year": movie_b['release_date'][:4],
+            "image": movie_b['poster_url'],
+        }
     ]
+
     result = None
+    streak = session.get('streak', 0)
+
     if request.method == "POST":
         selection = request.form.get("selection")
+
+        if request.form.get("next") == "true":
+            return redirect(url_for("game_play"))
+
+        is_correct = (str(selection) == str(movie_a['id']))
+
+        if is_correct:
+            streak += 1
+            session['streak'] = streak
+            message = "Correct!"
+            detail = f"{movie_a['title']} was the right answer."
+        else:
+            streak = 0  
+            session['streak'] = 0
+            message = "Wrong!"
+            detail = f"The correct answer was {movie_a['title']}."
+
         result = {
-            "correct": selection == "1",
-            "message": "Correct!" if selection == "1" else "Try again",
-            "detail": "Movie Alpha edged out Beta at the box office.",
+            "correct": is_correct,
+            "message": message,
+            "detail": detail
         }
+
     return render_template(
         "game.html",
-        prompt="Which film grossed more worldwide?",
+        prompt="Which movie had a higher budget?",  
         options=options,
-        streak=5,
+        streak=streak,
         result=result,
     )
-
-
-@app.route("/game/skip", methods=["POST", "GET"])
-def game_skip() -> Any:
-    return redirect(url_for("game"))
 
 
 @app.route("/leaderboard")
@@ -409,4 +477,4 @@ def collection_detail(collection_id: int) -> str:
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5050, debug=True)
