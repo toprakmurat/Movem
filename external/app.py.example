@@ -1,13 +1,13 @@
 # Look frontend independent from backend
 
 from __future__ import annotations
-
+from datetime import datetime, timedelta
 import random
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any, Iterable, List
 
-from flask import Blueprint, Flask, redirect, render_template, request, url_for, session
+from flask import Blueprint, Flask, redirect, render_template, request, url_for, session, jsonify
 
 app = Flask(__name__)
 app.secret_key = "dev-key"
@@ -103,6 +103,36 @@ def seed_people() -> list[dict[str, Any]]:
             }
         )
     return people
+
+
+def seed_detailed_reviews(count=50) -> list[dict[str, Any]]:
+    avatar = url_for("static", filename="img/placeholder_avatar.svg")
+    reviews = []
+    base_date = datetime.now()
+    
+    for i in range(1, count + 1):
+        rating = random.choice([5, 6, 7, 8, 9, 10])
+        days_ago = random.randint(0, 365)
+        review_date = base_date - timedelta(days=days_ago)
+        likes = random.randint(0, 500)
+        dislikes = random.randint(0, 200)
+        has_spoiler = random.choice([True, False, False, False]) 
+        
+        reviews.append({
+            "id": i,
+            "author": f"User_{i}",
+            "avatar": avatar,
+            "rating": rating,
+            "date_obj": review_date, 
+            "date_str": review_date.strftime("%Y-%m-%d"), 
+            "likes": likes,
+            "dislikes": dislikes,
+            "has_spoiler": has_spoiler,
+            "comment": f"This is a sample review number {i}. The cinematography was {'excellent' if rating > 7 else 'okay'}. " + ("WARNING: SPOILER ALERT!" if has_spoiler else "")
+        })
+    
+    return sorted(reviews, key=lambda x: x['date_obj'], reverse=True)
+
 
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
@@ -239,18 +269,19 @@ def movie_detail(movie_id: int) -> str:
     ]
 
     # Reviews
-    reviews = [
-        {"author": "cinefan", "rating": 9.0, "comment": "Loved the pacing."},
-        {"author": "critic101", "rating": 7.5, "comment": "Great visuals."},
-    ]
-
+    all_reviews = seed_detailed_reviews(count=45) 
+    
+    reviews = all_reviews[:3] 
+    
     favorite_count = 123
+    
     return render_template(
         "movie_detail.html",
         movie=movie,
         statistic=statistic,
         cast=cast,
-        reviews=reviews,
+        reviews=reviews,                     
+        total_reviews_count=len(all_reviews), 
         providers=providers,
         watch_options=watch_options,
         favorite_count=favorite_count
@@ -598,6 +629,107 @@ def collection_detail(collection_id: int) -> str:
     }
     return render_template("movies.html", movies=Pagination(collection["movies"]), genres=[])
 
+
+@app.route("/movies/<int:movie_id>/comments")
+def movie_comments(movie_id: int) -> str:
+    all_reviews = seed_detailed_reviews(count=65) 
+    movie = seed_movies()[movie_id - 1] 
+
+    sort_by = request.args.get('sort', 'newest')
+    spoiler_filter = request.args.get('spoiler', 'all') 
+    rating_filter = request.args.get('rating', 'all')  
+    
+    filtered_reviews = all_reviews
+
+    if spoiler_filter == 'hide':
+        filtered_reviews = [r for r in filtered_reviews if not r['has_spoiler']]
+    
+    if rating_filter == 'positive':
+        filtered_reviews = [r for r in filtered_reviews if r['rating'] >= 7]
+
+    if sort_by == 'newest':
+        filtered_reviews.sort(key=lambda x: x['date_obj'], reverse=True)
+    elif sort_by == 'oldest':
+        filtered_reviews.sort(key=lambda x: x['date_obj'], reverse=False)
+    elif sort_by == 'rating_desc': 
+        filtered_reviews.sort(key=lambda x: x['rating'], reverse=True)
+    elif sort_by == 'rating_asc': 
+        filtered_reviews.sort(key=lambda x: x['rating'], reverse=False)
+    elif sort_by == 'likes': 
+        filtered_reviews.sort(key=lambda x: x['likes'], reverse=True)
+
+    page = request.args.get("page", default=1, type=int)
+    per_page = 20
+    pagination = Pagination(filtered_reviews, page=page, per_page=per_page)
+
+    return render_template(
+        "comments.html",
+        movie=movie,
+        reviews=pagination,
+        current_sort=sort_by,
+        current_spoiler=spoiler_filter,
+        user_votes=session.get('user_votes', {})
+    )
+
+@app.route('/comments/<int:comment_id>/vote/<action>', methods=['POST'])
+def vote_comment_mock(comment_id, action):
+    """
+    Handles Like/Dislike logic: Toggle, Switch, and Remove.
+    action: 'like' or 'dislike'
+    """
+    if 'user_id' not in session:
+        return jsonify({"status": "error", "redirect": url_for('auth.login')}), 401
+
+    user_votes = session.get('user_votes', {})
+    
+    str_comment_id = str(comment_id)
+    current_status = user_votes.get(str_comment_id)
+    
+    changes = {
+        'like': 0,
+        'dislike': 0
+    }
+    
+    new_status = None
+    
+    if action == 'like':
+        if current_status == 'like':
+            del user_votes[str_comment_id]
+            changes['like'] = -1
+            new_status = None
+        elif current_status == 'dislike':
+            user_votes[str_comment_id] = 'like'
+            changes['dislike'] = -1
+            changes['like'] = 1
+            new_status = 'like'
+        else:
+            user_votes[str_comment_id] = 'like'
+            changes['like'] = 1
+            new_status = 'like'
+
+    elif action == 'dislike':
+        if current_status == 'dislike':
+            del user_votes[str_comment_id]
+            changes['dislike'] = -1
+            new_status = None
+        elif current_status == 'like':
+            user_votes[str_comment_id] = 'dislike'
+            changes['like'] = -1
+            changes['dislike'] = 1
+            new_status = 'dislike'
+        else:
+            user_votes[str_comment_id] = 'dislike'
+            changes['dislike'] = 1
+            new_status = 'dislike'
+
+    session['user_votes'] = user_votes
+    session.modified = True 
+
+    return jsonify({
+        "status": "success", 
+        "changes": changes,      
+        "current_status": new_status 
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050, debug=True)

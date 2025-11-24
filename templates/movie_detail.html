@@ -152,6 +152,17 @@
     {% endfor %}
   </div>
 
+  {% if total_reviews_count > 3 %}
+  <div class="mt-4 text-center">
+      <a href="{{ url_for('movie_comments', movie_id=movie.id) }}" class="inline-flex items-center gap-2 text-sm font-medium text-brand-300 hover:text-white transition-colors">
+          View all {{ total_reviews_count }} reviews
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+          </svg>
+      </a>
+  </div>
+  {% endif %}
+
   {# Review form #}
   <form method="post" action="{{ url_for('add_review', movie_id=movie.id) }}" class="mt-6 space-y-4">
     <label class="text-xs uppercase tracking-[0.4em] text-white/60" for="rating">Leave a rating</label>
