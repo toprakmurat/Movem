@@ -120,3 +120,54 @@ def delete_user_db(id: int):
 
     except Exception as e:
         return None, str(e)
+
+def get_user_by_username_db(username: str):
+    """Get user by username"""
+    try:
+        users = execute_query(
+            """
+            SELECT *  FROM users
+            WHERE username = %s
+            """,
+            (username,),
+            fetch=True
+        )
+        if users:
+            return users[0], None
+        return None, "User not found"
+    except Exception as e:
+        return None, str(e)
+
+def get_users_by_role_db(role: str):
+    """Get users by role"""
+    try:
+        users = execute_query(
+            """
+            SELECT *  FROM users
+            WHERE role = %s
+            """,
+            (role,),
+            fetch=True
+        )
+        if users:
+            return users, None
+        return None, "User not found"
+    except Exception as e:
+        return None, str(e)
+
+def get_user_by_email_db(email: str):
+    """Get user by email"""
+    try:
+        users = execute_query(
+            """
+            SELECT *  FROM users
+            WHERE email = %s
+            """,
+            (email,),
+            fetch=True
+        )
+        if users:
+            return users[0], None
+        return None, "User not found"
+    except Exception as e:
+        return None, str(e)
