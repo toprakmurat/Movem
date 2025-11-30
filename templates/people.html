@@ -10,31 +10,30 @@
     </div>
     <form class="flex flex-wrap gap-3 text-sm">
       <input type="search" name="q" placeholder="Search names" value="{{ request.args.get('q', '') }}" class="form-field w-60" />
-      <select name="role" class="form-field w-56">
-        <option value="">Any role</option>
-        {% for role in roles %}
-        <option value="{{ role }}" {% if role == request.args.get('role') %}selected{% endif %}>{{ role }}</option>
-        {% endfor %}
-      </select>
-      <button class="btn-secondary">Filter</button>
+      <button class="btn-secondary">Search</button>
     </form>
   </div>
+  
   <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    {% for person in people.items %}
-      {% set person = person %}
+    {% for person in actors %}
       {% include 'partials/person_card.html' with context %}
     {% else %}
-    <p class="text-slate-400">No people match your filters.</p>
+    <p class="text-slate-400">No people found.</p>
     {% endfor %}
   </div>
+  
   <div class="flex items-center justify-between text-sm text-slate-400">
-    <span>Showing {{ people.start_index() }} – {{ people.end_index() }} of {{ people.total }} people</span>
+    {% set start_index = (pagination.page - 1) * pagination.per_page + 1 %}
+    {% set end_index = start_index + actors|length - 1 %}
+    <span>Showing {{ start_index }} – {{ end_index }} of {{ pagination.total }} people</span>
+    
     <div class="flex gap-3">
-      {% if people.has_prev %}
-      <a href="{{ url_for('people', page=people.prev_num, **request.args) }}" class="btn-secondary">Previous</a>
+      {% if pagination.has_prev %}
+      <a href="{{ url_for('actors.get_actors', page=pagination.page - 1, per_page=pagination.per_page, q=request.args.get('q', '')) }}" class="btn-secondary">Previous</a>
       {% endif %}
-      {% if people.has_next %}
-      <a href="{{ url_for('people', page=people.next_num, **request.args) }}" class="btn-primary">Next</a>
+      
+      {% if pagination.has_next %}
+      <a href="{{ url_for('actors.get_actors', page=pagination.page + 1, per_page=pagination.per_page, q=request.args.get('q', '')) }}" class="btn-primary">Next</a>
       {% endif %}
     </div>
   </div>
