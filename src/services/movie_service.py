@@ -1,5 +1,62 @@
 from src.config.database import execute_query
+from typing import List, Any
+from dataclasses import dataclass
 
+@dataclass
+class Pagination:
+    items: List[Any]
+    page: int = 1
+    per_page: int = 8
+    total_count: int = 0
+
+    @property
+    def total(self) -> int:
+        return self.total_count
+
+    def start_index(self) -> int:
+        if not self.items:
+            return 0
+        return (self.page - 1) * self.per_page + 1
+
+    def end_index(self) -> int:
+        return min(self.page * self.per_page, self.total_count)
+
+    @property
+    def has_prev(self) -> bool:
+        return self.page > 1
+
+    @property
+    def has_next(self) -> bool:
+        return self.end_index() < self.total_count
+
+    @property
+    def prev_num(self) -> int:
+        return max(1, self.page - 1)
+
+    @property
+    def next_num(self) -> int:
+        return self.page + 1
+    
+
+######################### MOVIES ##########################
+
+def get_movies_paginated_db(page: int = 1, per_page: int = 8):
+    try:
+        total_result = execute_query("SELECT COUNT(*) as count FROM movies", fetch=True)
+        total_count = total_result[0]['count'] if total_result else 0
+
+        offset = (page - 1) * per_page
+        movies = execute_query(
+            "SELECT * FROM movies ORDER BY title LIMIT %s OFFSET %s",
+            (per_page, offset),
+            fetch=True
+        ) or []
+
+        return Pagination(items=movies, page=page, per_page=per_page, total_count=total_count), None
+    except Exception as e:
+        return Pagination(items=[], page=page, per_page=per_page, total_count=0), str(e)
+
+    
 def get_movies_db():
     """Get all movies"""
     try:
@@ -15,7 +72,6 @@ def get_movies_db():
     except Exception as e:
         return None, str(e)
 
-
 def get_movie_by_id_db(id: int):
     """Get movie by id"""
     try:
@@ -28,11 +84,13 @@ def get_movie_by_id_db(id: int):
             (id,),
             fetch=True
         )
-        if movies:
-            return movies[0], None 
-        return None, "Movie not found"
+        
+        if movies and isinstance(movies, list):
+            return movies[0], None
+        return None, None
     except Exception as e:
         return None, str(e)
+
 
 
 def create_movie_db(movie_data: dict):
@@ -40,11 +98,13 @@ def create_movie_db(movie_data: dict):
     try:
         new_movie = execute_query(
             """
-            INSERT INTO movies(title, overview, tagline, release_date, poster_file, banner_file, platform_id)
-            VALUES(%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO movies(id, title, overview, tagline, release_date, poster_file, banner_file, platform_id)
+            VALUES(%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id, title, overview, tagline, release_date, poster_file, banner_file, platform_id, created_at
             """,
-            (
+            (   
+                movie_data.get
+                ('id'),
                 movie_data.get('title'),
                 movie_data.get('overview'),
                 movie_data.get('tagline'),
@@ -70,7 +130,7 @@ def update_movie_db(id: int, movie_data: dict):
         if err:
             return None, err
         if not existing_movie:
-            return None, "Movie not found"
+            return None, None
         
         update_fields = []
         params = []
@@ -116,10 +176,27 @@ def delete_movie_db(id: int):
 
         if deleted_movie:
             return deleted_movie[0], None
-        return None, "Movie not found"
+        return None, None
 
     except Exception as e:
         return None, str(e)
+
+######################### GENRES ##########################
+def get_genres_db():
+    """Get all genres"""
+    try:
+        genres = execute_query(
+        """
+        SELECT *
+        FROM genres
+        """,
+        fetch=True)
+        if genres:
+            return genres, None
+        return None, None
+    except Exception as e:
+        return None, str(e)
+    
 
 def get_genres_by_id_db(id:int):
     """Get genres by id"""
@@ -135,10 +212,214 @@ def get_genres_by_id_db(id:int):
         fetch=True)
         if genres:
             return genres[0], None
-        return None, "Genre not found"
+        return None, None
     except Exception as e:
         return None, str(e)
     
+def create_genre_db(genre_data:dict):
+    """Get a new genre"""
+    try:
+        genres = execute_query(
+        """
+        INSERT INTO genres(id, genre_name)
+        VALUES (%s, %s)
+        RETURNING id, genre_name
+        """,
+        (   
+        genre_data.get
+        ('id'),
+        genre_data.get
+        ('genre_name'),
+        ),
+        fetch=True)
+
+        if genres:
+            return genres[0], None
+        return None, "Failed to create genre"
+    except Exception as e:
+        return None, str(e)
+    
+def update_genre_db(id: int, genre_data: dict):
+    """Update the genre with given id and return updated one"""
+    try:
+        existing_genre, err = get_genres_by_id_db(id)
+        if err:
+            return None, err
+        if not existing_genre:
+            return None, None
+
+        update_fields = []
+        params = []
+
+        if 'genre_name' in genre_data:
+            update_fields.append("genre_name = %s")
+            params.append(genre_data['genre_name'])
+
+        if not update_fields:
+            return existing_genre, None
+
+        params.append(id)  
+
+        updated_genre = execute_query(
+            f"""
+            UPDATE genres
+            SET {', '.join(update_fields)}
+            WHERE id = %s
+            RETURNING id, genre_name
+            """,
+            tuple(params),
+            fetch=True
+        )
+
+        if updated_genre:
+            return updated_genre[0], None
+        return None, "Failed to update genre"
+
+    except Exception as e:
+        return None, str(e)
+
+
+def delete_genre_db(id: int):
+    """Delete a genre by id"""
+    try:
+        deleted_genre = execute_query(
+            """
+            DELETE FROM genres
+            WHERE id = %s
+            RETURNING id, genre_name
+            """,
+            (id,),
+            fetch=True
+        )
+
+        if deleted_genre:
+            return deleted_genre[0], None
+        return None, "Genre not found"
+
+    except Exception as e:
+        return None, str(e)
+######################### MOVIES_GENRES ##########################
+
+def get_movies_genres_db():
+    """Get all movie-genre relationships"""
+    try:
+        movie_genres = execute_query(
+            "SELECT id, movie_id, genre_id FROM movies_genres",
+            fetch=True
+        )
+        return movie_genres, None
+    except Exception as e:
+        return None, str(e)
+
+
+def get_movies_genres_by_id_db(id: int):
+    """Get a movie-genre relationship by id"""
+    try:
+        rows = execute_query(
+            """
+            SELECT id, movie_id, genre_id
+            FROM movies_genres
+            WHERE id = %s
+            """,
+            (id,),
+            fetch=True
+        )
+        if rows:
+            return rows[0], None
+        return None, None
+    except Exception as e:
+        return None, str(e)
+
+    
+def create_movie_genre_db(movies_genre_data:dict):
+    """Create a new movie-genre relationship"""
+    try:
+        movies_genres = execute_query(
+        """
+        INSERT INTO movies_genres(movie_id, genre_id)
+        VALUES (%s, %s)
+        RETURNING id, movie_id, genre_id
+        """,
+        (   
+        movies_genre_data.get
+        ('movie_id'),
+        movies_genre_data.get
+        ('genre_id'),
+        ),
+        fetch=True)
+
+        if movies_genres:
+            return movies_genres[0], None
+        return None, "Failed to create movie-genre relationship"
+    except Exception as e:
+        return None, str(e)
+    
+def update_movie_genre_db(id: int, data: dict):
+    """Update a movie-genre relation by id and return updated one"""
+    try:
+
+        existing, err = get_movies_genres_by_id_db(id)
+        if err:
+            return None, err
+        if not existing:
+            return None, None
+        
+        update_fields = []
+        params = []
+
+        if 'movie_id' in data:
+            update_fields.append("movie_id = %s")
+            params.append(data['movie_id'])
+
+        if 'genre_id' in data:
+            update_fields.append("genre_id = %s")
+            params.append(data['genre_id'])
+
+        if not update_fields:
+            return existing, None
+
+        params.append(id)
+
+        updated = execute_query(
+            f"""
+            UPDATE movies_genres
+            SET {', '.join(update_fields)}
+            WHERE id = %s
+            RETURNING id, movie_id, genre_id
+            """,
+            tuple(params),
+            fetch=True
+        )
+
+        if updated:
+            return updated[0], None
+        
+        return None, "Failed to update movie-genre relationship"
+
+    except Exception as e:
+        return None, str(e)
+
+
+
+def delete_movie_genre_db(id: int):
+    """Delete a movie-genre relationship"""
+    try:
+        deleted = execute_query(
+            """
+            DELETE FROM movies_genres
+            WHERE id = %s
+            RETURNING id, movie_id, genre_id
+            """,
+            (id,),
+            fetch=True
+        )
+        if deleted:
+            return deleted[0], None
+        return None, None
+    except Exception as e:
+        return None, str(e)
+
+######################### MIXED ##########################    
 def get_movies_by_genre_db(genre_id: int):
     """Get movies by genre ID"""
     try:

@@ -40,6 +40,8 @@ services:
       DB_MAX_CONNECTIONS: ${DB_MAX_CONNECTIONS}
     volumes:
       - ./images:/app/images 
+      - ./src:/app/src
+      - ./templates:/app/templates
 
 volumes:
   pgdata:
