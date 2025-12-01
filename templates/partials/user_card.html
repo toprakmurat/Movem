@@ -1,0 +1,12 @@
+<article class="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
+  <a href="{{ url_for('person_detail', person_id=person.id) }}" class="absolute inset-0 z-10" aria-label="View {{ person.name }}"></a>
+  <div class="aspect-[2/3] w-full overflow-hidden rounded-t-2xl">
+    <img src="{{ person.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
+         alt="{{ person.name }}" 
+         class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+  </div>
+  <div class="flex flex-1 flex-col gap-2 p-4">
+    <h3 class="text-lg font-semibold text-white">{{ person.name }}</h3>
+    <p class="text-sm text-slate-400">{{ person.known_for }}</p>
+  </div>
+</article>

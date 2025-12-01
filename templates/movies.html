@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Movies • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl">
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Library</p>
+      <h1 class="mt-2 text-3xl font-semibold">Movies</h1>
+      <p class="text-slate-400">Browse curated titles or filter by genre, release year, and popularity.</p>
+    </div>
+    <form class="flex flex-wrap gap-3 text-sm">
+      <select name="genre" class="form-field w-48">
+        <option value="">All genres</option>
+        {% for genre in genres %}
+        <option value="{{ genre.id }}" {% if genre.id == request.args.get('genre', type=int) %}selected{% endif %}>{{ genre.name }}</option>
+        {% endfor %}
+      </select>
+      <select name="sort" class="form-field w-48">
+        <option value="trending">Trending</option>
+        <option value="rating" {% if request.args.get('sort') == 'rating' %}selected{% endif %}>Top rated</option>
+        <option value="release" {% if request.args.get('sort') == 'release' %}selected{% endif %}>Newest</option>
+      </select>
+      <button class="btn-secondary">Apply</button>
+    </form>
+  </div>
+  <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for movie in movies.items %}
+      {% set movie = movie %}
+      {% include 'partials/movie_card.html' with context %}
+    {% else %}
+    <p class="text-slate-400">No movies found for your filters. Try adjusting your search.</p>
+    {% endfor %}
+  </div>
+  <div class="mt-8 flex items-center justify-between text-sm text-slate-400">
+    <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
+    <div class="flex gap-3">
+      {% if movies.has_prev %}
+      <a href="{{ url_for('movies', page=movies.prev_num, **request.args) }}" class="btn-secondary">Previous</a>
+      {% endif %}
+      {% if movies.has_next %}
+      <a href="{{ url_for('movies', page=movies.next_num, **request.args) }}" class="btn-primary">Next</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

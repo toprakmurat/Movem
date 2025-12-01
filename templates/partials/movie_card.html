@@ -1,0 +1,20 @@
+<article class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
+  <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="absolute inset-0 z-10" aria-label="View {{ movie.title }}"></a>
+  <div class="aspect-[2/3] w-full overflow-hidden">
+    <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ movie.title }} poster" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+  </div>
+  <div class="flex flex-1 flex-col gap-3 p-4">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="text-xs uppercase tracking-wide text-brand-300">{{ movie.genre_list | join(', ') }}</p>
+        <h3 class="mt-1 text-lg font-semibold text-white">{{ movie.title }}</h3>
+      </div>
+      <span class="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-300">{{ movie.release_date }}</span>
+    </div>
+    <p class="line-clamp-3 text-sm text-slate-400">{{ movie.overview }}</p>
+    <div class="mt-auto flex items-center justify-between text-xs text-slate-400">
+      <span>Score: <span class="text-brand-300 font-semibold">{{ movie.rating or 'NR' }}</span></span>
+      <span>{{ movie.runtime }} min</span>
+    </div>
+  </div>
+</article>

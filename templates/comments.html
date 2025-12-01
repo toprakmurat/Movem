@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block title %}{{ movie.title }} Reviews • MoveM{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-5xl">
+  
+  {# --- HEADER & BACK NAVIGATION --- #}
+  <div class="mb-8 flex items-center gap-4">
+      <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="rounded-full bg-white/5 p-2 text-white/60 hover:bg-white/10 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+      </a>
+      <div>
+        <h1 class="text-2xl font-semibold text-white">Reviews for {{ movie.title }}</h1>
+        <p class="text-sm text-white/50">See what the community is saying</p>
+      </div>
+  </div>
+
+  {# --- FILTER & SORT BAR --- #}
+  <div class="mb-6 rounded-2xl border border-white/10 bg-black/40 p-4">
+      <form class="flex flex-wrap items-center gap-4 text-sm" method="GET">
+          
+          <div class="flex items-center gap-2">
+              <label class="text-white/60">Sort by:</label>
+              <select name="sort" class="form-field !py-1.5 !px-3 !text-sm bg-black" onchange="this.form.submit()">
+                  <option value="newest" {% if request.args.get('sort') == 'newest' %}selected{% endif %}>Newest First</option>
+                  <option value="oldest" {% if request.args.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                  <option value="rating_desc" {% if request.args.get('sort') == 'rating_desc' %}selected{% endif %}>Highest Rating</option>
+                  <option value="rating_asc" {% if request.args.get('sort') == 'rating_asc' %}selected{% endif %}>Lowest Rating</option>
+                  <option value="likes" {% if request.args.get('sort') == 'likes' %}selected{% endif %}>Most Helpful</option>
+              </select>
+          </div>
+
+          <div class="h-4 w-px bg-white/10"></div> <div class="flex items-center gap-2">
+            <label class="text-white/60">Filters:</label>
+            <select name="spoiler" class="form-field !py-1.5 !px-3 !text-sm bg-black" onchange="this.form.submit()">
+                <option value="all" {% if request.args.get('spoiler') == 'all' %}selected{% endif %}>Show All</option>
+                <option value="hide" {% if request.args.get('spoiler') == 'hide' %}selected{% endif %}>Hide Spoilers</option>
+            </select>
+          </div>
+      </form>
+  </div>
+
+  {# --- REVIEW CARDS --- #}
+  <div class="grid gap-4">
+      {% for review in reviews.items %}
+      <article class="relative rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-white/20" id="review-{{ review.id }}">
+          
+        {# Top Section: Author and Rating #}
+        <div class="mb-3 flex items-start justify-between">
+            <div class="flex items-center gap-3">
+                <img src="{{ review.avatar }}" class="w-10 h-10 rounded-full bg-white/10 object-cover">
+                <div>
+                    <p class="font-medium text-white">{{ review.author }}</p>
+                    <p class="text-xs text-white/40">{{ review.date_str }}</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-end">
+                <div class="flex items-center gap-1 text-yellow-400">
+                    <span class="text-lg font-bold">{{ review.rating }}</span>
+                    <span class="text-xs text-white/40">/10</span>
+                </div>
+            </div>
+        </div>
+
+        {# Middle Section: Review Body (SPOILER BLUR EFEKTİ BURADA) #}
+        <div class="relative group cursor-pointer" 
+             onclick="this.querySelector('p').classList.remove('blur-sm', 'select-none'); this.querySelector('.spoiler-overlay')?.remove(); this.classList.remove('cursor-pointer')">
+            
+            {% if review.has_spoiler %}
+            <div class="spoiler-overlay absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-xl backdrop-blur-[2px] transition-opacity group-hover:bg-black/40 z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-red-400 mb-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="text-sm font-bold uppercase tracking-wider text-red-400">Spoiler Warning</span>
+                <span class="text-xs text-white/70 mt-1">Click to reveal</span>
+            </div>
+            {% endif %}
+            
+            <p class="text-sm leading-relaxed text-white/80 {{ 'blur-sm transition-all duration-300 select-none' if review.has_spoiler else '' }}">
+                {{ review.comment }}
+            </p>
+        </div>
+
+        {# Bottom Section: Like & Dislike Buttons #}
+        <div class="mt-4 flex items-center gap-6 border-t border-white/5 pt-3">
+            
+            <button 
+                data-id="{{ review['id'] }}" 
+                onclick="handleInteraction(this.dataset.id, 'like')" 
+                class="flex items-center gap-1.5 text-xs font-medium transition-colors group 
+                {{ 'text-green-400' if user_votes.get(review['id']|string) == 'like' else 'text-white/50 hover:text-green-400' }}"
+                id="btn-like-{{ review['id'] }}">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 transition-colors">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.247-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.176.405.278.602.283.545.698 1.01 1.218 1.353A10.957 10.957 0 008.35 21h4.943c.316 0 .614-.143.834-.396C15.545 19.167 17.5 16.536 17.5 13.5v-2.25m0 0H21" />
+                </svg>
+                <span id="like-count-{{ review['id'] }}">{{ review.likes }}</span> Helpful
+            </button>
+
+            <button 
+                data-id="{{ review['id'] }}" 
+                onclick="handleInteraction(this.dataset.id, 'dislike')" 
+                class="flex items-center gap-1.5 text-xs font-medium transition-colors group 
+                {{ 'text-red-400' if user_votes.get(review['id']|string) == 'dislike' else 'text-white/50 hover:text-red-400' }}"
+                id="btn-dislike-{{ review['id'] }}">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 transition-colors -scale-y-100">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.247-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.176.405.278.602.283.545.698 1.01 1.218 1.353A10.957 10.957 0 008.35 21h4.943c.316 0 .614-.143.834-.396C15.545 19.167 17.5 16.536 17.5 13.5v-2.25m0 0H21" />
+                </svg>
+                <span id="dislike-count-{{ review['id'] }}">{{ review.dislikes }}</span> Helpless
+            </button>
+        </div>
+
+      </article>
+      {% endfor %}
+  </div>
+
+  {# --- PAGINATION (Bottom Section) --- #}
+  <div class="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
+      <p class="text-sm text-white/40">
+          Showing <span class="text-white">{{ reviews.start_index() }}</span> to <span class="text-white">{{ reviews.end_index() }}</span> of <span class="text-white">{{ reviews.total }}</span> results
+      </p>
+      
+      <div class="flex gap-2">
+          {% if reviews.has_prev %}
+          <a href="{{ url_for('movie_comments', movie_id=movie.id, page=reviews.prev_num, sort=request.args.get('sort'), spoiler=request.args.get('spoiler')) }}" class="btn-secondary px-4 py-2 text-sm">Previous</a>
+          {% endif %}
+          
+          {% if reviews.has_next %}
+          <a href="{{ url_for('movie_comments', movie_id=movie.id, page=reviews.next_num, sort=request.args.get('sort'), spoiler=request.args.get('spoiler')) }}" class="btn-primary px-4 py-2 text-sm">Next</a>
+          {% endif %}
+      </div>
+  </div>
+
+</section>
+
+<script>
+  async function handleInteraction(commentId, action) {
+      try {
+          const response = await fetch(`/comments/${commentId}/vote/${action}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });
+
+          const data = await response.json();
+
+          if (response.status === 401 && data.redirect) {
+              window.location.href = data.redirect;
+              return;
+          }
+
+          if (data.status === 'success') {
+              const likeSpan = document.getElementById(`like-count-${commentId}`);
+              const dislikeSpan = document.getElementById(`dislike-count-${commentId}`);
+              
+              if (likeSpan) {
+                  likeSpan.innerText = parseInt(likeSpan.innerText) + (data.changes.like || 0);
+              }
+              if (dislikeSpan) {
+                  dislikeSpan.innerText = parseInt(dislikeSpan.innerText) + (data.changes.dislike || 0);
+              }
+
+              const likeBtn = document.getElementById(`btn-like-${commentId}`);
+              const dislikeBtn = document.getElementById(`btn-dislike-${commentId}`);
+
+              resetButtonStyles(likeBtn, 'green');
+              resetButtonStyles(dislikeBtn, 'red');
+
+              if (data.current_status === 'like') {
+                  setActiveStyle(likeBtn, 'green');
+              } else if (data.current_status === 'dislike') {
+                  setActiveStyle(dislikeBtn, 'red');
+              }
+          }
+
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  }
+
+  function resetButtonStyles(btn, color) {
+      if(!btn) return;
+      btn.classList.remove(`text-${color}-400`);
+      btn.classList.add('text-white/50');
+      btn.classList.add(`hover:text-${color}-400`); 
+  }
+
+  function setActiveStyle(btn, color) {
+      if(!btn) return;
+      btn.classList.remove('text-white/50');
+      btn.classList.remove(`hover:text-${color}-400`); 
+      btn.classList.add(`text-${color}-400`);
+  }
+</script>
+
+{% endblock %}

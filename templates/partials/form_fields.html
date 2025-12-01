@@ -1,0 +1,24 @@
+{% macro input(name, label, type='text', placeholder='', value='', errors=[], helper='') %}
+<div class="flex flex-col gap-1">
+  <label for="{{ name }}" class="text-sm font-medium text-slate-200">{{ label }}</label>
+  <input
+    type="{{ type }}"
+    name="{{ name }}"
+    id="{{ name }}"
+    value="{{ value }}"
+    placeholder="{{ placeholder }}"
+    class="form-field {{ 'ring-2 ring-red-400' if errors }}"
+    required
+  />
+  {% if helper %}
+  <p class="text-xs text-slate-400">{{ helper }}</p>
+  {% endif %}
+  {% if errors %}
+  <p class="text-xs text-red-400">{{ errors | join(', ') }}</p>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro password(name, label, placeholder='', errors=[]) %}
+  {{ input(name, label, 'password', placeholder, '', errors) }}
+{% endmacro %}

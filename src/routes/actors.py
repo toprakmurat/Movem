@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from src.config.database import execute_query
 
 actors_bp = Blueprint('actors', __name__)
@@ -8,25 +8,96 @@ actors_bp = Blueprint('actors', __name__)
 
 @actors_bp.route('/', methods=['GET'])
 def get_actors():
-    """Get all actors"""
-    try:
+    """Get all actors with pagination - serves HTML or JSON based on request"""
+    # Get pagination parameters from query string
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 12, type=int)  # Changed default to 12 for better grid layout
+    search_query = request.args.get('q', '').strip()
+    
+    # Validate pagination parameters
+    if page < 1:
+        page = 1
+    if per_page < 1 or per_page > 100:  # Max 100 items per page
+        per_page = 12
+    
+    # Calculate offset
+    offset = (page - 1) * per_page
+    
+    # Build query based on search
+    if search_query:
+        # Get total count with search
+        count_result = execute_query(
+            "SELECT COUNT(*) as total FROM people WHERE name ILIKE %s",
+            (f'%{search_query}%',),
+            fetch=True
+        )
+        total = count_result[0]['total'] if count_result else 0
+        
+        # Get paginated actors with search
+        actors = execute_query(
+            """
+            SELECT id, name, biography, birth_date, photo_url, created_at
+            FROM people
+            WHERE name ILIKE %s
+            ORDER BY name
+            LIMIT %s OFFSET %s
+            """,
+            (f'%{search_query}%', per_page, offset),
+            fetch=True
+        )
+    else:
+        # Get total count
+        count_result = execute_query(
+            "SELECT COUNT(*) as total FROM people",
+            fetch=True
+        )
+        total = count_result[0]['total'] if count_result else 0
+        
+        # Get paginated actors
         actors = execute_query(
             """
             SELECT id, name, biography, birth_date, photo_url, created_at
             FROM people
             ORDER BY name
+            LIMIT %s OFFSET %s
             """,
+            (per_page, offset),
             fetch=True
         )
-        
-        return jsonify([dict(actor) for actor in actors])
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+    
+    # Calculate pagination metadata
+    total_pages = (total + per_page - 1) // per_page  # Ceiling division
+    
+    # Check if request wants JSON (AJAX request) or HTML (browser request)
+    if request.headers.get('Accept') == 'application/json' or request.is_json or 'json' in request.args:
+        # Return JSON for API calls
+        return jsonify({
+            'actors': [dict(actor) for actor in actors],
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total,
+                'total_pages': total_pages,
+                'has_next': page < total_pages,
+                'has_prev': page > 1
+            }
+        })
+    else:
+        # Render HTML template for browser requests
+        return render_template('people.html', 
+                                actors=[dict(actor) for actor in actors],
+                                pagination={
+                                    'page': page,
+                                    'per_page': per_page,
+                                    'total': total,
+                                    'total_pages': total_pages,
+                                    'has_next': page < total_pages,
+                                    'has_prev': page > 1
+        })
 
 @actors_bp.route('/<int:actor_id>', methods=['GET'])
 def get_actor(actor_id):
-    """Get a specific actor"""
+    """Get a specific actor - serves HTML or JSON based on request"""
     try:
         actor = execute_query(
             """
@@ -37,9 +108,41 @@ def get_actor(actor_id):
             (actor_id,),
             fetch=True
         )
-        if actor:
-            return jsonify(dict(actor[0]))
-        return jsonify({'error': 'Actor not found'}), 404
+        
+        if not actor:
+            return jsonify({'error': 'Actor not found'}), 404 
+               
+        # Get actor's filmography (movies they appeared in)
+        filmography = execute_query(
+            """
+            SELECT 
+                m.id as movie_id,
+                m.title,
+                m.release_year as year,
+                m.overview as summary,
+                m.poster_url,
+                m.vote_average as rating,
+                m.runtime,
+                mc.character_name as role
+            FROM movies m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            WHERE mc.person_id = %s
+            ORDER BY m.release_year DESC
+            """,
+            (actor_id,),
+            fetch=True
+        )
+        
+        # Check if request wants JSON or HTML
+        if request.headers.get('Accept') == 'application/json' or request.is_json or 'json' in request.args:
+            return jsonify({
+                'actor': dict(actor[0]),
+                'filmography': [dict(film) for film in filmography] if filmography else []
+            })
+        else:
+            return render_template('person_detail.html',
+                                   person=dict(actor[0]),
+                                   filmography=[dict(film) for film in filmography] if filmography else [])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
