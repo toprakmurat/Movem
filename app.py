@@ -8,6 +8,7 @@ from src.routes.movies import movies_bp
 from src.routes.actors import actors_bp
 from src.routes.comments import comments_bp
 from src.routes.game import game_bp
+from src.routes.statistic import statistic_bp
 
 def create_app(config_name=None):
     app = Flask(__name__)
@@ -34,6 +35,7 @@ def create_app(config_name=None):
     app.register_blueprint(actors_bp, url_prefix='/actors')
     app.register_blueprint(comments_bp, url_prefix='/comments')
     app.register_blueprint(game_bp, url_prefix='/game')
+    app.register_blueprint(statistic_bp, url_prefix='/statistic')
     
     @app.teardown_appcontext
     def teardown_db(exception):
