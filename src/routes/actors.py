@@ -95,8 +95,8 @@ def get_actors():
                                     'has_prev': page > 1
         })
 
-@actors_bp.route('/<int:actor_id>', methods=['GET'])
-def get_actor(actor_id):
+@actors_bp.route('/<int:person_id>', methods=['GET'])
+def person_detail(person_id):
     """Get a specific actor - serves HTML or JSON based on request"""
     try:
         actor = execute_query(
@@ -105,7 +105,7 @@ def get_actor(actor_id):
             FROM people
             WHERE id = %s
             """,
-            (actor_id,),
+            (person_id,),
             fetch=True
         )
         
