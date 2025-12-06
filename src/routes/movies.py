@@ -148,6 +148,7 @@ def get_movies_by_genre(genre_id):
     movies, err = get_movies_by_genre_db(genre_id)
     if err and err == "Genre not found":
         return jsonify({"error": "Genre not found"}), 404
+
     if err:
         return jsonify({"error": err}), 500
     return jsonify([dict(movie) for movie in movies]),200

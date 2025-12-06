@@ -8,13 +8,14 @@
       <a href="{{ url_for('movies') }}" class="nav-link">Movies</a>
       <a href="{{ url_for('people') }}" class="nav-link">People</a>
       <a href="{{ url_for('nexus') }}" class="nav-link">Nexus</a>
-      <a href="{{ url_for('game') }}" class="nav-link">Game</a>
+      <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
       <a href="{{ url_for('leaderboard') }}" class="nav-link">Leaderboard</a>
       <a href="{{ url_for('account') }}" class="nav-link">Account</a>
     </nav>
     <div class="flex items-center gap-3">
       {% if current_user.is_authenticated %}
-      <div class="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white md:flex">
+      <div
+        class="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white md:flex">
         <span>{{ current_user.first_name or current_user.username }}</span>
       </div>
       <a href="{{ url_for('logout') }}" class="btn-secondary">Logout</a>
@@ -36,7 +37,7 @@
       <a href="{{ url_for('movies') }}" class="nav-link">Movies</a>
       <a href="{{ url_for('people') }}" class="nav-link">People</a>
       <a href="{{ url_for('nexus') }}" class="nav-link">Nexus</a>
-      <a href="{{ url_for('game') }}" class="nav-link">Game</a>
+      <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
       <a href="{{ url_for('leaderboard') }}" class="nav-link">Leaderboard</a>
       <a href="{{ url_for('account') }}" class="nav-link">Account</a>
     </div>

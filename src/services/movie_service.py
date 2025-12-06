@@ -56,7 +56,7 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8):
     except Exception as e:
         return Pagination(items=[], page=page, per_page=per_page, total_count=0), str(e)
 
-    
+
 def get_movies_db():
     """Get all movies"""
     try:
@@ -71,6 +71,7 @@ def get_movies_db():
         return movies, None
     except Exception as e:
         return None, str(e)
+
 
 def get_movie_by_id_db(id: int):
     """Get movie by id"""
@@ -90,7 +91,6 @@ def get_movie_by_id_db(id: int):
         return None, None
     except Exception as e:
         return None, str(e)
-
 
 
 def create_movie_db(movie_data: dict):

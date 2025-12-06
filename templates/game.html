@@ -1,65 +1,190 @@
 {% extends 'base.html' %}
 {% block title %}Play • MoveM{% endblock %}
 {% block content %}
-<section class="mx-auto max-w-5xl space-y-8">
-  <div class="flex flex-col items-center justify-between gap-4 border-b border-slate-800 pb-6 md:flex-row">
+<section class="mx-auto max-w-5xl space-y-8 relative">
+
+  {% if game_over %}
+  <!-- Game Over Modal Overlay -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div
+      class="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center shadow-2xl shadow-brand-900/20">
+      <div class="mb-6 flex justify-center">
+        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-red-500/10 text-red-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </div>
+      </div>
+
+      <h2 class="text-3xl font-bold text-white">Game Over</h2>
+      <p class="mt-2 text-slate-400">You made a wrong choice!</p>
+
+      <div class="my-8 rounded-2xl bg-slate-800 p-6">
+        <p class="text-xs uppercase tracking-wide text-slate-400">Final Score</p>
+        <p class="text-5xl font-display text-brand-500 mt-2">{{ score }}</p>
+      </div>
+
+      <a href="{{ url_for('game.lobby') }}" class="btn-primary w-full py-4 text-lg shadow-lg shadow-brand-500/20">
+        Play Again
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div
+    class="flex flex-col items-center justify-between gap-4 border-b border-slate-800 pb-6 md:flex-row {{ 'blur-sm pointer-events-none' if game_over }}">
     <div class="text-center md:text-left">
-      <p class="text-xs uppercase tracking-wide text-slate-400">Current Streak</p>
-      <p class="text-4xl font-display text-brand-500 animate-pulse">{{ streak }}</p>
+      <p class="text-xs uppercase tracking-wide text-slate-400">Current Score</p>
+      <p class="text-4xl font-display text-brand-500 animate-pulse">{{ score }}</p>
     </div>
 
     <div class="text-center">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brand-300">Prompt</p>
-      <h1 class="mt-1 text-2xl font-bold text-white md:text-3xl">{{ prompt }}</h1>
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brand-300">Question</p>
+      <h1 class="mt-1 text-2xl font-bold text-white md:text-3xl">
+        {% if question %}
+        {% if question.question_type_name == 'higher_budget' %}
+        Which movie had a higher budget?
+        {% elif question.question_type_name == 'higher_revenue' %}
+        Which movie made more revenue?
+        {% elif question.question_type_name == 'longer_runtime' %}
+        Which movie is longer?
+        {% elif question.question_type_name == 'higher_rating' %}
+        Which movie has a higher rating?
+        {% elif question.question_type_name == 'more_votes' %}
+        Which movie has more votes?
+        {% else %}
+        {{ question.question_type_name }}
+        {% endif %}
+        {% else %}
+        Loading...
+        {% endif %}
+      </h1>
     </div>
 
-    <div class="hidden w-24 md:block"></div>
+    <div class="hidden w-24 md:block">
+      {% if result and not game_over %}
+      <a href="{{ url_for('game.play') }}" class="btn-primary px-6 py-2">Next</a>
+      {% endif %}
+    </div>
   </div>
 
-  <form method="post" class="w-full" data-game-form>
+  {% if question %}
+  <form action="{{ url_for('game.answer') }}" method="post"
+    class="w-full {{ 'blur-sm pointer-events-none' if game_over }}">
+    <input type="hidden" name="question_id" value="{{ question.question_id }}">
     <div class="grid gap-6 md:grid-cols-2">
-      {% for option in options %}
-      <button
-        type="submit"
-        name="selection"
-        value="{{ option.id }}"
-        class="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-900/40 focus:outline-none focus:ring-2 focus:ring-brand-500"
-      >
+
+      <!-- Option 1 -->
+      <button type="submit" name="selected_movie_id" value="{{ question.movie1_id }}" {% if result %}disabled{% endif %}
+        class="group relative flex flex-col overflow-hidden rounded-3xl border bg-slate-900 transition-all duration-300 
+        {% if result %}
+            {% if result.correct_movie_id == question.movie1_id %}
+                border-green-500 ring-2 ring-green-500 shadow-2xl shadow-green-900/40
+            {% elif user_selection == question.movie1_id and result.correct_movie_id != question.movie1_id %}
+                border-red-500 ring-2 ring-red-500 shadow-2xl shadow-red-900/40
+            {% else %}
+                border-slate-800 opacity-50
+            {% endif %}
+        {% else %}
+            border-slate-800 hover:-translate-y-1 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-900/40 focus:outline-none focus:ring-2 focus:ring-brand-500
+        {% endif %}">
         <div class="relative h-96 w-full overflow-hidden bg-slate-950">
-          <img
-            src="{{ option.image or url_for('static', filename='img/placeholder_poster.svg') }}"
-            alt="{{ option.title }}"
+          <img src="https://image.tmdb.org/t/p/w500/{{ question.movie1_poster }}" alt="{{ question.movie1_title }}"
             class="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-110 group-hover:opacity-100"
-          />
+            onerror="this.src='{{ url_for('static', filename='img/placeholder_poster.svg') }}'" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
-          <div class="absolute bottom-4 right-4 rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase text-white backdrop-blur-sm border border-slate-700 group-hover:border-brand-500 group-hover:text-brand-300">
+
+          {% if not result %}
+          <div
+            class="absolute bottom-4 right-4 rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase text-white backdrop-blur-sm border border-slate-700 group-hover:border-brand-500 group-hover:text-brand-300">
             Select
           </div>
+          {% endif %}
+
+          {% if result %}
+          <div class="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
+            <p class="text-4xl font-bold font-display text-white drop-shadow-lg">
+              {{ result.movie1_val }}
+            </p>
+          </div>
+          {% endif %}
         </div>
 
         <div class="absolute bottom-0 left-0 w-full p-6 text-left">
-          <h2 class="text-2xl font-bold text-white drop-shadow-md group-hover:text-brand-100">{{ option.title }}</h2>
-          <p class="mt-1 text-sm text-slate-300 group-hover:text-white">{{ option.year }}</p>
+          <h2 class="text-2xl font-bold text-white drop-shadow-md group-hover:text-brand-100">{{ question.movie1_title
+            }}</h2>
+        </div>
+      </button>
+
+      <!-- Option 2 -->
+      <button type="submit" name="selected_movie_id" value="{{ question.movie2_id }}" {% if result %}disabled{% endif %}
+        class="group relative flex flex-col overflow-hidden rounded-3xl border bg-slate-900 transition-all duration-300 
+        {% if result %}
+            {% if result.correct_movie_id == question.movie2_id %}
+                border-green-500 ring-2 ring-green-500 shadow-2xl shadow-green-900/40
+            {% elif user_selection == question.movie2_id and result.correct_movie_id != question.movie2_id %}
+                border-red-500 ring-2 ring-red-500 shadow-2xl shadow-red-900/40
+            {% else %}
+                border-slate-800 opacity-50
+            {% endif %}
+        {% else %}
+            border-slate-800 hover:-translate-y-1 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-900/40 focus:outline-none focus:ring-2 focus:ring-brand-500
+        {% endif %}">
+        <div class="relative h-96 w-full overflow-hidden bg-slate-950">
+          <img src="https://image.tmdb.org/t/p/w500/{{ question.movie2_poster }}" alt="{{ question.movie2_title }}"
+            class="h-full w-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-110 group-hover:opacity-100"
+            onerror="this.src='{{ url_for('static', filename='img/placeholder_poster.svg') }}'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
+
+          {% if not result %}
+          <div
+            class="absolute bottom-4 right-4 rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase text-white backdrop-blur-sm border border-slate-700 group-hover:border-brand-500 group-hover:text-brand-300">
+            Select
+          </div>
+          {% endif %}
+
+          {% if result %}
+          <div class="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
+            <p class="text-4xl font-bold font-display text-white drop-shadow-lg">
+              {{ result.movie2_val }}
+            </p>
+          </div>
+          {% endif %}
         </div>
 
-        <div class="absolute inset-0 bg-brand-500/0 transition-colors group-active:bg-brand-500/10"></div>
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left">
+          <h2 class="text-2xl font-bold text-white drop-shadow-md group-hover:text-brand-100">{{ question.movie2_title
+            }}</h2>
+        </div>
       </button>
-      {% endfor %}
-    </div>
 
-    {% if result %}
-    <div class="mt-8 animate-bounce-in rounded-3xl border border-{{ 'brand-500' if result.correct else 'red-500' }}/50 bg-slate-900/80 p-8 text-center backdrop-blur-md">
-      <p class="text-2xl font-bold {{ 'text-brand-400' if result.correct else 'text-red-400' }} mb-2">
-        {{ result.message }}
-      </p>
-      <p class="text-lg text-white">
-        {{ result.detail }}
-      </p>
-      <button type="submit" name="next" value="true" class="btn-secondary mt-6">
-        Next Round
-      </button>
     </div>
-    {% endif %}
   </form>
+  {% endif %}
+
+  {% if result and not game_over %}
+  <div class="flex justify-center pt-8">
+    <a href="{{ url_for('game.play') }}"
+      class="btn-primary px-12 py-4 text-xl shadow-xl shadow-brand-500/20 hover:scale-105">
+      Next Question
+    </a>
+  </div>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="mt-8 space-y-4 {{ 'blur-sm pointer-events-none' if game_over }}">
+    {% for category, message in messages %}
+    <div
+      class="p-4 rounded-lg {{ 'bg-green-500/20 text-green-400 border border-green-500/50' if category == 'success' else 'bg-red-500/20 text-red-400 border border-red-500/50' }}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
 </section>
 {% endblock %}
