@@ -21,7 +21,7 @@
     </div>
     {% endif %}
 
-    {# --- İçerik Alanı (z-10 ile resmin üzerine çıkartıldı) --- #}
+    {# --- İçerik Alanı --- #}
     <div class="relative z-10 grid gap-8 p-8 lg:grid-cols-[2fr,3fr]">
 
       {# --- POSTER --- #}
@@ -63,20 +63,17 @@
         <div class="flex flex-wrap gap-4 pt-2">
           <form method="post" action="{{ url_for('movies.toggle_favorite', movie_id=movie.id) }}">
             <button class="btn-primary flex items-center gap-2 transition-transform active:scale-95" type="submit">
-              
               {% if movie.is_favorite %}
                 <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
                 </svg>
                 <span>Remove Favorite</span>
-              
               {% else %}
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
                 <span>Add to Favorites</span>
               {% endif %}
-
             </button>
           </form>
           
@@ -139,7 +136,7 @@
   </section>
 
 
-  {# -------------------- CAST (Oyuncular) -------------------- #}
+  {# -------------------- CAST -------------------- #}
   <section class="mt-10">
     <div class="mb-6 flex items-center justify-between">
       <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">
@@ -148,7 +145,8 @@
       <a href="{{ url_for('actors.get_actors') }}" class="text-xs uppercase tracking-[0.2em] text-brand-400 hover:text-white transition">View Full Cast</a>
     </div>
     
-    <div class="mt-4 rail-scroll pb-4"> {% for member in cast %}
+    <div class="mt-4 rail-scroll pb-4"> 
+      {% for member in cast %}
       <div class="rail-card group min-w-[140px] relative">
         <div class="aspect-[3/4] overflow-hidden rounded-xl bg-slate-800">
           <img src="{{ url_for('static', filename='img/' ~ member.profile_url) if member.profile_url else url_for('static', filename='img/placeholder_avatar.svg') }}" 
@@ -167,54 +165,66 @@
     </div>
   </section>
 
-  {# -------------------- COMMUNITY REVIEWS -------------------- #}
+  {# -------------------- COMMUNITY REVIEWS (BİRLEŞTİRİLEN KISIM) -------------------- #}
   <section class="mt-6 rounded-3xl border border-white/10 bg-black/60 p-6">
-  <div class="flex items-center justify-between">
-  <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Community reviews</h3>
-  <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ reviews | length }} entries</span>
-  </div>
-  <div class="mt-4 space-y-4">
-  {% for review in reviews %}
-  <article class="rounded-2xl border border-white/10 bg-white/5 p-4">
-  <div class="flex items-center justify-between text-sm">
-  <strong class="text-white">{{ review.author }}</strong>
-  <div class="flex items-center gap-1">
-  {# Yıldızlı rating #}
-  {% for i in range(1, 11) %}
-  {% if i <= review.rating | round(0, 'floor') %}
-  <span class="text-yellow-400">★</span>
-  {% else %}
-  <span class="text-white/40">★</span>
-  {% endif %}
-  {% endfor %}
-  <span class="ml-2 text-white/60">{{ review.rating }}/10</span>
-  </div>
-  </div>
-  <p class="mt-2 text-sm text-white/80">{{ review.comment }}</p>
-  </article>
-  {% else %}
-  <p class="text-sm text-white/60">No comments yet. Be the first to share your thoughts.</p>
-  {% endfor %}
-  </div>
+    <div class="flex items-center justify-between">
+      <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Community reviews</h3>
+      <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ total_reviews_count }} entries</span>
+    </div>
 
-  {% if total_reviews_count > 3 %}
-  <div class="mt-4 text-center">
-  <a href="{{ url_for('movie_comments', movie_id=movie.id) }}" class="inline-flex items-center gap-2 text-sm font-medium text-brand-300 hover:text-white transition-colors">
-  View all {{ total_reviews_count }} reviews
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-  </svg>
-  </a>
-  </div>
-  {% endif %}
+    <div class="mt-4 space-y-4">
+      {% for review in reviews %}
+      <article class="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div class="flex items-center justify-between text-sm">
+          <strong class="text-white">{{ review.author or ("User #" ~ review.user_id) }}</strong>
+          <div class="flex items-center gap-1">
+            <span class="text-yellow-400">★</span>
+            <span class="ml-2 text-white/60">{{ review.rating }}/10</span>
+          </div>
+        </div>
+        
+        {% if review.has_spoiler %}
+            <p class="mt-2 text-sm text-white/40 italic">Contains spoilers. View all to reveal.</p>
+        {% else %}
+            <p class="mt-2 text-sm text-white/80">{{ review.body }}</p>
+        {% endif %}
+      </article>
+      {% else %}
+      <p class="text-sm text-white/60">No comments yet. Be the first to share your thoughts.</p>
+      {% endfor %}
+    </div>
 
-  {# Review form #}
-  <form method="post" action="{{ url_for('comments.create_comment_route', movie_id=movie.id) }}" class="mt-6 space-y-4">
-  <label class="text-xs uppercase tracking-[0.4em] text-white/60" for="rating">Leave a rating</label>
-  <input class="form-field" type="number" name="rating" id="rating" min="1" max="10" step="0.5" placeholder="8.5" />
-  <textarea class="form-field" name="comment" rows="4" placeholder="Share what you loved or not"></textarea>
-  <button class="btn-primary">Submit review</button>
-  </form>
+    {% if total_reviews_count > 3 %}
+    <div class="mt-4 text-center">
+        <a href="{{ url_for('movies.get_movie_reviews_page', movie_id=movie.id) }}" class="inline-flex items-center gap-2 text-sm font-medium text-brand-300 hover:text-white transition-colors">
+            View all {{ total_reviews_count }} reviews
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+            </svg>
+        </a>
+    </div>
+    {% endif %}
+
+    {# Review form (SENİN SPOILER CHECKBOX'IN EKLENDİ) #}
+    <form method="post" action="{{ url_for('comments.create_comment_route') }}" class="mt-6 space-y-4 pt-6 border-t border-white/10">
+      
+      <input type="hidden" name="movie_id" value="{{ movie.id }}">
+
+      <div class="flex items-center justify-between">
+          <label class="text-xs uppercase tracking-[0.4em] text-white/60" for="rating">Leave a rating</label>
+          
+          <div class="flex items-center gap-2">
+            <input type="checkbox" name="has_spoiler" id="has_spoiler" class="w-4 h-4 rounded border-white/20 bg-white/5 text-brand-500 focus:ring-brand-500">
+            <label for="has_spoiler" class="text-xs text-white/60 uppercase tracking-widest">Contains Spoilers</label>
+          </div>
+      </div>
+
+      <div class="flex gap-4">
+          <input class="form-field w-24" type="number" name="rating" id="rating" min="1" max="10" step="1" placeholder="Score" required />
+          <input class="form-field flex-1" type="text" name="body" placeholder="Share your thoughts..." required />
+          <button class="btn-secondary whitespace-nowrap">Post</button>
+      </div>
+    </form>
   </section>
 
 </article>

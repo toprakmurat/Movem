@@ -3,6 +3,7 @@ from src.config.database import execute_query
 from src.services.movie_service import *
 from src.services.favorite_service import *
 from flask_login import current_user
+from src.services.comments_service import get_comments_for_movie
 
 movies_bp = Blueprint('movies', __name__)
 
@@ -45,6 +46,14 @@ def movies_details_page(movie_id):
 
     if not movie_detail:
         return "Movie not found", 404
+    
+    all_comments, comm_err = get_comments_for_movie(movie_id)
+    if not all_comments:
+        all_comments = []
+
+    reviews_preview = all_comments[:3]
+    movie_detail['reviews'] = reviews_preview
+    movie_detail['total_reviews_count'] = len(all_comments)
 
     return render_template('movie_detail.html', **movie_detail)
 
@@ -354,3 +363,51 @@ def delete_platform_route(platform_id):
         return jsonify({"error": err}), 500
         
     return jsonify(dict(deleted)), 200
+
+# Routes reviews page from movie page
+
+@movies_bp.route('/<int:movie_id>/reviews', methods=['GET'])
+def get_movie_reviews_page(movie_id):
+    movie, err = get_movie_by_id_db(movie_id)
+    if not movie:
+        return render_template("404.html"), 404
+
+    sort_by = request.args.get('sort', 'newest')
+    spoiler_filter = request.args.get('spoiler', 'all')
+
+    all_reviews, _ = get_comments_for_movie(movie_id, sort_by=sort_by, spoiler_filter=spoiler_filter)
+    
+    if not all_reviews:
+        all_reviews = []
+
+    page = request.args.get('page', 1, type=int)
+    
+    class SimplePagination:
+        def __init__(self, items, page, per_page):
+            self.total = len(items)
+            self.page = page
+            self.per_page = per_page
+            start = (page - 1) * per_page
+            end = start + per_page
+            self.items = items[start:end]
+            @property
+            def has_prev(self): return self.page > 1
+            @property
+            def has_next(self): return (self.page * self.per_page) < self.total
+            @property
+            def prev_num(self): return self.page - 1
+            @property
+            def next_num(self): return self.page + 1
+            def start_index(self): return ((self.page - 1) * self.per_page) + 1 if self.total > 0 else 0
+            def end_index(self): return min(self.page * self.per_page, self.total)
+
+    pagination = SimplePagination(all_reviews, page=page, per_page=20)
+
+    return render_template(
+        "comments.html",
+        movie=movie,
+        reviews=pagination,
+        current_sort=sort_by,
+        current_spoiler=spoiler_filter,
+        user_votes={} 
+    )

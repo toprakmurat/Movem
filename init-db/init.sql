@@ -115,7 +115,8 @@ CREATE TABLE IF NOT EXISTS comments (
     rating INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     comment_likes INTEGER,
-    comment_dislikes INTEGER
+    comment_dislikes INTEGER,
+    has_spoiler BOOLEAN DEFAULT FALSE
 );
 
 ------------------------------------------------------------

@@ -30,14 +30,15 @@ def create_comment(comment_data):
         rating = comment_data.get('rating') 
         comment_likes = comment_data.get('comment_likes', 0)
         comment_dislikes = comment_data.get('comment_dislikes', 0)
+        has_spoiler = comment_data.get('has_spoiler', False)
 
         new_comment_list = execute_query(
             """
-            INSERT INTO comments (user_id, movie_id, body, rating, comment_likes, comment_dislikes)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO comments (user_id, movie_id, body, rating, comment_likes, comment_dislikes, has_spoiler)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING *
             """,
-            (user_id, movie_id, body, rating, comment_likes, comment_dislikes),
+            (user_id, movie_id, body, rating, comment_likes, comment_dislikes, has_spoiler),
             fetch=True
         )
         
@@ -67,7 +68,7 @@ def create_comment(comment_data):
     
 
 def update_comment(comment_id, comment_data):
-    """Updates an existing comment AND recalculates the movie's average rating"""
+    """Updates an existing comment (body, rating, spoiler) AND recalculates stats"""
     try:
         comment_check, err = get_comment_by_id(comment_id)
         if err:
@@ -78,14 +79,20 @@ def update_comment(comment_id, comment_data):
 
         update_fields = []
         params = []
-        
+                
         if 'body' in comment_data:
             update_fields.append("body = %s")
             params.append(comment_data['body'])
         if 'rating' in comment_data:
             update_fields.append("rating = %s")
             params.append(comment_data['rating'])
-        
+            
+        if 'has_spoiler' in comment_data:
+            update_fields.append("has_spoiler = %s")
+            spoiler_val = comment_data['has_spoiler']
+            is_spoiler = True if spoiler_val in [True, 'true', 'on', '1'] else False
+            params.append(is_spoiler)
+                
         if not update_fields:
             return comment_check, None 
 
@@ -103,8 +110,8 @@ def update_comment(comment_id, comment_data):
             return None, "Failed to update comment"
         
         updated_comment = updated_comment_list[0]
-        new_rating = comment_data.get('rating') 
         
+        new_rating = comment_data.get('rating') 
         if new_rating is not None and new_rating != old_rating:
             try:
                 execute_query(
@@ -117,7 +124,7 @@ def update_comment(comment_id, comment_data):
                     (old_rating, new_rating, movie_id)
                 )
             except Exception as e:
-                print(f"WARNING: Comment {comment_id} updated, but failed to *recalculate* statistics for movie {movie_id}. Error: {e}")
+                print(f"WARNING: Stats update failed: {e}")
 
         return updated_comment, None
     except Exception as e:
@@ -163,16 +170,41 @@ def delete_comment_by_id(comment_id):
         return None, str(e)
 
 
-def get_comments_for_movie(movie_id):
-    """Gets all comments for a specific movie"""
+def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all'):
+    """
+    Gets comments with filtering, sorting AND username (JOIN).
+    """
     try:
-        comments = execute_query(
-            "SELECT * FROM comments WHERE movie_id = %s ORDER BY created_at DESC",
-            (movie_id,), fetch=True
-        )
+        query = """
+            SELECT c.*, u.username as author, u.profile_picture as avatar
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            WHERE c.movie_id = %s
+        """
+        params = [movie_id]
+
+        if spoiler_filter == 'hide':
+            query += " AND c.has_spoiler = FALSE"
+
+        if sort_by == 'newest':
+            query += " ORDER BY c.created_at DESC"
+        elif sort_by == 'oldest':
+            query += " ORDER BY c.created_at ASC"
+        elif sort_by == 'rating_desc':
+            query += " ORDER BY c.rating DESC"
+        elif sort_by == 'rating_asc':
+            query += " ORDER BY c.rating ASC"
+        elif sort_by == 'likes':
+            query += " ORDER BY c.comment_likes DESC"
+        else:
+            query += " ORDER BY c.created_at DESC"
+
+        comments = execute_query(query, tuple(params), fetch=True)
+        
         if comments:
             return comments, None
-        return None, "No comments found for this movie"
+        return [], None
+
     except Exception as e:
         return None, str(e)
 
