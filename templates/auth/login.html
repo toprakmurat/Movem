@@ -1,29 +1,44 @@
 {% extends 'base.html' %}
 {% from 'partials/form_fields.html' import input, password %}
+
 {% block title %}Login • MoveM{% endblock %}
+
 {% block content %}
 <section class="mx-auto flex max-w-4xl flex-col gap-8 lg:flex-row">
   <div class="flex-1 space-y-6 rounded-3xl border border-slate-800 bg-slate-900/60 p-8">
     <h1 class="text-3xl font-semibold text-white">Welcome back</h1>
     <p class="text-slate-400">Sign in to access your personalized recommendations, favorites, and game stats.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="space-y-2">
+          {% for category, message in messages %}
+            <div class="p-4 rounded-lg text-sm font-medium border {{ 'border-red-500/50 bg-red-500/10 text-red-200' if category == 'error' else 'border-green-500/50 bg-green-500/10 text-green-200' }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
     <form method="post" class="space-y-6" novalidate>
       {{ input('email', 'Email address', 'email', 'you@example.com', request.form.email, form.email.errors if form else []) }}
       {{ password('password', 'Password', '••••••••', form.password.errors if form else []) }}
+
       <div class="flex items-center justify-between text-sm text-slate-400">
         <label class="inline-flex items-center gap-2">
           <input type="checkbox" name="remember" class="rounded border-slate-700 bg-slate-900 text-brand-400 focus:ring-brand-400" />
           Remember me
         </label>
-        {# <a href="{{ url_for('auth.forgot_password') }}" class="text-brand-300">Forgot password?</a> #}
       </div>
       <button class="btn-primary w-full">Login</button>
     </form>
   </div>
+
   <div class="flex-1 rounded-3xl border border-brand-500/20 bg-gradient-to-br from-brand-900/60 to-slate-900/80 p-8">
-    <h2 class="text-2xl font-semibold">New here?</h2>
+    <h2 class="text-2xl font-semibold text-white">New here?</h2>
     <p class="mt-4 text-slate-300">Create an account to build watchlists, join leaderboard challenges, and unlock exclusive features.</p>
     <div class="mt-8">
-      <a href="{{ url_for('auth.register') }}" class="btn-secondary w-full text-center">Create an account</a>
+      <a href="{{ url_for('auth.register') }}" class="btn-secondary w-full text-center block">Create an account</a>
     </div>
     <ul class="mt-8 space-y-4 text-sm text-slate-300">
       <li class="flex items-center gap-3">

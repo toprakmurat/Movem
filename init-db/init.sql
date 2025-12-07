@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(50),
     bio TEXT,
     birth_date DATE,
-    password_hash VARCHAR(128) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

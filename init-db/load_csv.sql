@@ -30,4 +30,4 @@
 -- movie_question
 \copy movie_question(id, question_type, movie1_id, movie2_id) FROM '/docker-entrypoint-initdb.d/db_movie_question.csv' DELIMITER ',' CSV HEADER
 
-
+SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
