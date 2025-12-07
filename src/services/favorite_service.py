@@ -105,3 +105,18 @@ def delete_favorite_db(id: int):
         return None, "Favorite not found"
     except Exception as e:
         return None, str(e)
+    
+
+def is_movie_favorite_for_user(user_id: int, movie_id: int) -> bool:
+    """Return True if the movie is in the given user's favorites"""
+    try:
+        fav = execute_query(
+            "SELECT 1 FROM favorites WHERE user_id = %s AND movie_id = %s",
+            (user_id, movie_id),
+            fetch=True
+        )
+        return bool(fav)
+    except Exception:
+        return False
+
+

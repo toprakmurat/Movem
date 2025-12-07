@@ -1,4 +1,4 @@
-<a href="{{ url_for('actors.get_actor', actor_id=person.id) }}">
+<a href="{{ url_for('actors.person_detail', person_id=person.id) }}">
   <article class="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60">
     <div class="relative">
       <img src="{{ url_for('static', filename='img/placeholder_avatar.svg') }}" alt="{{ person.name }} portrait" class="h-56 w-full rounded-xl object-cover" />

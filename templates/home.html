@@ -21,8 +21,8 @@
         <p class="max-w-2xl text-lg text-zinc-200 sm:text-xl">{{ movie.overview }}</p>
 
         <div class="flex flex-wrap gap-4 mt-4">
-          <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="btn-primary">View Details</a>
-          <a href="{{ url_for('movies') }}" class="btn-secondary flex items-center gap-1">
+          <a href="{{ url_for('movies.get_movie_by_id', movie_id=movie.id) }}" class="btn-primary">View Details</a>
+          <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9v6m3.75-6v6M5 5l1.5 14h11L19 5H5z" />
             </svg>
@@ -81,12 +81,12 @@
   <section class="mx-auto max-w-6xl space-y-6 mb-12">
     <div class="flex items-center justify-between">
       <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">People Spotlight</h2>
-      <a href="{{ url_for('people') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">See all</a>
+      <a href="{{ url_for('actors.get_actors') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">See all</a>
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {% for person in featured_people %}
-      <a href="{{ url_for('person_detail', person_id=person.id) }}" class="group rounded-2xl border border-white/10 bg-black/60 p-4 transition hover:border-white/40">
+      <a href="{{ url_for('actors.person_detail', person_id=person.id) }}" class="group rounded-2xl border border-white/10 bg-black/60 p-4 transition hover:border-white/40">
         <img src="{{ person.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
             alt="{{ person.name }}" 
             class="w-full h-56 object-cover rounded-xl mb-2" />
@@ -103,11 +103,12 @@
   <section class="space-y-6 mb-12 mx-auto max-w-6xl">
     <div class="flex items-center justify-between">
       <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Collections spotlight</h2>
-      <a href="{{ url_for('movies') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">Browse all</a>
+      <a href="{{ url_for('movies.movies_page') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">Browse all</a>
     </div>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {% for collection in featured_collections %}
-      <a href="{{ url_for('collection_detail', collection_id=collection.id) }}" class="group rounded-3xl border border-white/10 bg-gradient-to-br from-black via-black/70 to-brand-800/40 p-6 transition hover:border-white/40">
+      {# <a href="{{ url_for('collection_detail', collection_id=collection.id) }}" class="group rounded-3xl border border-white/10 bg-gradient-to-br from-black via-black/70 to-brand-800/40 p-6 transition hover:border-white/40"> #}
+      <a href="#" class="group rounded-3xl border border-white/10 bg-gradient-to-br from-black via-black/70 to-brand-800/40 p-6 transition hover:border-white/40">
         <p class="text-xs uppercase tracking-[0.4em] text-white/60">Collection</p>
         <h3 class="mt-2 text-2xl font-display tracking-widest text-white">{{ collection.title }}</h3>
         <p class="mt-4 text-sm text-white/70">{{ collection.count }} curated titles</p>
@@ -136,7 +137,7 @@
     <!-- The Slider (Rail) -->
     <div class="rail-scroll" data-rail="curated">
       {% for option in discovery_options %}
-      <a href="{{ url_for('movies', filter=option.link_param) }}" class="w-80 shrink-0 group relative flex h-80 flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-slate-900 transition-all duration-500 hover:scale-[1.02] hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-900/20">
+      <a href="{{ url_for('movies.movies_page', filter=option.link_param) }}" class="w-80 shrink-0 group relative flex h-80 flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-slate-900 transition-all duration-500 hover:scale-[1.02] hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-900/20">
 
         <!-- Background Image (The "First Movie") -->
         <img src="{{ option.image }}"
@@ -201,7 +202,7 @@
     <div class="rail-scroll" data-rail="reviewers">
       {% for reviewer in top_reviewers[:10] %}
       <article class="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
-        <a href="{{ url_for('person_detail', person_id=reviewer.id) }}" class="absolute inset-0 z-10" aria-label="View {{ reviewer.name }}"></a>
+        <a href="{{ url_for('actors.person_detail', person_id=reviewer.id) }}" class="absolute inset-0 z-10" aria-label="View {{ reviewer.name }}"></a>
         <div class="aspect-[2/3] w-full overflow-hidden rounded-t-2xl">
           <img src="{{ reviewer.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
                alt="{{ reviewer.name }}" 

@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, redirect, url_for
 from src.config.database import execute_query
 from src.services.movie_service import *
 from src.services.favorite_service import *
+from flask_login import current_user
 
 movies_bp = Blueprint('movies', __name__)
 
@@ -16,8 +17,11 @@ def movies_page():
     page = request.args.get("page", default=1, type=int)
     per_page = request.args.get("per_page", default=8, type=int)
 
+    genre_id = request.args.get("genre", type=int)
+    sort_by = request.args.get("sort")
+
     # Paginated movies
-    pagination, err_movies = get_movies_paginated_db(page=page, per_page=per_page)
+    pagination, err_movies = get_movies_paginated_db(page=page, per_page=per_page, genre_id=genre_id, sort_by=sort_by)
     if err_movies:
         return f"Error fetching movies: {err_movies}", 500
 
@@ -33,14 +37,31 @@ def movies_page():
     )
 
 @movies_bp.route('/<int:movie_id>', methods=['GET'])
-def get_movie_by_id(movie_id):
-    """Get a specific movie"""
-    movie, err = get_movie_by_id_db(movie_id)
+def movies_details_page(movie_id):
+    movie_detail, err = get_movie_details_full_db(movie_id)
+    
     if err:
-        return jsonify({"error": err}), 500
-    if not movie:
-        return jsonify({"message": "Movie not found"}), 404
-    return jsonify(movie), 200
+        return f"Error fetching movie details: {err}", 500
+
+    if not movie_detail:
+        return "Movie not found", 404
+
+    return render_template('movie_detail.html', **movie_detail)
+
+@movies_bp.route('/<int:movie_id>/favorite', methods=['POST'])
+def toggle_favorite(movie_id):
+    if not current_user.is_authenticated:
+        return jsonify({"message": "You need to login to add favorites."}), 401
+
+    result, error = toggle_favorite_db(current_user.id, movie_id)
+
+    if error:
+        return jsonify({"error": error}), 500
+
+    action = result["action"]
+    message = "Added to favorites" if action == "added" else "Removed from favorites"
+
+    return redirect(url_for('movies.movies_details_page', movie_id=movie_id))
 
 
 @movies_bp.route("/", methods=["POST"])

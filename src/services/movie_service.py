@@ -1,6 +1,8 @@
 from src.config.database import execute_query
+from src.services.favorite_service import *
 from typing import List, Any
 from dataclasses import dataclass
+from flask_login import current_user
 
 @dataclass
 class Pagination:
@@ -40,23 +42,177 @@ class Pagination:
 
 ######################### MOVIES ##########################
 
-def get_movies_paginated_db(page: int = 1, per_page: int = 8):
+def get_movies_paginated_db(page: int = 1, per_page: int = 8, genre_id: int = None, sort_by: str = None):
     try:
-        total_result = execute_query("SELECT COUNT(*) as count FROM movies", fetch=True)
+        offset = (page - 1) * per_page
+
+        if genre_id:
+            join_genre = "JOIN movies_genres mg ON m.id = mg.movie_id"
+            where_genre = "WHERE mg.genre_id = %s"
+            params_count = (genre_id,)
+            params_data = (genre_id, per_page, offset)
+        else:
+            join_genre = ""
+            where_genre = ""
+            params_count = ()
+            params_data = (per_page, offset)
+
+        count_sql = f"""
+            SELECT COUNT(DISTINCT m.id) as count 
+            FROM movies m 
+            {join_genre} 
+            {where_genre}
+        """
+        total_result = execute_query(count_sql, params_count, fetch=True)
         total_count = total_result[0]['count'] if total_result else 0
 
-        offset = (page - 1) * per_page
-        movies = execute_query(
-            "SELECT * FROM movies ORDER BY title LIMIT %s OFFSET %s",
-            (per_page, offset),
-            fetch=True
-        ) or []
+        if sort_by == "rating_desc" or sort_by == "rating": 
+            order_clause = "ORDER BY s.vote_avg DESC"       
+        
+        elif sort_by == "rating_asc":
+            order_clause = "ORDER BY s.vote_avg ASC"        
+            
+        elif sort_by == "release_desc" or sort_by == "release":
+            order_clause = "ORDER BY m.release_date DESC"   
+            
+        elif sort_by == "release_asc":
+            order_clause = "ORDER BY m.release_date ASC" 
+
+        else:
+            order_clause = "ORDER BY m.title ASC"           
+
+        base_select = """
+            SELECT DISTINCT m.*, m.poster_file as poster_path, s.vote_avg as rating, s.vote_count, s.runtime
+            FROM movies m
+            LEFT JOIN statistic s ON m.id = s.movie_id
+        """
+
+        sql = f"""
+            {base_select}
+            {join_genre}
+            {where_genre}
+            {order_clause}
+            LIMIT %s OFFSET %s
+        """
+
+        movies = execute_query(sql, params_data, fetch=True) or []
 
         return Pagination(items=movies, page=page, per_page=per_page, total_count=total_count), None
+
     except Exception as e:
+        print(f"DB Error: {e}")
         return Pagination(items=[], page=page, per_page=per_page, total_count=0), str(e)
 
+def get_movie_details_full_db(movie_id: int):
+    """
+    Get detailed page for movies 
+    """
+    try:
+        sql_movie = """
+            SELECT 
+                m.id, m.title, m.overview, m.tagline, m.release_date, 
+                m.poster_file, m.banner_file,
+                s.runtime, s.vote_avg, s.vote_count, s.budget, s.revenue,
+                p.platform_name, p.logo_path as platform_logo
+            FROM movies m
+            LEFT JOIN statistic s ON m.id = s.movie_id
+            LEFT JOIN platforms p ON m.platform_id = p.id
+            WHERE m.id = %s
+        """
+        movie_rows = execute_query(sql_movie, (movie_id,), fetch=True)
+        
+        if not movie_rows:
+            return None, "Movie not found"
 
+        row = movie_rows[0]
+
+        sql_genres = """
+            SELECT g.genre_name 
+            FROM genres g
+            JOIN movies_genres mg ON g.id = mg.genre_id
+            WHERE mg.movie_id = %s
+        """
+        genre_rows = execute_query(sql_genres, (movie_id,), fetch=True)
+        genre_list = [g['genre_name'] for g in genre_rows] if genre_rows else []
+
+        try:
+            sql_cast = """
+                SELECT a.name, c.character_name as character, a.profile_file as profile_url
+                FROM casts c
+                JOIN actors a ON c.actor_id = a.id
+                WHERE c.movie_id = %s
+                LIMIT 10
+            """
+            cast_list = execute_query(sql_cast, (movie_id,), fetch=True) or []
+        except:
+            cast_list = [] 
+
+        try:
+            sql_reviews = """
+                SELECT author, rating, comment, created_at 
+                FROM reviews WHERE movie_id = %s 
+                ORDER BY created_at DESC LIMIT 5
+            """
+            reviews_list = execute_query(sql_reviews, (movie_id,), fetch=True) or []
+        except:
+            reviews_list = []
+
+        try:
+            sql_fav = "SELECT COUNT(*) as count FROM favorites WHERE movie_id = %s"
+            fav_data = execute_query(sql_fav, (movie_id,), fetch=True)
+            fav_count = fav_data[0]['count'] if fav_data else 0
+        except:
+            fav_count = 0
+
+
+        movie_data = {
+            'id': row['id'],
+            'title': row['title'],
+            'overview': row['overview'],
+            'tagline': row['tagline'],
+            'release_date': row['release_date'],
+            'poster_file': row['poster_file'],  
+            'banner_file': row['banner_file'],
+            'genre_list': genre_list,
+            'is_favorite': False
+        }
+
+        if current_user.is_authenticated:
+            movie_data['is_favorite'] = is_movie_favorite_for_user(current_user.id, movie_id)
+        else:
+            movie_data['is_favorite'] = False
+
+        statistic_data = {
+            'runtime': row['runtime'],
+            'vote_avg': row['vote_avg'],
+            'vote_count': row['vote_count'],
+            'budget': f"${row['budget']:,.0f}" if row['budget'] else "Unknown",
+            'revenue': f"${row['revenue']:,.0f}" if row['revenue'] else "Unknown"
+        }
+
+        providers_data = []
+        if row['platform_name']:
+            providers_data.append({
+                'name': row['platform_name'],
+                'logo': row['platform_logo']
+            })
+
+        full_context = {
+            'movie': movie_data,
+            'statistic': statistic_data,
+            'cast': cast_list,
+            'reviews': reviews_list,
+            'providers': providers_data,
+            'favorite_count': fav_count,
+            'total_reviews_count': len(reviews_list)
+        }
+
+        return full_context, None
+
+    except Exception as e:
+        print(f"DB Detailed Error: {e}")
+        return None, str(e)
+    
 def get_movies_db():
     """Get all movies"""
     try:
@@ -72,7 +228,47 @@ def get_movies_db():
     except Exception as e:
         return None, str(e)
 
+def toggle_favorite_db(user_id: int, movie_id: int):
+    """
+    Toggle favorite
+    """
 
+    try:
+        favorites, err = get_favorites_db()
+        if err:
+            return None, err
+
+        existing = None
+        for fav in favorites:
+            if fav["user_id"] == user_id and fav["movie_id"] == movie_id:
+                existing = fav
+                break
+
+        if existing:
+            deleted, err = delete_favorite_db(existing["id"])
+            if err:
+                return None, err
+            return {
+                "action": "removed",
+                "favorite": deleted
+            }, None
+
+        new_fav, err = create_favorite_db({
+            "user_id": user_id,
+            "movie_id": movie_id
+        })
+        if err:
+            return None, err
+
+        return {
+            "action": "added",
+            "favorite": new_fav
+        }, None
+
+    except Exception as e:
+        return None, str(e)
+
+    
 def get_movie_by_id_db(id: int):
     """Get movie by id"""
     try:

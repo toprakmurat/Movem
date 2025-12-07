@@ -10,12 +10,16 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(50) UNIQUE NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    bio TEXT,
     birth_date DATE,
-    password_hash VARCHAR(128) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    game_score INTEGER
+    game_score INTEGER,
+    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg'
 );
 
 ------------------------------------------------------------
@@ -148,4 +152,24 @@ CREATE TABLE IF NOT EXISTS people_question (
     actor2_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+------------------------------------------------------------
+-- user_lists table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS user_lists (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    list_name VARCHAR(100) NOT NULL,
+    is_public BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+------------------------------------------------------------
+-- list_items table
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS list_items (
+    id SERIAL PRIMARY KEY,
+    list_id INTEGER REFERENCES user_lists(id) ON DELETE CASCADE,
+    movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(list_id, movie_id)
+);

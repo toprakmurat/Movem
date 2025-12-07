@@ -39,7 +39,7 @@ services:
       DB_MIN_CONNECTIONS: ${DB_MIN_CONNECTIONS}
       DB_MAX_CONNECTIONS: ${DB_MAX_CONNECTIONS}
     volumes:
-      - ./images:/app/images 
+      - ./static:/app/static 
       - ./src:/app/src
       - ./templates:/app/templates
 

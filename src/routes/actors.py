@@ -69,7 +69,7 @@ def get_actors():
     total_pages = (total + per_page - 1) // per_page  # Ceiling division
     
     # Check if request wants JSON (AJAX request) or HTML (browser request)
-    if request.headers.get('Accept') == 'application/json' or request.is_json or 'json' in request.args:
+    if request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json':
         # Return JSON for API calls
         return jsonify({
             'actors': [dict(actor) for actor in actors],
@@ -95,8 +95,8 @@ def get_actors():
                                     'has_prev': page > 1
         })
 
-@actors_bp.route('/<int:actor_id>', methods=['GET'])
-def get_actor(actor_id):
+@actors_bp.route('/<int:person_id>', methods=['GET'])
+def person_detail(person_id):
     """Get a specific actor - serves HTML or JSON based on request"""
     try:
         actor = execute_query(
@@ -105,44 +105,18 @@ def get_actor(actor_id):
             FROM people
             WHERE id = %s
             """,
-            (actor_id,),
+            (person_id,),
             fetch=True
         )
         
         if not actor:
-            return jsonify({'error': 'Actor not found'}), 404 
-               
-        # Get actor's filmography (movies they appeared in)
-        filmography = execute_query(
-            """
-            SELECT 
-                m.id as movie_id,
-                m.title,
-                m.release_year as year,
-                m.overview as summary,
-                m.poster_url,
-                m.vote_average as rating,
-                m.runtime,
-                mc.character_name as role
-            FROM movies m
-            JOIN movie_cast mc ON m.id = mc.movie_id
-            WHERE mc.person_id = %s
-            ORDER BY m.release_year DESC
-            """,
-            (actor_id,),
-            fetch=True
-        )
+            return jsonify({'error': 'Actor not found'}), 404
         
         # Check if request wants JSON or HTML
-        if request.headers.get('Accept') == 'application/json' or request.is_json or 'json' in request.args:
-            return jsonify({
-                'actor': dict(actor[0]),
-                'filmography': [dict(film) for film in filmography] if filmography else []
-            })
+        if request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json':
+            return jsonify({'actor': dict(actor[0])})
         else:
-            return render_template('person_detail.html',
-                                   person=dict(actor[0]),
-                                   filmography=[dict(film) for film in filmography] if filmography else [])
+            return render_template('person_detail.html', person=dict(actor[0]))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -161,20 +135,23 @@ def get_actor_movies(actor_id):
         if not actor:
             return jsonify({'error': 'Actor not found'}), 404
         
-        # Get movies with role and character information
-        movies = execute_query(
+        # Get actor's filmography (movies they appeared in)
+        filmography = execute_query(
             """
             SELECT 
-                m.id,
+                m.id AS movie_id,
                 m.title,
+                m.release_date,
                 m.overview,
                 m.tagline,
-                m.release_date,
-                m.poster_url,
-                mc.role,
-                mc.character_name
+                m.poster_file,
+                m.banner_file,
+                s.vote_avg AS rating,
+                s.runtime,
+                mc.character_name AS role
             FROM movies m
-            INNER JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            LEFT JOIN statistic s ON m.id = s.movie_id
             WHERE mc.person_id = %s
             ORDER BY m.release_date DESC
             """,
@@ -184,8 +161,8 @@ def get_actor_movies(actor_id):
         
         return jsonify({
             'actor': dict(actor[0]),
-            'movies': [dict(movie) for movie in movies],
-            'total_movies': len(movies)
+            'filmography': [dict(film) for film in filmography] if filmography else [],
+            'total_movies': len(filmography) if filmography else 0
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

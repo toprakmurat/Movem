@@ -10,15 +10,20 @@
     </div>
     <form class="flex flex-wrap gap-3 text-sm">
       <select name="genre" class="form-field w-48">
-        <option value="">All genres</option>
-        {% for genre in genres %}
-        <option value="{{ genre.id }}" {% if genre.id == request.args.get('genre', type=int) %}selected{% endif %}>{{ genre.name }}</option>
-        {% endfor %}
-      </select>
+      <option value="">All genres</option>
+      {% for genre in genres %}
+        <option value="{{ genre['id'] }}" 
+                {% if request.args.get('genre') and genre['id'] == request.args.get('genre')|int %}selected{% endif %}>
+            {{ genre['genre_name'] }}
+        </option>
+      {% endfor %}
+    </select>
       <select name="sort" class="form-field w-48">
-        <option value="trending">Trending</option>
-        <option value="rating" {% if request.args.get('sort') == 'rating' %}selected{% endif %}>Top rated</option>
-        <option value="release" {% if request.args.get('sort') == 'release' %}selected{% endif %}>Newest</option>
+      <option value="rating_desc" {% if request.args.get('sort') == 'rating_desc' %}selected{% endif %}>Highest Rated</option>
+      <option value="rating_asc" {% if request.args.get('sort') == 'rating_asc' %}selected{% endif %}>Lowest Rated</option>
+      
+      <option value="release_desc" {% if request.args.get('sort') == 'release_desc' %}selected{% endif %}>Newest First</option>
+      <option value="release_asc" {% if request.args.get('sort') == 'release_asc' %}selected{% endif %}>Oldest First</option>
       </select>
       <button class="btn-secondary">Apply</button>
     </form>
@@ -34,13 +39,17 @@
   <div class="mt-8 flex items-center justify-between text-sm text-slate-400">
     <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
     <div class="flex gap-3">
+      
       {% if movies.has_prev %}
-      <a href="{{ url_for('movies', page=movies.prev_num, **request.args) }}" class="btn-secondary">Previous</a>
+      <a href="{{ url_for('movies.movies_page', page=movies.prev_num, genre=request.args.get('genre'), sort=request.args.get('sort')) }}" class="btn-secondary">Previous</a>
       {% endif %}
+
       {% if movies.has_next %}
-      <a href="{{ url_for('movies', page=movies.next_num, **request.args) }}" class="btn-primary">Next</a>
+      <a href="{{ url_for('movies.movies_page', page=movies.next_num, genre=request.args.get('genre'), sort=request.args.get('sort')) }}" class="btn-primary">Next</a>
       {% endif %}
+
     </div>
   </div>
+
 </section>
 {% endblock %}
