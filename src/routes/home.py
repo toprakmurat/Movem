@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, url_for
 from src.services.movie_service import *
 from src.services.users_service import *
 from src.routes.actors import *
+from src.services.comments_service import get_top_reviewers
 
 home_bp = Blueprint('home', __name__)
 
@@ -53,8 +54,10 @@ def home():
     best_movies_for_genres, _ = get_best_movies_detailed_db(60)
     best_movies_for_genres = [dict(m) for m in best_movies_for_genres]
 
-    top_reviewers, _ = get_users_db()
-    
+    top_reviewers, err = get_top_reviewers(limit=10)
+    if not top_reviewers:
+        top_reviewers = []
+
     data = {
         "trending_movies": best_movies,
         "featured_movies": featured_movies,
@@ -64,7 +67,7 @@ def home():
             {"id": 2, "title": "Family Night", "count": 8},
         ],
         "featured_people": featured_people[:4],
-        "top_reviewers": top_reviewers[:13],
+        "top_reviewers": top_reviewers,
         "home_movies": best_movies_for_genres,
         "discovery_options": discovery_options
     }

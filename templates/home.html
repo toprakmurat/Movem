@@ -197,9 +197,9 @@
     {% endfor %}
 
   {# -------------------- TOP REVIEWERS / COMMUNITY RAIL -------------------- #}
-  <section class="mb-12 mx-auto max-w-6xl">
-    <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Top Reviewers</h2>
+<section class="mt-12">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-semibold text-white">Top Reviewers</h2>
       <div class="flex gap-3">
         <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="reviewers">&larr;</button>
         <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="reviewers">&rarr;</button>
@@ -207,21 +207,24 @@
     </div>
 
     <div class="rail-scroll" data-rail="reviewers">
-      {% for reviewer in top_reviewers[:10] %}
+      {% for reviewer in top_reviewers %}
       <article class="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
-        <a href="{{ url_for('actors.person_detail', person_id=reviewer.id) }}" class="absolute inset-0 z-10" aria-label="View {{ reviewer.name }}"></a>
-        <div class="aspect-[2/3] w-full overflow-hidden rounded-t-2xl">
-          <img src="{{ reviewer.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
-               alt="{{ reviewer.name }}" 
+        
+        <a href="{{ url_for('auth.account') }}" class="absolute inset-0 z-10" aria-label="View {{ reviewer.username }}'s profile"></a>
+        
+        <div class="aspect-[1/1] w-full overflow-hidden rounded-t-2xl"> 
+          <img src="{{ url_for('static', filename='img/' ~ (reviewer.profile_picture or 'placeholder_profile.svg')) }}" 
+               alt="{{ reviewer.username }} avatar" 
                class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
         </div>
+        
         <div class="flex flex-1 flex-col gap-2 p-4">
-          <h3 class="text-lg font-semibold text-white">{{ reviewer.name }}</h3>
-          <p class="text-sm text-slate-400">{{ reviewer.known_for }}</p>
+          <h3 class="text-white font-semibold line-clamp-1">{{ reviewer.username }}</h3>
+          <p class="text-sm text-white/60">{{ reviewer.review_count }} Reviews</p> 
         </div>
       </article>
       {% else %}
-      <p class="text-sm text-zinc-400">No reviewers available.</p>
+        <p class="text-white/50 col-span-full">No reviewers found yet. Be the first!</p>
       {% endfor %}
     </div>
 </section>

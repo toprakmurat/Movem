@@ -290,3 +290,27 @@ def get_comments_by_user(user_id):
         return [], None
     except Exception as e:
         return None, str(e)
+    
+
+def get_top_reviewers(limit: int = 10):
+    """
+    Fetches the top reviewers based on the total number of comments made.
+    Joins with users table to get username and avatar.
+    """
+    try:
+        query = """
+            SELECT
+                u.username,
+                u.profile_picture,
+                u.id AS user_id,
+                COUNT(c.id) AS review_count
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            GROUP BY u.username, u.profile_picture, u.id
+            ORDER BY review_count DESC
+            LIMIT %s;
+        """
+        top_reviewers = execute_query(query, (limit,), fetch=True)
+        return top_reviewers, None
+    except Exception as e:
+        return None, str(e)
