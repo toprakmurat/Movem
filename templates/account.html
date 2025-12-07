@@ -39,7 +39,7 @@
             {{ current_user.bio or 'Keep watching and build your cinematic fingerprint on MoveM.' }}
         </p>
         <div class="flex flex-wrap gap-4">
-          <a href="#" class="btn-secondary">View catalog</a>
+          <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary">View catalog</a>
         </div>
       </div>
 
@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <div class="grid gap-6 lg:grid-cols-[1.15fr,0.85fr]">
+  <div class="grid gap-6 lg:grid-cols-[1.15fr,0.85fr]">    
     <form method="post" class="space-y-6 rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
       <div class="flex items-center justify-between">
         <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">Profile details</h2>
@@ -108,5 +108,81 @@
       </section>
     </div>
   </div>
+
+  <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">My Reviews & Ratings</h2>
+        <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ user_reviews|length }} entries</span>
+    </div>
+    
+    <div class="space-y-4">
+        {% for review in user_reviews %}
+        <div class="group relative flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-colors hover:border-white/20 hover:bg-white/10">
+            
+            <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}" class="shrink-0 w-24 sm:w-28 aspect-[2/3] overflow-hidden rounded-xl bg-black shadow-lg">
+                <img src="{{ url_for('static', filename='img/' ~ (review.movie_poster or 'placeholder_poster.svg')) }}" 
+                     alt="{{ review.movie_title }}" 
+                     class="h-full w-full object-cover transition duration-500 group-hover:scale-110">
+            </a>
+
+            <div class="flex flex-1 flex-col justify-between py-1">
+                <div>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <h3 class="font-semibold text-white text-lg leading-tight">
+                            <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}" class="hover:text-brand-400 transition">
+                                {{ review.movie_title }}
+                            </a>
+                        </h3>
+                        
+                        <div class="self-start sm:self-auto flex items-center gap-1.5 rounded-lg bg-black/40 px-3 py-1 text-yellow-400 font-bold border border-white/10">
+                            <span class="text-sm">★</span>
+                            <span>{{ review.rating }}</span>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-1 text-xs text-white/40">{{ review.created_at }}</p>
+
+                    {% if review.body %}
+                    <p class="mt-3 text-sm text-white/80 line-clamp-3 leading-relaxed">
+                        {{ review.body }}
+                    </p>
+                    {% else %}
+                    <p class="mt-3 text-xs text-white/40 italic">Rated without comment.</p>
+                    {% endif %}
+                </div>
+
+                <div class="mt-4 flex items-center gap-4 text-xs text-white/40 border-t border-white/5 pt-3">
+                    <span class="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
+                            <path d="M1 8.25a1.25 1.25 0 112.5 0v7.5a1.25 1.25 0 11-2.5 0v-7.5zM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0114 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 01-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 01-1.341-.317l-2.734-1.366A3 3 0 006.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 012.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388z" />
+                        </svg>
+                        {{ review.comment_likes or 0 }} Helpful
+                    </span>
+                    
+                    {% if review.has_spoiler %}
+                    <span class="rounded border border-red-500/20 bg-red-500/10 px-2 py-0.5 text-[10px] text-red-400 uppercase tracking-wider font-bold">
+                        Spoiler
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 py-12 text-center">
+            <div class="rounded-full bg-white/5 p-4 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-white/40">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                </svg>
+            </div>
+            <p class="text-lg font-medium text-white">No reviews yet</p>
+            <p class="text-sm text-white/40 mt-1 max-w-xs mx-auto">Start rating movies to build your personal collection of reviews.</p>
+            <a href="{{ url_for('movies.movies_page') }}" class="mt-6 btn-secondary inline-flex items-center gap-2">
+                Browse Movies
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+  </section>
+
 </section>
 {% endblock %}

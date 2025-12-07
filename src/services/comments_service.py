@@ -27,7 +27,11 @@ def create_comment(comment_data):
         user_id = comment_data.get('user_id')
         movie_id = comment_data.get('movie_id')
         body = comment_data.get('body')
+        if body == "": 
+            body = None
         rating = comment_data.get('rating') 
+        if rating is None:
+            return None, "Rating is required"
         comment_likes = comment_data.get('comment_likes', 0)
         comment_dislikes = comment_data.get('comment_dislikes', 0)
         has_spoiler = comment_data.get('has_spoiler', False)
@@ -81,11 +85,15 @@ def update_comment(comment_id, comment_data):
         params = []
                 
         if 'body' in comment_data:
+            body_val = comment_data['body']
+            if body_val == "": 
+                body_val = None
             update_fields.append("body = %s")
-            params.append(comment_data['body'])
+            params.append(body_val)
         if 'rating' in comment_data:
-            update_fields.append("rating = %s")
-            params.append(comment_data['rating'])
+            if comment_data['rating'] is not None:
+                update_fields.append("rating = %s")
+                params.append(comment_data['rating'])
             
         if 'has_spoiler' in comment_data:
             update_fields.append("has_spoiler = %s")
@@ -254,5 +262,31 @@ def dislike_comment(comment_id):
         if updated:
             return updated[0], None
         return None, "Comment not found"
+    except Exception as e:
+        return None, str(e)
+    
+
+def get_comments_by_user(user_id):
+    """
+    Get all reviews/ratings made by a specific user.
+    Joins with movies table to show movie title and poster.
+    """
+    try:
+        query = """
+            SELECT 
+                c.*, 
+                m.title as movie_title, 
+                m.poster_file as movie_poster,
+                m.id as movie_id
+            FROM comments c
+            JOIN movies m ON c.movie_id = m.id
+            WHERE c.user_id = %s
+            ORDER BY c.created_at DESC
+        """
+        user_reviews = execute_query(query, (user_id,), fetch=True)
+        
+        if user_reviews:
+            return user_reviews, None
+        return [], None
     except Exception as e:
         return None, str(e)

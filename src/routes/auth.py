@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 from src.services.users_service import create_user_db, get_user_by_email_db, update_user_db, get_user_by_id_db
 from src.models.user_model import User
+from src.services.comments_service import get_comments_by_user
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -117,6 +118,10 @@ def account():
         'games_played': 0
     }
 
+    user_reviews, err = get_comments_by_user(current_user.id)
+    if not user_reviews:
+        user_reviews = []
+
     favorites = []
     sessions = []
 
@@ -124,5 +129,6 @@ def account():
         'account.html',
         stats=stats,
         favorites=favorites,
-        sessions=sessions
+        sessions=sessions,
+        user_reviews=user_reviews
     )
