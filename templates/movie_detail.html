@@ -1,177 +1,221 @@
 {% extends 'base.html' %}
+
 {% block title %}{{ movie.title }} • MoveM{% endblock %}
+
 {% block content %}
 <article class="mx-auto max-w-6xl space-y-10">
-  {# -------------------- HERO SECTION -------------------- #}
-  <section class="relative overflow-hidden rounded-[40px] border border-white/10 bg-black/70">
+  
+  {# -------------------- HERO SECTION (BANNER) -------------------- #}
+  <section class="relative overflow-hidden rounded-[40px] border border-white/10 bg-slate-900 shadow-2xl">
 
-    <div class="grid gap-8 p-8 lg:grid-cols-[2fr,3fr]">
+    {# --- Banner Background Logic --- #}
+    {% if movie.banner_file %}
+    <div class="absolute inset-0 z-0">
+        <img src="{{ url_for('static', filename='img/' ~ movie.banner_file) }}"
+             alt="{{ movie.title }} banner"
+             class="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
+        
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent"></div>
+    </div>
+    {% endif %}
 
-      {# -------------------- POSTER -------------------- #}
-      <div class="relative">
-        <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" 
+    {# --- İçerik Alanı (z-10 ile resmin üzerine çıkartıldı) --- #}
+    <div class="relative z-10 grid gap-8 p-8 lg:grid-cols-[2fr,3fr]">
+
+      {# --- POSTER --- #}
+      <div class="relative group">
+        <img src="{{ url_for('static', filename='img/' ~ (movie.poster_file or 'placeholder_poster.svg')) }}" 
              alt="{{ movie.title }} poster" 
-             class="w-full rounded-3xl object-cover" />
+             class="w-full rounded-3xl object-cover shadow-lg shadow-black/50 transition duration-300 group-hover:scale-[1.02]" />
       </div>
 
-      {# -------------------- FILM DETAILS -------------------- #}
-      <div class="space-y-5">
-        <p class="text-xs uppercase tracking-[0.4em] text-white/50">
+      {# --- FILM DETAILS --- #}
+      <div class="flex flex-col justify-center space-y-6">
+        
+        <p class="text-xs uppercase tracking-[0.4em] text-brand-300 font-bold drop-shadow-md">
           {{ movie.genre_list | join(' • ') }}
         </p>
 
-        <h1 class="text-5xl font-display tracking-widest text-white">
+        <h1 class="text-5xl font-display tracking-widest text-white drop-shadow-lg">
           {{ movie.title }}
         </h1>
 
-        <p class="text-lg text-white/70">
-          {{ movie.tagline }}
+        {% if movie.tagline %}
+        <p class="text-lg text-slate-200 italic">
+          "{{ movie.tagline }}"
         </p>
+        {% endif %}
 
-        <div class="flex flex-wrap gap-4 text-sm text-white/60">
-          <span>Released {{ movie.release_date }}</span>
+        <div class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            {{ movie.release_date }}
+          </span>
+          <span class="h-1 w-1 rounded-full bg-slate-500"></span>
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4 text-brand-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {{ favorite_count }} Favorites
+          </span>
         </div>
 
-        <div class="inline-block rounded-3xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/80 mt-2">
-        Favorited by {{ favorite_count }} people
-      </div>
+        <div class="flex flex-wrap gap-4 pt-2">
+          <form method="post" action="{{ url_for('movies.toggle_favorite', movie_id=movie.id) }}">
+            <button class="btn-primary flex items-center gap-2 transition-transform active:scale-95" type="submit">
+              
+              {% if movie.is_favorite %}
+                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                </svg>
+                <span>Remove Favorite</span>
+              
+              {% else %}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span>Add to Favorites</span>
+              {% endif %}
 
-
-        <div class="flex flex-wrap gap-4">
-          <form method="post" action="{{ url_for('toggle_favorite', movie_id=movie.id) }}">
-            <button class="btn-primary" type="submit">
-              {% if movie.is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}
             </button>
           </form>
-          <a href="{{ url_for('movies') }}" class="btn-secondary">Back to catalog</a>
+          
+          <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary">Back to Catalog</a>
         </div>
 
-    
-    <div class="inline-block rounded-3xl border border-white/10 bg-white/5 px-4 py-3">
-      <p class="text-xs uppercase tracking-[0.4em] text-white/60 mb-1">Where to watch</p>
-      <div>
-        {% if providers %}
-          <span class="inline-flex items-center rounded-xl border border-white/20 bg-black/40 px-3 py-1.5 text-sm text-white">
-            {{ providers[0].name }}
-          </span>
-        {% else %}
-          <span class="text-xs text-white/60">Availability info coming soon.</span>
-        {% endif %}
-      </div>
-    </div>
-
+        <div class="mt-4 inline-block rounded-2xl border border-white/10 bg-black/40 px-5 py-3 backdrop-blur-md">
+            <p class="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">Where to watch</p>
+            <div class="flex items-center gap-3">
+              {% if providers %}
+                {% if providers[0].logo %}
+                  <img src="{{ url_for('static', filename='img/platforms/' ~ providers[0].logo) }}" 
+                  alt="{{ providers[0].name }}" 
+                  class="h-10 w-10 rounded-lg object-cover shadow-md">
+                {% endif %}
+                <span class="text-sm font-medium text-white">{{ providers[0].name }}</span>
+              {% else %}
+                <span class="text-xs text-white/60 italic">No streaming info available.</span>
+              {% endif %}
+            </div>
+        </div>
 
       </div>
     </div>
   </section>
 
-{# -------------------- SYNOPSIS & PRODUCTION FACTS -------------------- #}
-<section class="grid gap-6 lg:grid-cols-2">
-  <div class="rounded-3xl border border-white/10 bg-black/60 p-6">
-    <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Synopsis</h2>
-    <p class="mt-4 text-white/80 leading-relaxed">{{ movie.overview or "Overview not available." }}</p>
+  {# -------------------- SYNOPSIS & FACTS -------------------- #}
+  <section class="grid gap-6 lg:grid-cols-2">
+    <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-8 backdrop-blur-sm">
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-brand-300">Synopsis</h2>
+      <p class="mt-6 text-lg text-slate-300 leading-relaxed font-light">
+        {{ movie.overview or "Overview not available." }}
+      </p>
 
-    {# Metrics #}
-    <div class="mt-6 grid gap-4 sm:grid-cols-2">
-      <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-        <p class="text-xs uppercase tracking-[0.4em] text-white/60">Runtime</p>
-        <p class="mt-2 text-2xl font-semibold text-white">{{ statistic.runtime | default('—') }} min</p>
-      </div>
-      <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-        <p class="text-xs uppercase tracking-[0.4em] text-white/60">Rating</p>
-        <p class="mt-2 text-2xl font-semibold text-white">{{ statistic.vote_avg | default('—') }}/10</p>
-      </div>
-    </div>
-  </div>
-
-  {# Production Facts #}
-  <div class="rounded-3xl border border-white/10 bg-black/60 p-6">
-    <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Production facts</h3>
-    <dl class="mt-4 space-y-3 text-sm text-white/80">
-      <div class="flex justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-        <dt>Budget</dt>
-        <dd>{{ statistic.budget | default('—') }}</dd>
-      </div>
-      <div class="flex justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-        <dt>Revenue</dt>
-        <dd>{{ statistic.revenue | default('—') }}</dd>
-      </div>
-    </dl>
-  </div>
-</section>
-
-
-{# -------------------- CAST -------------------- #}
-<section class="mt-6">
-  <div class="mb-3 flex items-center justify-between">
-    <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Cast & Crew</h3>
-    <a href="{{ url_for('actors.get_actors') }}" class="text-xs uppercase tracking-[0.4em] text-white/60">Full credits</a>
-  </div>
-  <div class="mt-4 rail-scroll">
-    {% for member in cast %}
-    <div class="rail-card">
-      <img src="{{ member.profile_url or url_for('static', filename='img/placeholder_avatar.svg') }}" alt="{{ member.name }}" />
-      <div class="rail-card-content">
-        <p>{{ member.name }}</p>
-        <span class="text-xs text-white/70">as {{ member.character }}</span>
-      </div>
-    </div>
-    {% else %}
-    <p class="text-sm text-white/60">Cast details coming soon.</p>
-    {% endfor %}
-  </div>
-</section>
-
-{# -------------------- COMMUNITY REVIEWS -------------------- #}
-<section class="mt-6 rounded-3xl border border-white/10 bg-black/60 p-6">
-  <div class="flex items-center justify-between">
-    <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Community reviews</h3>
-    <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ reviews | length }} entries</span>
-  </div>
-  <div class="mt-4 space-y-4">
-    {% for review in reviews %}
-    <article class="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div class="flex items-center justify-between text-sm">
-        <strong class="text-white">{{ review.author }}</strong>
-        <div class="flex items-center gap-1">
-          {# Yıldızlı rating #}
-          {% for i in range(1, 11) %}
-            {% if i <= review.rating | round(0, 'floor') %}
-              <span class="text-yellow-400">★</span>
-            {% else %}
-              <span class="text-white/40">★</span>
-            {% endif %}
-          {% endfor %}
-          <span class="ml-2 text-white/60">{{ review.rating }}/10</span>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl border border-white/5 bg-white/5 p-4 text-center">
+          <p class="text-xs uppercase tracking-[0.4em] text-white/40">Runtime</p>
+          <p class="mt-1 text-2xl font-bold text-white">{{ statistic.runtime | default('—') }} min</p>
+        </div>
+        <div class="rounded-2xl border border-white/5 bg-white/5 p-4 text-center">
+          <p class="text-xs uppercase tracking-[0.4em] text-white/40">Rating</p>
+          <p class="mt-1 text-2xl font-bold text-brand-400">{{ statistic.vote_avg | default('—') }}<span class="text-sm text-white/40">/10</span></p>
         </div>
       </div>
-      <p class="mt-2 text-sm text-white/80">{{ review.comment }}</p>
-    </article>
-    {% else %}
-    <p class="text-sm text-white/60">No comments yet. Be the first to share your thoughts.</p>
-    {% endfor %}
+    </div>
+
+    <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-8 backdrop-blur-sm">
+      <h3 class="text-xl font-semibold uppercase tracking-[0.3em] text-white/80">Production Facts</h3>
+      <div class="mt-6 space-y-4">
+        <div class="flex justify-between items-center rounded-2xl border border-white/5 bg-white/5 px-6 py-4">
+          <span class="text-sm text-white/50">Budget</span>
+          <span class="text-lg font-mono text-white">{{ statistic.budget | default('—') }}</span>
+        </div>
+        <div class="flex justify-between items-center rounded-2xl border border-white/5 bg-white/5 px-6 py-4">
+          <span class="text-sm text-white/50">Revenue</span>
+          <span class="text-lg font-mono text-green-400">{{ statistic.revenue | default('—') }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  {# -------------------- CAST (Oyuncular) -------------------- #}
+  <section class="mt-10">
+    <div class="mb-6 flex items-center justify-between">
+      <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">
+      Cast & Crew
+    </h3>
+      <a href="{{ url_for('actors.get_actors') }}" class="text-xs uppercase tracking-[0.2em] text-brand-400 hover:text-white transition">View Full Cast</a>
+    </div>
+    
+    <div class="mt-4 rail-scroll pb-4"> {% for member in cast %}
+      <div class="rail-card group min-w-[140px] relative">
+        <div class="aspect-[3/4] overflow-hidden rounded-xl bg-slate-800">
+          <img src="{{ url_for('static', filename='img/' ~ member.profile_url) if member.profile_url else url_for('static', filename='img/placeholder_avatar.svg') }}" 
+               alt="{{ member.name }}" 
+               loading="lazy"
+               class="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+        </div>
+        <div class="mt-3">
+          <p class="text-sm font-semibold text-white truncate">{{ member.name }}</p>
+          <p class="text-xs text-slate-400 truncate">{{ member.character }}</p>
+        </div>
+      </div>
+      {% else %}
+      <p class="text-sm text-white/60">Cast details not available.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# -------------------- COMMUNITY REVIEWS -------------------- #}
+  <section class="mt-6 rounded-3xl border border-white/10 bg-black/60 p-6">
+  <div class="flex items-center justify-between">
+  <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Community reviews</h3>
+  <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ reviews | length }} entries</span>
+  </div>
+  <div class="mt-4 space-y-4">
+  {% for review in reviews %}
+  <article class="rounded-2xl border border-white/10 bg-white/5 p-4">
+  <div class="flex items-center justify-between text-sm">
+  <strong class="text-white">{{ review.author }}</strong>
+  <div class="flex items-center gap-1">
+  {# Yıldızlı rating #}
+  {% for i in range(1, 11) %}
+  {% if i <= review.rating | round(0, 'floor') %}
+  <span class="text-yellow-400">★</span>
+  {% else %}
+  <span class="text-white/40">★</span>
+  {% endif %}
+  {% endfor %}
+  <span class="ml-2 text-white/60">{{ review.rating }}/10</span>
+  </div>
+  </div>
+  <p class="mt-2 text-sm text-white/80">{{ review.comment }}</p>
+  </article>
+  {% else %}
+  <p class="text-sm text-white/60">No comments yet. Be the first to share your thoughts.</p>
+  {% endfor %}
   </div>
 
   {% if total_reviews_count > 3 %}
   <div class="mt-4 text-center">
-      <a href="{{ url_for('movie_comments', movie_id=movie.id) }}" class="inline-flex items-center gap-2 text-sm font-medium text-brand-300 hover:text-white transition-colors">
-          View all {{ total_reviews_count }} reviews
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-          </svg>
-      </a>
+  <a href="{{ url_for('movie_comments', movie_id=movie.id) }}" class="inline-flex items-center gap-2 text-sm font-medium text-brand-300 hover:text-white transition-colors">
+  View all {{ total_reviews_count }} reviews
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+  </svg>
+  </a>
   </div>
   {% endif %}
 
   {# Review form #}
-  <form method="post" action="{{ url_for('add_review', movie_id=movie.id) }}" class="mt-6 space-y-4">
-    <label class="text-xs uppercase tracking-[0.4em] text-white/60" for="rating">Leave a rating</label>
-    <input class="form-field" type="number" name="rating" id="rating" min="1" max="10" step="0.5" placeholder="8.5" />
-    <textarea class="form-field" name="comment" rows="4" placeholder="Share what you loved or not"></textarea>
-    <button class="btn-primary">Submit review</button>
+  <form method="post" action="{{ url_for('comments.create_comment_route', movie_id=movie.id) }}" class="mt-6 space-y-4">
+  <label class="text-xs uppercase tracking-[0.4em] text-white/60" for="rating">Leave a rating</label>
+  <input class="form-field" type="number" name="rating" id="rating" min="1" max="10" step="0.5" placeholder="8.5" />
+  <textarea class="form-field" name="comment" rows="4" placeholder="Share what you loved or not"></textarea>
+  <button class="btn-primary">Submit review</button>
   </form>
-</section>
-
+  </section>
 
 </article>
 {% endblock %}
