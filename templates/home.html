@@ -8,7 +8,7 @@
 
     {% for movie in trending_movies %}
     <div data-slide class="absolute inset-0 transition-all duration-700 {% if loop.first %}opacity-100 translate-x-0 pointer-events-auto{% else %}opacity-0 -translate-x-4 pointer-events-none{% endif %}">
-      <img src="{{ movie.backdrop_url or movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" 
+      <img src="{{ url_for('static', filename='img/' ~ (movie.banner_file or 'placeholder_poster.svg')) }}" 
            alt="{{ movie.title }} backdrop" 
            class="absolute inset-0 h-full w-full object-cover opacity-70" />
       <div class="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
@@ -18,10 +18,11 @@
         <h1 class="max-w-3xl text-5xl font-display uppercase tracking-[0.08em]">
           {{ movie.title }}
         </h1>
-        <p class="max-w-2xl text-lg text-zinc-200 sm:text-xl">{{ movie.overview }}</p>
+        <p class="max-w-2xl text-lg text-zinc-200 sm:text-xl">{{ movie.tagline or "Oops! Looks like this movie hasn’t spilled its secrets yet." }}
+</p>
 
         <div class="flex flex-wrap gap-4 mt-4">
-          <a href="{{ url_for('movies.get_movie_by_id', movie_id=movie.id) }}" class="btn-primary">View Details</a>
+          <a href="{{ url_for('movies.movies_details_page', movie_id=movie.id) }}" class="btn-primary">View Details</a>
           <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary flex items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9v6m3.75-6v6M5 5l1.5 14h11L19 5H5z" />
@@ -58,10 +59,10 @@
 
 </section>
 
-  {# -------------------- POPULAR ON MOVEM (HORIZONTAL RAIL) -------------------- #}
+  {# -------------------- Surprise Me (HORIZONTAL RAIL) -------------------- #}
   <section class="mb-12 mx-auto max-w-6xl">
     <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Popular on MoveM</h2>
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Surprise Me</h2>
       <div class="flex gap-3">
         <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="popular">&larr;</button>
         <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="popular">&rarr;</button>
@@ -168,26 +169,32 @@
   </section>
 
   {# -------------------- GENRE SPOTLIGHT (HORIZONTAL RAILS) -------------------- #}
-  {% set genre_list = ['Action', 'Fantasy', 'Comedy', 'Drama', 'Sci-Fi'] %}
-  {% for genre_name in genre_list %}
-  <section class="mb-12 mx-auto max-w-6xl">
-    <div class="mb-3 flex items-center justify-between">
-      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">{{ genre_name }} Movies</h2>
-      <div class="flex gap-3">
-        <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="genre-{{ loop.index }}">&larr;</button>
-        <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="genre-{{ loop.index }}">&rarr;</button>
-      </div>
-    </div>
-
-    <div class="rail-scroll" data-rail="genre-{{ loop.index }}">
-      {% for movie in featured_movies if genre_name in movie.genre_list %}
-        {% include 'partials/movie_card.html' with context %}
-      {% else %}
-        <p class="text-sm text-zinc-400">No {{ genre_name }} movies available.</p>
+    {% for genre_name in genres %}
+      {% set match = namespace(found=false) %}
+      {% for movie in home_movies %}
+        {% if genre_name in movie.genre_list %}
+          {% set match.found = true %}
+        {% endif %}
       {% endfor %}
-    </div>
-  </section>
-  {% endfor %}
+
+      {% if match.found %}
+      <section class="mb-12 mx-auto max-w-6xl">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">{{ genre_name }} Movies</h2>
+          <div class="flex gap-3">
+            <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="genre-{{ loop.index }}">&larr;</button>
+            <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="genre-{{ loop.index }}">&rarr;</button>
+          </div>
+        </div>
+
+        <div class="rail-scroll" data-rail="genre-{{ loop.index }}">
+          {% for movie in home_movies if genre_name in movie.genre_list %}
+            {% include 'partials/movie_card.html' %}
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    {% endfor %}
 
   {# -------------------- TOP REVIEWERS / COMMUNITY RAIL -------------------- #}
   <section class="mb-12 mx-auto max-w-6xl">

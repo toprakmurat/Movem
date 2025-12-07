@@ -1,5 +1,6 @@
 from src.config.database import execute_query
 from src.services.favorite_service import *
+from src.services.nexus_service import *
 from typing import List, Any
 from dataclasses import dataclass
 from flask_login import current_user
@@ -136,18 +137,6 @@ def get_movie_details_full_db(movie_id: int):
         genre_list = [g['genre_name'] for g in genre_rows] if genre_rows else []
 
         try:
-            sql_cast = """
-                SELECT a.name, c.character_name as character, a.profile_file as profile_url
-                FROM casts c
-                JOIN actors a ON c.actor_id = a.id
-                WHERE c.movie_id = %s
-                LIMIT 10
-            """
-            cast_list = execute_query(sql_cast, (movie_id,), fetch=True) or []
-        except:
-            cast_list = [] 
-
-        try:
             sql_reviews = """
                 SELECT author, rating, comment, created_at 
                 FROM reviews WHERE movie_id = %s 
@@ -197,6 +186,9 @@ def get_movie_details_full_db(movie_id: int):
                 'logo': row['platform_logo']
             })
 
+        director = get_movie_director(movie_id)
+        cast_list = get_movie_actors(movie_id)
+
         full_context = {
             'movie': movie_data,
             'statistic': statistic_data,
@@ -204,6 +196,7 @@ def get_movie_details_full_db(movie_id: int):
             'reviews': reviews_list,
             'providers': providers_data,
             'favorite_count': fav_count,
+            'director': director, 
             'total_reviews_count': len(reviews_list)
         }
 
@@ -228,6 +221,115 @@ def get_movies_db():
     except Exception as e:
         return None, str(e)
 
+def get_best_movies_detailed_db(limit: int = 3):
+    """
+    Get top rated movies with statistics and genres.
+    """
+    try:
+        movies = execute_query("""
+            SELECT m.id, m.title, m.overview, m.tagline,
+                   m.poster_file as poster_url, m.banner_file as backdrop_url,
+                   m.release_date, s.vote_avg, s.vote_count, s.runtime, s.budget, s.revenue
+            FROM movies m
+            JOIN statistic s ON m.id = s.movie_id
+            ORDER BY s.vote_avg DESC
+            LIMIT %s
+        """, (limit,), fetch=True)
+        
+        if not movies:
+            return [], None
+
+        movie_ids = [m["id"] for m in movies]
+        genre_rows = execute_query("""
+            SELECT mg.movie_id, g.genre_name
+            FROM movies_genres mg
+            JOIN genres g ON mg.genre_id = g.id
+            WHERE mg.movie_id = ANY(%s)
+        """, (movie_ids,), fetch=True)
+
+        genre_map = {}
+        for row in genre_rows:
+            genre_map.setdefault(row["movie_id"], []).append(row["genre_name"])
+
+        movie_list = []
+        for m in movies:
+            movie_list.append({
+                "id": m["id"],
+                "title": m["title"],
+                "release_date": m["release_date"],
+                "overview": m.get("overview"),
+                "tagline": m.get("tagline"),
+                "poster_file": m.get("poster_url"),
+                "banner_file": m.get("backdrop_url"),
+                "rating": float(m.get("vote_avg") or 0),
+                "vote_count": m.get("vote_count"),
+                "runtime": float(m.get("runtime") or 0),
+                "budget": m.get("budget"),
+                "revenue": m.get("revenue"),
+                "genre_list": genre_map.get(m["id"], [])
+            })
+        
+        return movie_list, None
+
+    except Exception as e:
+        return None, str(e)
+
+
+def get_random_movies_detailed_db(limit: int = 8):
+    """
+    Get random movies with statistics and genres.
+    """
+    try:
+        movies = execute_query("""
+            SELECT m.id, m.title, m.overview, m.tagline,
+                   m.poster_file as poster_url, m.banner_file as backdrop_url,
+                   m.release_date, s.vote_avg, s.vote_count, s.runtime, s.budget, s.revenue
+            FROM movies m
+            LEFT JOIN statistic s ON m.id = s.movie_id
+            ORDER BY RANDOM()
+            LIMIT %s
+        """, (limit,), fetch=True)
+
+        if not movies:
+            return [], None
+
+        movie_ids = [m["id"] for m in movies]
+        genre_rows = execute_query("""
+            SELECT mg.movie_id, g.genre_name
+            FROM movies_genres mg
+            JOIN genres g ON mg.genre_id = g.id
+            WHERE mg.movie_id = ANY(%s)
+        """, (movie_ids,), fetch=True)
+
+        genre_map = {}
+        for row in genre_rows:
+            genre_map.setdefault(row["movie_id"], []).append(row["genre_name"])
+
+        movie_list = []
+        for m in movies:
+            movie_list.append({
+                "id": m["id"],
+                "title": m["title"],
+                "release_date": m["release_date"],
+                "overview": m.get("overview"),
+                "tagline": m.get("tagline"),
+                "poster_file": m.get("poster_url"),
+                "banner_file": m.get("backdrop_url"),
+                "rating": float(m.get("vote_avg") or 0),
+                "vote_count": m.get("vote_count"),
+                "runtime": float(m.get("runtime") or 0),
+                "budget": m.get("budget"),
+                "revenue": m.get("revenue"),
+                "genre_list": genre_map.get(m["id"], [])
+            })
+
+        return movie_list, None
+
+    except Exception as e:
+        print(f"DB Error (Random Movies): {e}")
+        return None, str(e)
+    
+    
 def toggle_favorite_db(user_id: int, movie_id: int):
     """
     Toggle favorite
