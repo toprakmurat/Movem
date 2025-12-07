@@ -15,8 +15,8 @@
         </div>
         <p class="max-w-3xl text-lg text-white/80">{{ current_user.bio or 'Keep watching and build your cinematic fingerprint on MoveM.' }}</p>
         <div class="flex flex-wrap gap-4">
-          <a href="{{ url_for('account_settings') }}" class="btn-primary">Manage account</a>
-          <a href="{{ url_for('movies') }}" class="btn-secondary">View catalog</a>
+          {# <a href="{{ url_for('account_settings') }}" class="btn-primary">Manage account</a> #}
+          <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary">View catalog</a>
         </div>
       </div>
       <div class="grid gap-3 text-center text-sm sm:grid-cols-3 lg:grid-cols-1">
@@ -115,7 +115,7 @@
     </div>
     <div class="rail-scroll">
       {% for movie in favorites %}
-      <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="rail-card">
+      <a href="{{ url_for('movies.get_movie_by_id', movie_id=movie.id) }}" class="rail-card">
         <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ movie.title }} poster" />
         <div class="rail-card-content">
           <p>{{ movie.title }}</p>

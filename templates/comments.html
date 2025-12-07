@@ -6,7 +6,7 @@
   
   {# --- HEADER & BACK NAVIGATION --- #}
   <div class="mb-8 flex items-center gap-4">
-      <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="rounded-full bg-white/5 p-2 text-white/60 hover:bg-white/10 hover:text-white transition-colors">
+      <a href="{{ url_for('movies.get_movie_by_id', movie_id=movie.id) }}" class="rounded-full bg-white/5 p-2 text-white/60 hover:bg-white/10 hover:text-white transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
         </svg>
@@ -127,11 +127,11 @@
       
       <div class="flex gap-2">
           {% if reviews.has_prev %}
-          <a href="{{ url_for('movie_comments', movie_id=movie.id, page=reviews.prev_num, sort=request.args.get('sort'), spoiler=request.args.get('spoiler')) }}" class="btn-secondary px-4 py-2 text-sm">Previous</a>
+          {# <a href="{{ url_for('movie_comments', movie_id=movie.id, page=reviews.prev_num, sort=request.args.get('sort'), spoiler=request.args.get('spoiler')) }}" class="btn-secondary px-4 py-2 text-sm">Previous</a> #}
           {% endif %}
           
           {% if reviews.has_next %}
-          <a href="{{ url_for('movie_comments', movie_id=movie.id, page=reviews.next_num, sort=request.args.get('sort'), spoiler=request.args.get('spoiler')) }}" class="btn-primary px-4 py-2 text-sm">Next</a>
+          {# <a href="{{ url_for('movie_comments', movie_id=movie.id, page=reviews.next_num, sort=request.args.get('sort'), spoiler=request.args.get('spoiler')) }}" class="btn-primary px-4 py-2 text-sm">Next</a> #}
           {% endif %}
       </div>
   </div>

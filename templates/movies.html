@@ -35,10 +35,10 @@
     <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
     <div class="flex gap-3">
       {% if movies.has_prev %}
-      <a href="{{ url_for('movies', page=movies.prev_num, **request.args) }}" class="btn-secondary">Previous</a>
+      <a href="{{ url_for('movies.movies_page', page=movies.prev_num, **request.args) }}" class="btn-secondary">Previous</a>
       {% endif %}
       {% if movies.has_next %}
-      <a href="{{ url_for('movies', page=movies.next_num, **request.args) }}" class="btn-primary">Next</a>
+      <a href="{{ url_for('movies.movies_page', page=movies.next_num, **request.args) }}" class="btn-primary">Next</a>
       {% endif %}
     </div>
   </div>

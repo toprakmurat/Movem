@@ -10,7 +10,7 @@
     </div>
     
     <div class="flex items-center gap-3">
-      <button class="btn-icon" title="Random movie" onclick="window.location.href='{{ url_for('nexus', random=1) }}'">
+      <button class="btn-icon" title="Random movie" onclick="window.location.href='{{ url_for('nexus.nexus', random=1) }}'">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
@@ -49,7 +49,7 @@
         <div class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
           Director
         </div>
-        <a href="{{ url_for('person_detail', person_id=director.id) }}" class="mt-2 group relative flex flex-col items-center transition-transform hover:scale-105">
+        <a href="{{ url_for('actors.person_detail', person_id=director.id) }}" class="mt-2 group relative flex flex-col items-center transition-transform hover:scale-105">
           <div class="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 transition-all duration-300 hover:border-brand-400 hover:shadow-lg hover:shadow-brand-900/30">
             <img
               src="{{ director.profile_url or url_for('static', filename='img/placeholder_avatar.svg') }}"
@@ -86,7 +86,7 @@
     
     <div class="absolute z-10" style="left: {{ pos.x }}%; top: {{ pos.y }}%; transform: translate(-50%, -50%);">
       <div class="flex flex-col items-center">
-        <a href="{{ url_for('person_detail', person_id=actor.id) }}" class="group relative flex flex-col items-center transition-transform hover:scale-110">
+        <a href="{{ url_for('actors.person_detail', person_id=actor.id) }}" class="group relative flex flex-col items-center transition-transform hover:scale-110">
           <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-900 transition-all duration-300 hover:border-brand-400 hover:shadow-lg hover:shadow-brand-900/30">
             <img
               src="{{ actor.profile_url or url_for('static', filename='img/placeholder_avatar.svg') }}"
@@ -203,7 +203,7 @@
     
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {% for related in related_movies %}
-      <a href="{{ url_for('nexus', movie_id=related.id) }}" class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all hover:border-brand-500 hover:shadow-lg hover:shadow-brand-900/30">
+      <a href="{{ url_for('nexus.nexus', movie_id=related.id) }}" class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all hover:border-brand-500 hover:shadow-lg hover:shadow-brand-900/30">
         <img src="{{ related.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" 
              alt="{{ related.title }}" 
              class="h-64 w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" />
