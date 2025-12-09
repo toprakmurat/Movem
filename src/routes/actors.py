@@ -98,27 +98,54 @@ def get_actors():
 @actors_bp.route('/<int:person_id>', methods=['GET'])
 def person_detail(person_id):
     """Get a specific actor - serves HTML or JSON based on request"""
-    try:
-        actor = execute_query(
-            """
-            SELECT id, name, biography, birth_date, photo_url, created_at
-            FROM people
-            WHERE id = %s
-            """,
-            (person_id,),
-            fetch=True
+    actor = execute_query(
+        """
+        SELECT id, name, biography, birth_date, photo_url, created_at
+        FROM people
+        WHERE id = %s
+        """,
+        (person_id,),
+        fetch=True
+    )
+    
+    if not actor:
+        return jsonify({'error': 'Actor not found'}), 404
+    
+    # Get actor's filmography (movies they appeared in)
+    filmography = execute_query(
+        """
+        SELECT 
+            m.id AS movie_id,  m.title,
+            m.release_date,
+            m.overview,
+            m.tagline,
+            m.poster_file,
+            m.banner_file,
+            s.vote_avg AS rating,
+            s.runtime,
+            mc.character_name AS role
+        FROM movies m
+        JOIN movie_cast mc ON m.id = mc.movie_id
+        LEFT JOIN statistic s ON m.id = s.movie_id
+        WHERE mc.person_id = %s
+        ORDER BY m.release_date DESC
+        """,
+        (person_id,),
+        fetch=True
+    )
+    
+    # Check if request wants JSON or HTML
+    if request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json':
+        return jsonify({
+            'actor': dict(actor[0]),
+            'filmography': [dict(film) for film in filmography] if filmography else []
+        })
+    else:
+        return render_template(
+            'person_detail.html', 
+            person=dict(actor[0]),
+            filmography=[dict(film) for film in filmography] if filmography else []
         )
-        
-        if not actor:
-            return jsonify({'error': 'Actor not found'}), 404
-        
-        # Check if request wants JSON or HTML
-        if request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json':
-            return jsonify({'actor': dict(actor[0])})
-        else:
-            return render_template('person_detail.html', person=dict(actor[0]))
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 
 @actors_bp.route('/<int:actor_id>/movies', methods=['GET'])

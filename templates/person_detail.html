@@ -40,78 +40,33 @@
     <div class="mt-6 space-y-4">
       {% for credit in filmography %}
       <article class="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center">
-        <img src="{{ credit.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ credit.title }} poster" class="h-32 w-24 rounded-2xl object-cover" />
+        <img src="{{ url_for('static', filename='img/' ~ (credit.poster_file or 'placeholder_poster.svg')) }}" alt="{{ credit.title }} poster" class="h-32 w-24 rounded-2xl object-cover" />
         <div class="flex-1 space-y-1">
           <div class="flex items-center justify-between">
             <h3 class="text-xl font-semibold text-white">{{ credit.title }}</h3>
-            {% if credit.year %}
-            <span class="text-sm text-white/60">{{ credit.year }}</span>
+            {% if credit.release_date %}
+            <span class="text-sm text-white/60">{{ credit.release_date }}</span>
             {% endif %}
           </div>
           {% if credit.role %}
           <p class="text-sm text-white/70">as {{ credit.role }}</p>
           {% endif %}
-          {% if credit.summary %}
-          <p class="text-sm text-white/60 line-clamp-2">{{ credit.summary }}</p>
+          {% if credit.overview %}
+          <p class="text-sm text-white/60 line-clamp-2">{{ credit.overview }}</p>
           {% endif %}
           <div class="flex gap-3 text-xs uppercase tracking-[0.4em] text-white/60">
             {% if credit.rating %}
-            <span>Rating {{ credit.rating }}</span>
+            <span>Rating {{ "%.1f"|format(credit.rating) }}</span>
             {% endif %}
             {% if credit.runtime %}
             <span>{{ credit.runtime }} min</span>
             {% endif %}
           </div>
         </div>
-        <a href="{{ url_for('movies.movie_detail', movie_id=credit.movie_id) }}" class="btn-secondary">View</a>
+        <a href="{{ url_for('movies.movies_details_page', movie_id=credit.movie_id) }}" class="btn-secondary">View</a>
       </article>
       {% else %}
       <p class="text-sm text-white/60">No credits available yet.</p>
-      {% endfor %}
-    </div>
-  </section>
-</section>
-{% endblock %}
-    <div class="rounded-3xl border border-white/10 bg-black/60 p-6">
-      <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Awards & Recognition</h3>
-      <ul class="mt-4 space-y-3 text-sm text-white/80">
-        {% for award in awards %}
-        <li class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <p class="font-semibold text-white">{{ award.title }}</p>
-          <p class="text-white/60">{{ award.year }} • {{ award.body }}</p>
-        </li>
-        {% else %}
-        <li class="text-white/60">No awards listed.</li>
-        {% endfor %}
-      </ul>
-    </div>
-    <div class="rounded-3xl border border-white/10 bg-black/60 p-6">
-      <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Quotes & Notes</h3>
-      <div class="mt-4 space-y-4">
-        {% for quote in quotes %}
-        <blockquote class="rounded-2xl border border-white/10 bg-white/5 p-4 text-white">“{{ quote.text }}”<footer class="mt-2 text-xs uppercase tracking-[0.4em] text-white/60">{{ quote.source }}</footer></blockquote>
-        {% else %}
-        <p class="text-white/60">Quotes coming soon.</p>
-        {% endfor %}
-      </div>
-    </div>
-  </section>
-
-  <section class="space-y-4 rounded-3xl border border-white/10 bg-black/60 p-6">
-    <div class="flex items-center justify-between">
-      <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Related Movies</h3>
-      <a href="{{ url_for('movies.movies_page') }}" class="text-xs uppercase tracking-[0.4em] text-white/60">Browse catalog</a>
-    </div>
-    <div class="rail-scroll">
-      {% for movie in related_movies %}
-      <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="rail-card">
-        <img src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" alt="{{ movie.title }} poster" />
-        <div class="rail-card-content">
-          <p>{{ movie.title }}</p>
-        </div>
-      </a>
-      {% else %}
-      <p class="text-sm text-white/60">Add related titles to showcase them here.</p>
       {% endfor %}
     </div>
   </section>

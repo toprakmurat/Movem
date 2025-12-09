@@ -26,7 +26,7 @@
       <div class="group relative flex flex-col items-center">
         <div class="relative overflow-hidden rounded-3xl border-2 border-brand-500 bg-slate-900 shadow-2xl shadow-brand-900/50 transition-all duration-300 hover:scale-105 hover:shadow-brand-900/70">
           <img
-            src="{{ movie.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}"
+            src="{{ url_for('static', filename='img/' ~ (movie.poster_url or 'placeholder_poster.svg')) }}"
             alt="{{ movie.title }}"
             class="h-80 w-56 object-cover opacity-90"
           />
@@ -73,13 +73,14 @@
 
     <!-- Actor Nodes (Evenly distributed in a circle) -->
     {% set positions = [
-      {'x': 18, 'y': 25},
-      {'x': 82, 'y': 25},
-      {'x': 10, 'y': 55},
-      {'x': 90, 'y': 55},
-      {'x': 18, 'y': 80},
-      {'x': 82, 'y': 80} 
+      {'x': 30, 'y': 25},
+      {'x': 70, 'y': 25},
+      {'x': 20, 'y': 50},
+      {'x': 80, 'y': 50},
+      {'x': 30, 'y': 75},
+      {'x': 70, 'y': 75}
     ] %}
+
     
     {% for actor in actors %}
     {% set pos = positions[loop.index0] if loop.index0 < positions|length else {'x': 50, 'y': 15} %}
@@ -112,32 +113,42 @@
     <!-- Legend -->
     <div class="absolute bottom-6 right-6 rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
       <h3 class="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">Legend</h3>
-      <div class="space-y-2 text-xs">
+
+      <!-- 2x2 grid -->
+      <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs">
+
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-full border-2 border-brand-500"></div>
           <span class="text-slate-300">Movie</span>
         </div>
+
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded border border-slate-700 bg-slate-900"></div>
           <span class="text-slate-300">Director</span>
         </div>
+
         <div class="flex items-center gap-2">
           <div class="h-3 w-3 rounded-sm border border-slate-700 bg-slate-900"></div>
           <span class="text-slate-300">Actor</span>
         </div>
-        <div class="flex items-center gap-2">
-          <svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="rgba(229, 9, 20, 0.3)" stroke-width="2" stroke-dasharray="3,3" /></svg>
+
+        <div class="flex items-center gap-0">
+          <svg width="20" height="2">
+            <line x1="0" y1="1" x2="15" y2="1" stroke="rgba(229, 9, 20, 0.3)" stroke-width="2" stroke-dasharray="3,3" />
+          </svg>
           <span class="text-slate-300">Connection</span>
         </div>
+
       </div>
     </div>
 
+
     <!-- Info Card -->
-    <div class="absolute bottom-6 left-6 max-w-md rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
+    <div class="absolute bottom-6 left-6 max-w-2xl rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
       <h3 class="mb-2 text-sm font-bold uppercase tracking-widest text-brand-300">About</h3>
-      <p class="text-xs leading-relaxed text-slate-400">
+      <p class="text-xs leading-relaxed text-slate-00">
         This visualization shows the relationships between the featured movie, its director, and key cast members. 
-        Each node represents a person or film, and the connecting lines show their collaborative relationships.
+        Each node represents a person or film, and the connecting lines show their collaborations.
       </p>
     </div>
   </div>
@@ -204,7 +215,7 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {% for related in related_movies %}
       <a href="{{ url_for('nexus.nexus', movie_id=related.id) }}" class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all hover:border-brand-500 hover:shadow-lg hover:shadow-brand-900/30">
-        <img src="{{ related.poster_url or url_for('static', filename='img/placeholder_poster.svg') }}" 
+        <img src="{{ url_for('static', filename='img/' ~ (related.poster_url or 'placeholder_poster.svg')) }}"
              alt="{{ related.title }}" 
              class="h-64 w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" />
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
