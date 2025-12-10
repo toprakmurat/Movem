@@ -14,6 +14,7 @@ from src.routes.comments import comments_bp
 from src.routes.game import game_bp
 from src.routes.statistic import statistic_bp
 from src.routes.nexus import nexus_bp
+from src.routes.movie_cast import movie_cast_bp
 
 def create_app(config_name=None):
     app = Flask(__name__)
@@ -54,6 +55,7 @@ def create_app(config_name=None):
     app.register_blueprint(game_bp, url_prefix='/game')
     app.register_blueprint(statistic_bp, url_prefix='/statistic')
     app.register_blueprint(nexus_bp, url_prefix='/nexus')
+    app.register_blueprint(movie_cast_bp, url_prefix='/movie_cast')
     
     @app.teardown_appcontext
     def teardown_db(exception):
