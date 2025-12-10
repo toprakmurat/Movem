@@ -1,5 +1,12 @@
 from flask import Blueprint, jsonify, request, render_template
-from src.config.database import execute_query
+from src.services.actors_service import (
+    get_actors_paginated_db,
+    get_actor_by_id_db,
+    get_actor_filmography_db,
+    create_actor_db,
+    update_actor_db,
+    delete_actor_db
+)
 
 actors_bp = Blueprint('actors', __name__)
 
@@ -11,312 +18,126 @@ def get_actors():
     """Get all actors with pagination - serves HTML or JSON based on request"""
     # Get pagination parameters from query string
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 12, type=int)  # Changed default to 12 for better grid layout
-    search_query = request.args.get('q', '').strip()
+    per_page = request.args.get('per_page', 12, type=int)
+    search_query = request.args.get('q', '').strip() if request.args.get('q') else None
     
-    # Validate pagination parameters
-    if page < 1:
-        page = 1
-    if per_page < 1 or per_page > 100:  # Max 100 items per page
-        per_page = 12
+    # Get paginated actors from service
+    result, error = get_actors_paginated_db(page, per_page, search_query)
     
-    # Calculate offset
-    offset = (page - 1) * per_page
+    if error:
+        return jsonify({'error': error}), 500
     
-    # Build query based on search
-    if search_query:
-        # Get total count with search
-        count_result = execute_query(
-            "SELECT COUNT(*) as total FROM people WHERE name ILIKE %s",
-            (f'%{search_query}%',),
-            fetch=True
-        )
-        total = count_result[0]['total'] if count_result else 0
-        
-        # Get paginated actors with search
-        actors = execute_query(
-            """
-            SELECT id, name, biography, birth_date, photo_url, created_at
-            FROM people
-            WHERE name ILIKE %s
-            ORDER BY name
-            LIMIT %s OFFSET %s
-            """,
-            (f'%{search_query}%', per_page, offset),
-            fetch=True
-        )
-    else:
-        # Get total count
-        count_result = execute_query(
-            "SELECT COUNT(*) as total FROM people",
-            fetch=True
-        )
-        total = count_result[0]['total'] if count_result else 0
-        
-        # Get paginated actors
-        actors = execute_query(
-            """
-            SELECT id, name, biography, birth_date, photo_url, created_at
-            FROM people
-            ORDER BY name
-            LIMIT %s OFFSET %s
-            """,
-            (per_page, offset),
-            fetch=True
-        )
-    
-    # Calculate pagination metadata
-    total_pages = (total + per_page - 1) // per_page  # Ceiling division
+    actors = result['actors']
+    pagination = result['pagination']
     
     # Check if request wants JSON (AJAX request) or HTML (browser request)
     if request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json':
         # Return JSON for API calls
         return jsonify({
             'actors': [dict(actor) for actor in actors],
-            'pagination': {
-                'page': page,
-                'per_page': per_page,
-                'total': total,
-                'total_pages': total_pages,
-                'has_next': page < total_pages,
-                'has_prev': page > 1
-            }
+            'pagination': pagination
         })
     else:
         # Render HTML template for browser requests
         return render_template('people.html', 
                                 actors=[dict(actor) for actor in actors],
-                                pagination={
-                                    'page': page,
-                                    'per_page': per_page,
-                                    'total': total,
-                                    'total_pages': total_pages,
-                                    'has_next': page < total_pages,
-                                    'has_prev': page > 1
-        })
+                                pagination=pagination)
 
 @actors_bp.route('/<int:person_id>', methods=['GET'])
 def person_detail(person_id):
     """Get a specific actor - serves HTML or JSON based on request"""
-    actor = execute_query(
-        """
-        SELECT id, name, biography, birth_date, photo_url, created_at
-        FROM people
-        WHERE id = %s
-        """,
-        (person_id,),
-        fetch=True
-    )
+    # Get actor details
+    actor, error = get_actor_by_id_db(person_id)
     
-    if not actor:
-        return jsonify({'error': 'Actor not found'}), 404
+    if error:
+        return jsonify({'error': error}), 404
     
-    # Get actor's filmography (movies they appeared in)
-    filmography = execute_query(
-        """
-        SELECT 
-            m.id AS movie_id,  m.title,
-            m.release_date,
-            m.overview,
-            m.tagline,
-            m.poster_file,
-            m.banner_file,
-            s.vote_avg AS rating,
-            s.runtime,
-            mc.character_name AS role
-        FROM movies m
-        JOIN movie_cast mc ON m.id = mc.movie_id
-        LEFT JOIN statistic s ON m.id = s.movie_id
-        WHERE mc.person_id = %s
-        ORDER BY m.release_date DESC
-        """,
-        (person_id,),
-        fetch=True
-    )
+    # Get actor's filmography
+    filmography, error = get_actor_filmography_db(person_id)
+    
+    if error:
+        return jsonify({'error': error}), 500
     
     # Check if request wants JSON or HTML
     if request.accept_mimetypes.best_match(['application/json', 'text/html']) == 'application/json':
         return jsonify({
-            'actor': dict(actor[0]),
-            'filmography': [dict(film) for film in filmography] if filmography else []
+            'actor': dict(actor),
+            'filmography': [dict(film) for film in filmography]
         })
     else:
         return render_template(
             'person_detail.html', 
-            person=dict(actor[0]),
-            filmography=[dict(film) for film in filmography] if filmography else []
+            person=dict(actor),
+            filmography=[dict(film) for film in filmography]
         )
 
 
 @actors_bp.route('/<int:actor_id>/movies', methods=['GET'])
 def get_actor_movies(actor_id):
     """Get all movies for an actor"""
-    try:
-        # First check if actor exists
-        actor = execute_query(
-            "SELECT id, name FROM people WHERE id = %s",
-            (actor_id,),
-            fetch=True
-        )
-        
-        if not actor:
-            return jsonify({'error': 'Actor not found'}), 404
-        
-        # Get actor's filmography (movies they appeared in)
-        filmography = execute_query(
-            """
-            SELECT 
-                m.id AS movie_id,
-                m.title,
-                m.release_date,
-                m.overview,
-                m.tagline,
-                m.poster_file,
-                m.banner_file,
-                s.vote_avg AS rating,
-                s.runtime,
-                mc.character_name AS role
-            FROM movies m
-            JOIN movie_cast mc ON m.id = mc.movie_id
-            LEFT JOIN statistic s ON m.id = s.movie_id
-            WHERE mc.person_id = %s
-            ORDER BY m.release_date DESC
-            """,
-            (actor_id,),
-            fetch=True
-        )
-        
-        return jsonify({
-            'actor': dict(actor[0]),
-            'filmography': [dict(film) for film in filmography] if filmography else [],
-            'total_movies': len(filmography) if filmography else 0
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    # Check if actor exists
+    actor, error = get_actor_by_id_db(actor_id)
+    
+    if error:
+        return jsonify({'error': error}), 404
+    
+    # Get actor's filmography
+    filmography, error = get_actor_filmography_db(actor_id)
+    
+    if error:
+        return jsonify({'error': error}), 500
+    
+    return jsonify({
+        'actor': dict(actor),
+        'filmography': [dict(film) for film in filmography],
+        'total_movies': len(filmography)
+    })
 
 
 @actors_bp.route('/', methods=['POST'])
 def create_actor():
     """Create a new actor"""
-    try:
-        data = request.get_json()
-        
-        # Validate required fields
-        if not data or 'name' not in data:
-            return jsonify({'error': 'Name is required'}), 400
-        
-        # Insert new actor
-        result = execute_query(
-            """
-            INSERT INTO people (name, biography, birth_date, photo_url)
-            VALUES (%s, %s, %s, %s)
-            RETURNING id, name, biography, birth_date, photo_url, created_at
-            """,
-            (
-                data['name'],
-                data.get('biography'),
-                data.get('birth_date'),
-                data.get('photo_url')
-            ),
-            fetch=True
-            # RETURNING makes the query produce rows, just like a SELECT query. No need to have a separate query.
-            # Therefore, fetch must be equal to True to get the newly inserted row
-        )
-        
-        if result:
-            return jsonify(dict(result[0])), 201
-        return jsonify({'error': 'Failed to create actor'}), 500
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    data = request.get_json()
+    
+    # Create actor using service
+    result, error = create_actor_db(data)
+    
+    if error:
+        status_code = 400 if error == 'Name is required' else 500
+        return jsonify({'error': error}), status_code
+    
+    return jsonify(dict(result)), 201
 
 # TODO: Subject to change, might better handle parameters with a helper function
 @actors_bp.route('/<int:actor_id>', methods=['PUT'])
 def update_actor(actor_id):
     """Update an existing actor"""
-    try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        # Check if actor exists
-        actor = execute_query(
-            "SELECT id FROM people WHERE id = %s",
-            (actor_id,),
-            fetch=True
-        )
-        
-        if not actor:
-            return jsonify({'error': 'Actor not found'}), 404
-        
-        # Build update query dynamically based on provided fields
-        update_fields = []
-        params = []
-        
-        if 'name' in data:
-            update_fields.append("name = %s")
-            params.append(data['name'])
-        if 'biography' in data:
-            update_fields.append("biography = %s")
-            params.append(data['biography'])
-        if 'birth_date' in data:
-            update_fields.append("birth_date = %s")
-            params.append(data['birth_date'])
-        if 'photo_url' in data:
-            update_fields.append("photo_url = %s")
-            params.append(data['photo_url'])
-        
-        if not update_fields:
-            return jsonify({'error': 'No valid fields to update'}), 400
-        
-        params.append(actor_id)
-        
-        # Update actor
-        result = execute_query(
-            f"""
-            UPDATE people
-            SET {', '.join(update_fields)}
-            WHERE id = %s
-            RETURNING id, name, biography, birth_date, photo_url, created_at
-            """,
-            tuple(params),
-            fetch=True
-        )
-        
-        if result:
-            return jsonify(dict(result[0]))
-        return jsonify({'error': 'Failed to update actor'}), 500
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    data = request.get_json()
+    
+    # Update actor using service
+    result, error = update_actor_db(actor_id, data)
+    
+    if error:
+        if error == 'Actor not found':
+            return jsonify({'error': error}), 404
+        elif error in ['No data provided', 'No valid fields to update']:
+            return jsonify({'error': error}), 400
+        return jsonify({'error': error}), 500
+    
+    return jsonify(dict(result))
 
 
 @actors_bp.route('/<int:actor_id>', methods=['DELETE'])
 def delete_actor(actor_id):
     """Delete an actor"""
-    try:
-        # Check if actor exists
-        actor = execute_query(
-            "SELECT id, name FROM people WHERE id = %s",
-            (actor_id,),
-            fetch=True
-        )
-        
-        if not actor:
-            return jsonify({'error': 'Actor not found'}), 404
-        
-        # Delete actor
-        execute_query(
-            "DELETE FROM people WHERE id = %s",
-            (actor_id,)
-            # Remember, ON DELETE CASCADE in movie_cast table
-        )
-        
-        return jsonify({
-            'message': 'Actor deleted successfully',
-            'actor': dict(actor[0])
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    # Delete actor using service
+    result, error = delete_actor_db(actor_id)
+    
+    if error:
+        status_code = 404 if error == 'Actor not found' else 500
+        return jsonify({'error': error}), status_code
+    
+    return jsonify({
+        'message': 'Actor deleted successfully',
+        'actor': dict(result)
+    })
