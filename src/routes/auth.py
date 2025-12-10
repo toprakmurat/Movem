@@ -132,3 +132,31 @@ def account():
         sessions=sessions,
         user_reviews=user_reviews
     )
+
+
+@auth_bp.route('/user/<int:user_id>')
+def public_profile(user_id):
+    target_user, err = get_user_by_id_db(user_id)
+
+    if not target_user:
+        return render_template("404.html"), 404
+
+    user_reviews, _ = get_comments_by_user(user_id)
+    if not user_reviews:
+        user_reviews = []
+
+    stats = {
+        'score': target_user.get('game_score', 0),
+        'games_played': 0, 
+        'accuracy': 0,
+        'best_streak': 0 
+    }
+
+    return render_template(
+        'account.html', 
+        current_user=target_user, 
+        user_reviews=user_reviews, 
+        stats=stats, 
+        is_public=True,
+        favorites=[]
+    )
