@@ -53,8 +53,7 @@ def movies_details_page(movie_id):
     if not all_comments:
         all_comments = []
 
-    reviews_preview = all_comments[:3]
-    movie_detail['reviews'] = reviews_preview
+    movie_detail['reviews'] = all_comments
     movie_detail['total_reviews_count'] = len(all_comments)
 
     return render_template('movie_detail.html', **movie_detail)
