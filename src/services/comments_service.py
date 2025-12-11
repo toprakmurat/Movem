@@ -26,6 +26,10 @@ def create_comment(comment_data):
     try:
         user_id = comment_data.get('user_id')
         movie_id = comment_data.get('movie_id')
+        check_query = "SELECT id FROM comments WHERE user_id = %s AND movie_id = %s"
+        existing_comment = execute_query(check_query, (user_id, movie_id), fetch=True)
+        if existing_comment:
+            return None, "You have already reviewed this movie. Please edit your existing review."
         body = comment_data.get('body')
         if body == "": 
             body = None
@@ -94,18 +98,19 @@ def update_comment(comment_id, comment_data):
             if comment_data['rating'] is not None:
                 update_fields.append("rating = %s")
                 params.append(comment_data['rating'])
-            
+        
         if 'has_spoiler' in comment_data:
             update_fields.append("has_spoiler = %s")
             spoiler_val = comment_data['has_spoiler']
             is_spoiler = True if spoiler_val in [True, 'true', 'on', '1'] else False
             params.append(is_spoiler)
-                
-        if not update_fields:
-            return comment_check, None 
-
-        params.append(comment_id)
         
+        if not update_fields:
+            return comment_check, None
+
+        update_fields.append("updated_at = NOW()")
+        params.append(comment_id)
+
         query = f"""
             UPDATE comments
             SET {', '.join(update_fields)}
@@ -113,12 +118,11 @@ def update_comment(comment_id, comment_data):
             RETURNING *
         """
         updated_comment_list = execute_query(query, tuple(params), fetch=True)
-        
         if not updated_comment_list:
             return None, "Failed to update comment"
-        
+
         updated_comment = updated_comment_list[0]
-        
+
         new_rating = comment_data.get('rating') 
         if new_rating is not None and new_rating != old_rating:
             try:
@@ -126,7 +130,9 @@ def update_comment(comment_id, comment_data):
                     """
                     UPDATE statistic
                     SET 
-                        vote_avg = ( (COALESCE(vote_avg, 0) * COALESCE(vote_count, 0)) - COALESCE(%s, 0) + %s ) / COALESCE(vote_count, 1)
+                        vote_avg = ( (COALESCE(vote_avg, 0) * COALESCE(vote_count, 0)) 
+                                     - COALESCE(%s, 0) + %s ) 
+                                    / COALESCE(vote_count, 1)
                     WHERE movie_id = %s
                     """,
                     (old_rating, new_rating, movie_id)
@@ -178,9 +184,10 @@ def delete_comment_by_id(comment_id):
         return None, str(e)
 
 
-def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all'):
+def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all', user_id=None):
     """
     Gets comments with filtering, sorting AND username (JOIN).
+    Also checks user vote status if user_id is provided.
     """
     try:
         query = """
@@ -210,6 +217,14 @@ def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all'):
         comments = execute_query(query, tuple(params), fetch=True)
         
         if comments:
+            if user_id:
+                for comment in comments:
+                    vote_type = get_user_vote_status(user_id, comment['id'])
+                    comment['user_vote'] = vote_type
+            else:
+                for comment in comments:
+                    comment['user_vote'] = None
+
             return comments, None
         return [], None
 
@@ -314,3 +329,52 @@ def get_top_reviewers(limit: int = 10):
         return top_reviewers, None
     except Exception as e:
         return None, str(e)
+    
+
+def toggle_comment_vote_db(user_id, comment_id, vote_type='like'):
+    """
+    Toggles a vote. 
+    - If vote exists and is same: Remove vote (Unlike)
+    - If vote exists and is diff: Change vote (Like -> Dislike)
+    - If no vote: Add vote
+    """
+    try:
+        check_query = "SELECT id, vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
+        existing_vote = execute_query(check_query, (user_id, comment_id), fetch=True)
+        if existing_vote:
+            current_type = existing_vote[0]['vote_type']
+            vote_db_id = existing_vote[0]['id']
+            if current_type == vote_type:
+                execute_query("DELETE FROM comment_votes WHERE id = %s", (vote_db_id,))
+                col = "comment_likes" if vote_type == 'like' else "comment_dislikes"
+                execute_query(f"UPDATE comments SET {col} = {col} - 1 WHERE id = %s", (comment_id,))
+                return {"action": "removed", "type": vote_type}, None
+            else:
+                execute_query("UPDATE comment_votes SET vote_type = %s WHERE id = %s", (vote_type, vote_db_id))
+                if vote_type == 'like':
+                    execute_query("UPDATE comments SET comment_likes = comment_likes + 1, comment_dislikes = comment_dislikes - 1 WHERE id = %s", (comment_id,))
+                else:
+                    execute_query("UPDATE comments SET comment_dislikes = comment_dislikes + 1, comment_likes = comment_likes - 1 WHERE id = %s", (comment_id,))
+                return {"action": "changed", "type": vote_type}, None
+        else:
+            execute_query("INSERT INTO comment_votes (user_id, comment_id, vote_type) VALUES (%s, %s, %s)", (user_id, comment_id, vote_type))
+            col = "comment_likes" if vote_type == 'like' else "comment_dislikes"
+            execute_query(f"UPDATE comments SET {col} = {col} + 1 WHERE id = %s", (comment_id,))
+            return {"action": "added", "type": vote_type}, None
+    except Exception as e:
+        return None, str(e)
+    
+
+def get_user_vote_status(user_id, comment_id):
+    """
+    It finds the user's rating (like/dislike) on a comment. 
+    It uses Raw SQL.
+    """
+    try:
+        query = "SELECT vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
+        result = execute_query(query, (user_id, comment_id), fetch=True)
+        if result:
+            return result[0]['vote_type']
+        return None
+    except Exception as e:
+        return None
