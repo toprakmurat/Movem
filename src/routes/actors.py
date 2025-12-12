@@ -8,7 +8,7 @@ from src.services.actors_service import (
     delete_actor_db
 )
 
-actors_bp = Blueprint('actors', __name__)
+actors_bp = Blueprint('actors', __name__) 
 
 # Column names are written explicitly on purpose in SELECT statements.
 # This makes debugging easier in case the database table changes.

@@ -238,3 +238,29 @@ def delete_actor_db(actor_id: int):
         
     except Exception as e:
         return None, str(e)
+
+
+def get_featured_people_db(limit: int = 4):
+    """Get featured people based on number of movie credits"""
+    try:
+        featured_people = execute_query(
+            """
+            SELECT 
+                p.id, 
+                p.name, 
+                p.photo_url,
+                COUNT(mc.movie_id) as movie_count
+            FROM people p
+            JOIN movie_cast mc ON p.id = mc.person_id
+            GROUP BY p.id, p.name, p.photo_url
+            ORDER BY movie_count DESC
+            LIMIT %s
+            """,
+            (limit,),
+            fetch=True
+        )
+        
+        return featured_people, None
+        
+    except Exception as e:
+        return None, str(e)

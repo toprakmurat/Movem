@@ -3,6 +3,7 @@ from src.services.movie_service import *
 from src.services.users_service import *
 from src.routes.actors import *
 from src.services.comments_service import get_top_reviewers
+from src.services.actors_service import get_featured_people_db
 
 home_bp = Blueprint('home', __name__)
 
@@ -45,12 +46,10 @@ def home():
     genres_available, _ = get_genres_db()
     genres_available = [g['genre_name'] for g in genres_available]
 
-    featured_people = [
-    {"id": 1, "name": "John Doe", "photo_url": "/static/img/john.png", "known_for": "Action Movies"},
-    {"id": 2, "name": "Jane Smith", "photo_url": "/static/img/jane.png", "known_for": "Comedy"},
-    {"id": 3, "name": "Alice Green", "photo_url": "/static/img/alice.png", "known_for": "Drama"},
-    {"id": 4, "name": "Bob Brown", "photo_url": "/static/img/bob.png", "known_for": "Sci-Fi"}
-    ]
+    featured_people, _ = get_featured_people_db(4)
+    if not featured_people:
+        featured_people = []
+    
     best_movies_for_genres, _ = get_best_movies_detailed_db(60)
     best_movies_for_genres = [dict(m) for m in best_movies_for_genres]
 
@@ -66,7 +65,7 @@ def home():
             {"id": 1, "title": "Award Winners", "count": 12},
             {"id": 2, "title": "Family Night", "count": 8},
         ],
-        "featured_people": featured_people[:4],
+        "featured_people": featured_people,
         "top_reviewers": top_reviewers,
         "home_movies": best_movies_for_genres,
         "discovery_options": discovery_options

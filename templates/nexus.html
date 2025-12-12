@@ -51,9 +51,10 @@
         </div>
         <a href="{{ url_for('actors.person_detail', person_id=director.id) }}" class="mt-2 group relative flex flex-col items-center transition-transform hover:scale-105">
           <div class="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 transition-all duration-300 hover:border-brand-400 hover:shadow-lg hover:shadow-brand-900/30">
-            <img
-              src="{{ director.profile_url or url_for('static', filename='img/placeholder_avatar.svg') }}"
-              alt="{{ director.name }}"
+          {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
+          <img src="{{ url_for('static', filename='img/people/' ~ director.id ~ '.jpg') }}" 
+              onerror="this.src='{{ placeholder }}'"
+              alt="{{ director.name }} portrait" 
               class="h-24 w-24 object-cover opacity-85 transition-opacity duration-300 group-hover:opacity-100"
             />
           </div>
@@ -89,9 +90,10 @@
       <div class="flex flex-col items-center">
         <a href="{{ url_for('actors.person_detail', person_id=actor.id) }}" class="group relative flex flex-col items-center transition-transform hover:scale-110">
           <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-900 transition-all duration-300 hover:border-brand-400 hover:shadow-lg hover:shadow-brand-900/30">
-            <img
-              src="{{ actor.profile_url or url_for('static', filename='img/placeholder_avatar.svg') }}"
-              alt="{{ actor.name }}"
+          {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
+          <img src="{{ url_for('static', filename='img/people/' ~ actor.id ~ '.jpg') }}" 
+              onerror="this.src='{{ placeholder }}'"
+              alt="{{ actor.name }} portrait" 
               class="h-20 w-20 object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
             />
           </div>

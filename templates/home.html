@@ -88,9 +88,11 @@
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {% for person in featured_people %}
       <a href="{{ url_for('actors.person_detail', person_id=person.id) }}" class="group rounded-2xl border border-white/10 bg-black/60 p-4 transition hover:border-white/40">
-        <img src="{{ person.profile_url or url_for('static', filename='img/placeholder_profile.svg') }}" 
-            alt="{{ person.name }}" 
-            class="w-full h-56 object-cover rounded-xl mb-2" />
+        {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
+        <img src="{{ url_for('static', filename='img/people/' ~ person.id ~ '.jpg') }}" 
+             onerror="this.src='{{ placeholder }}'"
+             alt="{{ person.name }} portrait" 
+             class="w-full h-56 object-cover rounded-xl mb-2" />
         <p class="text-white font-semibold">{{ person.name }}</p>
         <p class="text-sm text-zinc-400">{{ person.known_for }}</p>
       </a>

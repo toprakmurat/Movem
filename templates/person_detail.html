@@ -10,7 +10,7 @@
         <p class="text-sm uppercase tracking-[0.4em] text-white/60">Born {{ person.birth_date }}</p>
         {% endif %}
         {% if person.biography %}
-        <p class="text-white/80 text-lg leading-relaxed">{{ person.biography }}</p>
+        <p class="text-white/80 text-lg leading-relaxed whitespace-pre-line">{{ person.biography }}</p>
         {% else %}
         <p class="text-white/60 italic">No biography available.</p>
         {% endif %}
@@ -20,7 +20,11 @@
         </div>
       </div>
       <div class="relative">
-        <img src="{{ person.photo_url or url_for('static', filename='img/placeholder_avatar.svg') }}" alt="{{ person.name }} portrait" class="h-full w-full rounded-3xl object-cover" />
+        {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
+        <img src="{{ url_for('static', filename='img/people/' ~ person.id ~ '.jpg') }}" 
+             onerror="this.src='{{ placeholder }}'"
+             alt="{{ person.name }} portrait" 
+             class="rounded-3xl" />
         <div class="mt-4 grid grid-cols-1 gap-3 text-center text-sm">
           <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p class="text-xs uppercase tracking-[0.4em] text-white/60">Film Credits</p>
