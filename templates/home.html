@@ -81,26 +81,60 @@
   {# -------------------- PEOPLE SPOTLIGHT -------------------- #}
   <section class="mx-auto max-w-6xl space-y-6 mb-12">
     <div class="flex items-center justify-between">
-      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">People Spotlight</h2>
-      <a href="{{ url_for('actors.get_actors') }}" class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">See all</a>
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">
+        People Spotlight
+      </h2>
+      <a href="{{ url_for('actors.get_actors') }}"
+        class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white">
+        See all
+      </a>
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {% for person in featured_people %}
-      <a href="{{ url_for('actors.person_detail', person_id=person.id) }}" class="group rounded-2xl border border-white/10 bg-black/60 p-4 transition hover:border-white/40">
-        {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
-        <img src="{{ url_for('static', filename='img/people/' ~ person.id ~ '.jpg') }}" 
-             onerror="this.src='{{ placeholder }}'"
-             alt="{{ person.name }} portrait" 
-             class="w-full h-56 object-cover rounded-xl mb-2" />
-        <p class="text-white font-semibold">{{ person.name }}</p>
-        <p class="text-sm text-zinc-400">{{ person.known_for }}</p>
-      </a>
+        <a href="{{ url_for('actors.person_detail', person_id=person.actor_id) }}"
+          class="group rounded-2xl border border-white/10 bg-black/60 p-4 transition hover:border-white/40">
+
+          {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
+
+          <img
+            src="{{ url_for('static', filename='img/people/' ~ person.actor_id ~ '.jpg') }}"
+            onerror="this.src='{{ placeholder }}'"
+            alt="{{ person.actor_name }} portrait"
+            class="w-full h-56 object-cover rounded-xl mb-3"
+          />
+
+          <p class="text-white font-semibold">
+            {{ person.actor_name }}
+          </p>
+
+          <div class="mt-1 text-sm text-zinc-400 space-y-0.5">
+            <p>
+              🤝 {{ person.collaborators_count }} collaborators
+            </p>
+            <p>
+              🎬 {{ person.total_movies }} movies
+            </p>
+            {% if person.avg_movie_rating %}
+              <p>
+                ⭐ {{ person.avg_movie_rating }}/10 avg rating
+              </p>
+            {% else %}
+              <p class="italic text-zinc-500">
+                No ratings yet
+              </p>
+            {% endif %}
+          </div>
+
+        </a>
       {% else %}
-      <p class="text-sm text-zinc-400">No people to display yet.</p>
+        <p class="text-sm text-zinc-400">
+          No people to display yet.
+        </p>
       {% endfor %}
     </div>
   </section>
+
 
   {# -------------------- COLLECTIONS SPOTLIGHT -------------------- #}
   <section class="space-y-6 mb-12 mx-auto max-w-6xl">

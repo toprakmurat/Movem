@@ -187,7 +187,7 @@ def get_movie_details_full_db(movie_id: int):
             })
 
         director = get_movie_director(movie_id)
-        cast_list = get_movie_actors(movie_id)
+        cast_list = get_movie_actors(movie_id, limit=15)
 
         full_context = {
             'movie': movie_data,

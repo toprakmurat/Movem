@@ -133,10 +133,16 @@
     </div>
     <div class="mt-4 rail-scroll pb-4"> 
       {% for member in cast %}
-      <div class="rail-card group min-w-[140px] relative">
-        <div class="aspect-[3/4] overflow-hidden rounded-xl bg-slate-800">
-          <img src="{{ url_for('static', filename='img/' ~ member.profile_url) if member.profile_url else url_for('static', filename='img/placeholder_avatar.svg') }}" 
-               alt="{{ member.name }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+      <div class="rail-card group min-w-[150px] relative">
+        {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
+        <div class="relative w-full aspect-[1/2] overflow-hidden rounded-xl">
+          <img
+            src="{{ url_for('static', filename='img/people/' ~ member.id ~ '.jpg') }}"
+            onerror="this.onerror=null;this.src='{{ placeholder }}'"
+            alt="{{ member.name }} portrait"
+            loading="lazy"
+            class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"
+          />
         </div>
         <div class="mt-3">
           <p class="text-sm font-semibold text-white truncate">{{ member.name }}</p>

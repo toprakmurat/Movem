@@ -100,8 +100,9 @@ def get_actor_filmography_db(person_id: int):
     try:
         filmography = execute_query(
             """
-            SELECT 
-                m.id AS movie_id,  m.title,
+            SELECT DISTINCT ON (m.id)
+                m.id AS movie_id,
+                m.title,
                 m.release_date,
                 m.overview,
                 m.tagline,
@@ -111,15 +112,19 @@ def get_actor_filmography_db(person_id: int):
                 s.runtime,
                 mc.character_name AS role
             FROM movies m
-            JOIN movie_cast mc ON m.id = mc.movie_id
-            LEFT JOIN statistic s ON m.id = s.movie_id
+            JOIN movie_cast mc
+                ON m.id = mc.movie_id
+            LEFT JOIN statistic s
+                ON m.id = s.movie_id
             WHERE mc.person_id = %s
-            ORDER BY m.release_date DESC
+            ORDER BY
+                m.id,
+                m.release_date DESC;
             """,
             (person_id,),
             fetch=True
         )
-        
+
         return filmography if filmography else [], None
         
     except Exception as e:
@@ -245,16 +250,47 @@ def get_featured_people_db(limit: int = 4):
     try:
         featured_people = execute_query(
             """
-            SELECT 
-                p.id, 
-                p.name, 
-                p.photo_url,
-                COUNT(mc.movie_id) as movie_count
+            SELECT
+                p.id AS actor_id,
+                p.name AS actor_name,
+
+                COUNT(DISTINCT mc2.person_id) AS collaborators_count,
+
+                COUNT(DISTINCT m.id) AS total_movies,
+
+                ROUND(AVG(s.vote_avg), 2) AS avg_movie_rating
+
             FROM people p
-            JOIN movie_cast mc ON p.id = mc.person_id
-            GROUP BY p.id, p.name, p.photo_url
-            ORDER BY movie_count DESC
-            LIMIT %s
+
+            -- actor → their movie roles
+            JOIN movie_cast mc1
+                ON mc1.person_id = p.id
+
+            -- movie they worked on
+            JOIN movies m
+                ON m.id = mc1.movie_id
+
+            -- other people in the same movies
+            JOIN movie_cast mc2
+                ON mc2.movie_id = m.id
+            AND mc2.person_id != p.id
+
+            -- movie statistics
+            LEFT JOIN statistic s
+                ON s.movie_id = m.id
+
+            GROUP BY
+                p.id,
+                p.name
+
+            HAVING COUNT(DISTINCT mc2.person_id) >= 10
+
+            ORDER BY
+                collaborators_count DESC,
+                total_movies DESC
+
+            LIMIT %s;
+
             """,
             (limit,),
             fetch=True
