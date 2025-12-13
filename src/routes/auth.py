@@ -15,7 +15,8 @@ from src.services.users_service import (
     update_password_db,
     set_reset_token_db,
     get_user_by_reset_token_db,
-    clear_reset_token_db
+    clear_reset_token_db,
+    delete_user_db
 )
 from src.models.user_model import User
 from src.services.comments_service import get_comments_by_user
@@ -279,3 +280,19 @@ def reset_password(token):
             flash('Error resetting password.', 'error')
 
     return render_template('auth/reset_password.html', token=token)
+
+
+@auth_bp.route('/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    # Double check it is the current user
+    user_id = int(current_user.id)
+    deleted_user, err = delete_user_db(user_id)
+    
+    if deleted_user:
+        logout_user()
+        flash('Your account has been successfully deleted.', 'success')
+        return redirect(url_for('auth.login'))
+    else:
+        flash(f'Error deleting account: {err}', 'error')
+        return redirect(url_for('auth.account'))

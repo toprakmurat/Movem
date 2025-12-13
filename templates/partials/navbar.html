@@ -11,6 +11,9 @@
       <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
       {# <a href="{{ url_for('leaderboard') }}" class="nav-link">Leaderboard</a> #}
       <a href="{{ url_for('auth.account') }}" class="nav-link">Account</a>
+      {% if current_user.is_authenticated and current_user.role == 'admin' %}
+      <a href="{{ url_for('admin.dashboard') }}" class="nav-link text-purple-400 hover:text-purple-300">Admin</a>
+      {% endif %}
     </nav>
     <div class="flex items-center gap-3">
       {% if current_user.is_authenticated %}

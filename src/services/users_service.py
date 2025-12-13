@@ -134,6 +134,37 @@ def get_user_favorite_genre_stats_db(user_id: int):
     except Exception as e:
         return None, str(e)
 
+def get_user_favorite_actor_stats_db(user_id):
+    """
+   Finds user's favorite actor from collections
+    """
+    query = """
+        SELECT 
+            p.name, 
+            p.profile_path, 
+            COUNT(*) as appearance_count
+        FROM user_lists ul
+        JOIN list_items li ON ul.id = li.list_id
+        JOIN movie_cast mc ON li.movie_id = mc.movie_id
+        JOIN people p ON mc.person_id = p.id
+        WHERE ul.user_id = %s
+        GROUP BY p.id, p.name, p.profile_path
+        ORDER BY appearance_count DESC
+        LIMIT 1;
+    """
+    try:
+        result = execute_query(query, (user_id,), fetch=True)
+        if result:
+            return {
+                'name': result[0][0],
+                'image': result[0][1], 
+                'count': result[0][2]
+            }
+        return None
+    except Exception as e:
+        print(f"Error calculating actor obsession: {e}")
+        return None
+
 def get_most_active_curators_db():
     """Users who created the most collections"""
     try:

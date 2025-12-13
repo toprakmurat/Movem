@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard • MoveM{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto space-y-10">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="space-y-2">
+        {% for category, message in messages %}
+        <div
+            class="p-4 rounded-3xl border {{ 'border-red-500/50 bg-red-500/10 text-red-200' if category == 'error' else 'border-green-500/50 bg-green-500/10 text-green-200' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Header -->
+    <div class="rounded-[40px] border border-white/10 bg-gradient-to-r from-black via-black/80 to-purple-800/40 p-10">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-display text-white mb-2">Admin Dashboard</h1>
+                <p class="text-white/60">Manage users, lists, and system data.</p>
+            </div>
+            <div class="space-x-4">
+                <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-sm">
+                    Total Users: {{ users|length if users else 0 }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- LEFT COLUMN -->
+        <div class="space-y-8">
+
+            <!-- Quick User Lookup -->
+            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">User Lookup</h2>
+                <form action="{{ url_for('admin.lookup_user') }}" method="post"
+                    class="grid gap-4 sm:grid-cols-[1fr,2fr,1fr]">
+                    <select name="method"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                        <option value="id">ID</option>
+                        <option value="username">Username</option>
+                        <option value="email">Email</option>
+                    </select>
+                    <input type="text" name="value" placeholder="Search value..."
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
+                    <button class="btn-primary py-2 px-4 rounded-xl">Search</button>
+                </form>
+            </section>
+
+            <!-- User Management (Visible if selected_user is present) -->
+            {% if selected_user %}
+            <section class="rounded-3xl border border-blue-500/30 bg-blue-900/10 p-6 space-y-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-xl font-semibold uppercase tracking-widest text-blue-300">User Details: {{
+                            selected_user.username }}</h2>
+                        <p class="text-xs text-white/40">ID: {{ selected_user.id }} | Role: {{ selected_user.role }}</p>
+                    </div>
+                    <img src="{{ url_for('static', filename=selected_user.profile_picture) }}"
+                        class="w-16 h-16 rounded-full border border-white/10">
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-black/40 rounded-xl p-4 border border-white/5">
+                        <h4 class="text-xs uppercase text-white/50 mb-2">Favorite Genres</h4>
+                        {% if genre_stats %}
+                        <ul class="text-sm text-white/80 space-y-1">
+                            {% for g in genre_stats %}
+                            <li>{{ g.genre_name }}: {{ g.genre_count }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-xs text-white/40">No stats available</p>
+                        {% endif %}
+                    </div>
+                    <div class="bg-black/40 rounded-xl p-4 border border-white/5">
+                        <h4 class="text-xs uppercase text-white/50 mb-2">Favorite Actor</h4>
+                        {% if actor_stats %}
+                        <div class="flex items-center gap-3">
+                            <img src="https://image.tmdb.org/t/p/w200{{ actor_stats.image }}"
+                                class="w-10 h-10 rounded-full object-cover">
+                            <div>
+                                <p class="text-sm text-white">{{ actor_stats.name }}</p>
+                                <p class="text-xs text-white/40">{{ actor_stats.count }} appearances</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-xs text-white/40">No stats available</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Update Form -->
+                <form action="{{ url_for('admin.update_user') }}" method="post"
+                    class="space-y-4 border-t border-white/10 pt-4">
+                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                    <h4 class="text-sm font-semibold text-white">Edit User</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input name="first_name" value="{{ selected_user.first_name }}" placeholder="First Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
+                        <input name="last_name" value="{{ selected_user.last_name }}" placeholder="Last Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
+                    </div>
+                    <input name="email" value="{{ selected_user.email }}" placeholder="Email (ReadOnly)"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white/50 text-sm"
+                        readonly>
+                    <input name="bio" value="{{ selected_user.bio or '' }}" placeholder="Bio"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
+                    <button
+                        class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                        User</button>
+                </form>
+
+                <!-- Delete User -->
+                <form action="{{ url_for('admin.delete_user') }}" method="post"
+                    onsubmit="return confirm('Delete this user?');">
+                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                    <button
+                        class="w-full bg-red-600/20 hover:bg-red-600/40 text-red-200 border border-red-500/30 rounded-xl py-2 font-medium transition">Delete
+                        User</button>
+                </form>
+
+                <!-- Lists Action -->
+                <form action="{{ url_for('admin.create_list') }}" method="post"
+                    class="space-y-3 border-t border-white/10 pt-4">
+                    <h4 class="text-sm font-semibold text-white">Create List for User</h4>
+                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                    <div class="flex gap-2">
+                        <input name="list_name" placeholder="List Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm w-full"
+                            required>
+                        <label class="flex items-center gap-2 text-white/60 text-xs whitespace-nowrap">
+                            <input type="checkbox" name="is_public" checked> Public
+                        </label>
+                    </div>
+                    <button
+                        class="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 font-medium transition text-sm">Create
+                        List</button>
+                </form>
+
+            </section>
+            {% endif %}
+
+            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Create New User</h2>
+                <form action="{{ url_for('admin.create_user') }}" method="post" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input name="username" placeholder="Username"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
+                            required>
+                        <input name="email" type="email" placeholder="Email"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
+                            required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input name="first_name" placeholder="First Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                        <input name="last_name" placeholder="Last Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                    </div>
+                    <input name="password" type="password" placeholder="Password"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
+                    <button class="w-full btn-secondary">Create User</button>
+                </form>
+            </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="space-y-8">
+
+            <!-- Active Curators -->
+            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Most Active Curators</h2>
+                <ul class="space-y-3">
+                    {% if active_curators %}
+                    {% for curator in active_curators %}
+                    <li class="flex items-center justify-between bg-white/5 rounded-xl p-3 px-4">
+                        <div class="flex items-center gap-3">
+                            <img src="{{ url_for('static', filename=curator.profile_picture) }}"
+                                class="w-8 h-8 rounded-full">
+                            <span class="text-white font-medium">{{ curator.username }}</span>
+                        </div>
+                        <span class="text-white/60 text-sm">{{ curator.total_movies }} movies curated</span>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-white/40 italic">No activity yet.</p>
+                    {% endif %}
+                </ul>
+            </section>
+
+            <!-- List Lookup / Management -->
+            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">List Management</h2>
+                <form action="{{ url_for('admin.view_list') }}" method="post" class="flex gap-4 mb-6">
+                    <input type="number" name="list_id" placeholder="List ID"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                        required>
+                    <button class="btn-primary py-2 px-4 rounded-xl">View</button>
+                </form>
+
+                {% if selected_list %}
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">{{ selected_list.list_info.list_name }}</h3>
+                            <p class="text-xs text-white/50">ID: {{ selected_list.list_info.id }} | Public: {{
+                                selected_list.list_info.is_public }}</p>
+                        </div>
+                        <form action="{{ url_for('admin.delete_list') }}" method="post"
+                            onsubmit="return confirm('Delete this list?');">
+                            <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
+                            <button class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-trash-2">
+                                    <path d="M3 6h18" />
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
+                                    <line x1="10" x2="10" y1="11" y2="17" />
+                                    <line x1="14" x2="14" y1="11" y2="17" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="text-xs uppercase text-white/40">Movies in List</h4>
+                        {% for movie in selected_list.movies %}
+                        <div class="flex items-center justify-between text-sm text-white/80 bg-black/20 p-2 rounded-lg">
+                            <span>{{ movie.title }} (ID: {{ movie.id }})</span>
+                            <form action="{{ url_for('admin.remove_movie') }}" method="post">
+                                <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
+                                <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                                <button class="text-red-400 hover:text-red-300 text-xs">Remove</button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <form action="{{ url_for('admin.add_movie') }}" method="post"
+                        class="flex gap-2 pt-2 border-t border-white/5">
+                        <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
+                        <input type="number" name="movie_id" placeholder="Movie ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-white text-sm w-full"
+                            required>
+                        <button
+                            class="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-lg border border-green-500/30">Add</button>
+                    </form>
+                </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Full User Table -->
+    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 overflow-hidden">
+        <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Users</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-white/70">
+                <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                    <tr>
+                        <th class="px-4 py-3">ID</th>
+                        <th class="px-4 py-3">Username</th>
+                        <th class="px-4 py-3">Email</th>
+                        <th class="px-4 py-3">Role</th>
+                        <th class="px-4 py-3">Game Score</th>
+                        <th class="px-4 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for u in users %}
+                    <tr
+                        class="hover:bg-white/5 transition {{ 'bg-blue-900/10' if selected_user and selected_user.id == u.id }}">
+                        <td class="px-4 py-3 font-mono text-white/50">{{ u.id }}</td>
+                        <td class="px-4 py-3 font-medium text-white">{{ u.username }}</td>
+                        <td class="px-4 py-3">{{ u.email }}</td>
+                        <td class="px-4 py-3">
+                            <span
+                                class="px-2 py-1 rounded-md text-xs {{ 'bg-purple-500/20 text-purple-300' if u.role == 'admin' else 'bg-white/10 text-white/60' }}">
+                                {{ u.role }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">{{ u.game_score }}</td>
+                        <td class="px-4 py-3">
+                            <form action="{{ url_for('admin.dashboard') }}" method="get">
+                                <input type="hidden" name="view_user_id" value="{{ u.id }}">
+                                <button class="text-brand-400 hover:text-brand-300">Manage</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</section>
+{% endblock %}
