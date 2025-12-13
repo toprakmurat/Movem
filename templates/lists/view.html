@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ list_info.list_name }} • MoveM{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-6xl space-y-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-[0.4em] text-white/60 mb-2">
+                {{ 'Public List' if list_info.is_public else 'Private List' }}
+            </p>
+            <h1 class="text-4xl font-display tracking-widest text-white">
+                {{ list_info.list_name }}
+            </h1>
+            <p class="text-white/40 mt-2">Created {{ list_info.created_at.strftime('%d %B %Y') }}</p>
+        </div>
+        {% if is_owner %}
+        <form action="{{ url_for('lists.delete_list', list_id=list_info.id) }}" method="post"
+            onsubmit="return confirm('Delete this list?');">
+            <button
+                class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-200 hover:bg-red-500/20">
+                Delete List
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {% if movies %}
+        {% for movie in movies %}
+        <div class="group relative overflow-hidden rounded-xl bg-white/5 transition hover:bg-white/10">
+            <a href="{{ url_for('movies.movies_details_page', movie_id=movie.id) }}" class="block">
+                <div class="aspect-[2/3] w-full overflow-hidden bg-black">
+                    <img src="{{ url_for('static', filename='img/' ~ (movie.poster_file or 'placeholder_poster.svg')) }}"
+                        alt="{{ movie.title }}"
+                        class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        onerror="this.src='{{ url_for('static', filename='img/placeholder_poster.svg') }}'">
+                </div>
+            </a>
+            <div class="p-4">
+                <h3 class="font-semibold text-white line-clamp-1">{{ movie.title }}</h3>
+                <div class="mt-1 flex items-center justify-between text-xs text-white/40">
+                    <span>{{ movie.vote_avg }}/10</span>
+                    <span>{{ movie.release_date.strftime('%Y') if movie.release_date else 'N/A' }}</span>
+                </div>
+                {% if is_owner %}
+                <form action="{{ url_for('lists.remove_from_list') }}" method="post" class="mt-3">
+                    <input type="hidden" name="list_id" value="{{ list_info.id }}">
+                    <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                    <button
+                        class="w-full rounded-lg bg-red-500/10 py-1.5 text-xs font-medium text-red-300 hover:bg-red-500/20">
+                        Remove
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-span-full py-20 text-center">
+            <div class="mx-auto w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+            <p class="text-white/40 mb-2">This list is empty.</p>
+            {% if is_owner %}
+            <a href="{{ url_for('movies.movies_page') }}" class="text-brand-400 hover:underline">Browse movies to
+                add</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

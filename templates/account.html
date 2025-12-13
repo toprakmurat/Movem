@@ -121,14 +121,69 @@
 
       <button class="btn-primary w-full">Update Password</button>
     </form>
+
+    <form action="{{ url_for('auth.delete_account') }}" method="post"
+      class="space-y-6 rounded-3xl border border-red-500/30 bg-red-900/10 p-6 sm:p-8"
+      onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold uppercase tracking-[0.3em] text-red-400">Danger Zone</h2>
+      </div>
+      <p class="text-sm text-white/60">
+        Deleting your account is irreversible. All your data will be wiped.
+      </p>
+      <button
+        class="w-full rounded-xl bg-red-600/80 px-4 py-3 font-semibold text-white transition hover:bg-red-600 border border-red-500/50">
+        Delete Account
+      </button>
+    </form>
     {% endif %}
 
     <div class="space-y-6">
       <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
-        <h3 class="text-lg font-semibold uppercase tracking-[0.3em] text-white">Game stats</h3>
+        <h3 class="text-lg font-semibold uppercase tracking-[0.3em] text-white">Movie stats</h3>
         <dl class="mt-4 space-y-4 text-sm">
+          <!-- Favorite Genres -->
           <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <dt class="text-xs uppercase tracking-[0.4em] text-white/60">Accuracy</dt>
+            <dt class="text-xs uppercase tracking-[0.4em] text-white/60 mb-2">Top Genres</dt>
+            {% if genre_stats %}
+            <div class="space-y-2">
+              {% for genre in genre_stats[:3] %}
+              <div class="flex items-center justify-between text-white/80">
+                <span>{{ genre.genre_name }}</span>
+                <span class="text-brand-400 font-mono">{{ genre.count }}</span>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-white/40 italic">No genres yet</p>
+            {% endif %}
+          </div>
+
+          <!-- Favorite Actor -->
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <dt class="text-xs uppercase tracking-[0.4em] text-white/60 mb-2">Top Actors</dt>
+            {% if actor_stats %}
+            <div class="space-y-3">
+              {% for actor in actor_stats %}
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-black overflow-hidden ring-1 ring-white/20">
+                  <img src="{{ url_for('static', filename='img/people/' ~ actor.id ~ '.jpg') }}"
+                    class="h-full w-full object-cover">
+                </div>
+                <div>
+                  <p class="text-white font-medium">{{ actor.name }}</p>
+                  <p class="text-xs text-white/40">{{ actor.count }} movies watched</p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-white/40 italic">No actors yet</p>
+            {% endif %}
+          </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <dt class="text-xs uppercase tracking-[0.4em] text-white/60">Game Accuracy</dt>
             <dd class="mt-2 text-3xl font-display text-white">{{ stats.accuracy }}%</dd>
             <div class="mt-3 h-2 rounded-full bg-white/10">
               <div class="h-full rounded-full bg-brand-500" style="width: {{ stats.accuracy }}%"></div>
@@ -185,8 +240,62 @@
     </a>
     {% endfor %}
   </div>
-</section>
+    <!-- Lists Section -->
+    <div class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">Lists</h2>
+        <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ user_lists | length }} lists</span>
+      </div>
+
+      {% if not is_public %}
+      <form method="post" class="mb-6 flex gap-2">
+        <input type="hidden" name="create_list" value="1">
+        <div class="relative flex-1">
+          <input type="text" name="list_name" placeholder="New List Name" required
+            class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+        </div>
+        <label
+          class="flex items-center gap-2 cursor-pointer px-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10">
+          <input type="checkbox" name="is_public" checked class="accent-brand-500 w-4 h-4">
+          <span class="text-xs text-white/60 uppercase tracking-widest">Public</span>
+        </label>
+        <button type="submit"
+          class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-500">
+          Create
+        </button>
+      </form>
+      {% endif %}
+
+      <div class="space-y-3">
+        {% if user_lists %}
+        {% for list in user_lists %}
+        <a href="{{ url_for('lists.view_list', list_id=list.id) }}"
+          class="block rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition group">
+          <!-- Public List View -->
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold text-white group-hover:text-brand-400 transition">{{ list.list_name }}</h3>
+              <p class="text-xs text-white/40">{{ list.created_at.strftime('%Y-%m-%d') }} • {{ 'Public' if
+                list.is_public else 'Private' }}</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-5 h-5 text-white/20 group-hover:text-white/60">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
+        </a>
+        {% endfor %}
+        {% else %}
+        <div
+          class="flex items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 py-8 text-center">
+          <p class="text-sm font-medium text-white/60">No lists created yet</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
 {% endif %}
+
 
   <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
     <div class="flex items-center justify-between mb-6">

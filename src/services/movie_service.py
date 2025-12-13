@@ -1035,7 +1035,7 @@ def update_platform(platform_id, platform_data):
 
 
 def delete_platform_by_id(platform_id):
-    """Deletes a platform by its ID"""
+    """Deletes a platform by its ID """
     try:
         deleted_platform = execute_query(
             "DELETE FROM platforms WHERE id = %s RETURNING *",

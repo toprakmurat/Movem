@@ -4,6 +4,7 @@ from src.services.movie_service import *
 from src.services.favorite_service import *
 from flask_login import current_user
 from src.services.comments_service import get_comments_for_movie
+from src.services.list_service import get_lists_by_user_db
 
 movies_bp = Blueprint('movies', __name__)
 
