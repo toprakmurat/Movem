@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-
+from src.services.favorite_service import get_favorite_movies_detailed_for_user_db
 from datetime import datetime, timedelta
 import secrets
 
@@ -147,7 +147,9 @@ def account():
     if not user_reviews:
         user_reviews = []
 
-    favorites = []
+    favorites, fav_err = get_favorite_movies_detailed_for_user_db(int(current_user.id))
+    if not favorites or fav_err:
+        favorites = []
     sessions = []
 
     return render_template(

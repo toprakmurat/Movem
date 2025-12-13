@@ -43,65 +43,70 @@ class Pagination:
 
 ######################### MOVIES ##########################
 
-def get_movies_paginated_db(page: int = 1, per_page: int = 8, genre_id: int = None, sort_by: str = None):
+def get_movies_paginated_db(page: int = 1, per_page: int = 8,
+    genre_id: int = None, sort_by: str = None, search: str = None):
     try:
         offset = (page - 1) * per_page
 
+        where_clauses = []
+        params = []
+
         if genre_id:
-            join_genre = "JOIN movies_genres mg ON m.id = mg.movie_id"
-            where_genre = "WHERE mg.genre_id = %s"
-            params_count = (genre_id,)
-            params_data = (genre_id, per_page, offset)
+            where_clauses.append("mg.genre_id = %s")
+            params.append(genre_id)
+
+        if search:
+            where_clauses.append("(m.title ILIKE %s OR m.overview ILIKE %s)")
+            keyword = f"%{search}%"
+            params.extend([keyword, keyword])
+
+        where_sql = ""
+        if where_clauses:
+            where_sql = "WHERE " + " AND ".join(where_clauses)
+
+        join_sql = "JOIN movies_genres mg ON m.id = mg.movie_id" if genre_id else ""
+
+        if sort_by == "rating_desc":
+            order_sql = "ORDER BY s.vote_avg DESC"
+        elif sort_by == "rating_asc":
+            order_sql = "ORDER BY s.vote_avg ASC"
+        elif sort_by == "release_desc":
+            order_sql = "ORDER BY m.release_date DESC"
+        elif sort_by == "release_asc":
+            order_sql = "ORDER BY m.release_date ASC"
         else:
-            join_genre = ""
-            where_genre = ""
-            params_count = ()
-            params_data = (per_page, offset)
+            order_sql = "ORDER BY m.title ASC"
 
         count_sql = f"""
-            SELECT COUNT(DISTINCT m.id) as count 
-            FROM movies m 
-            {join_genre} 
-            {where_genre}
+            SELECT COUNT(DISTINCT m.id) AS count
+            FROM movies m
+            {join_sql}
+            {where_sql}
         """
-        total_result = execute_query(count_sql, params_count, fetch=True)
-        total_count = total_result[0]['count'] if total_result else 0
+        total_result = execute_query(count_sql, tuple(params), fetch=True)
+        total_count = total_result[0]["count"] if total_result else 0
 
-        if sort_by == "rating_desc" or sort_by == "rating": 
-            order_clause = "ORDER BY s.vote_avg DESC"       
-        
-        elif sort_by == "rating_asc":
-            order_clause = "ORDER BY s.vote_avg ASC"        
-            
-        elif sort_by == "release_desc" or sort_by == "release":
-            order_clause = "ORDER BY m.release_date DESC"   
-            
-        elif sort_by == "release_asc":
-            order_clause = "ORDER BY m.release_date ASC" 
-
-        else:
-            order_clause = "ORDER BY m.title ASC"           
-
-        base_select = """
-            SELECT DISTINCT m.*, m.poster_file as poster_path, s.vote_avg as rating, s.vote_count, s.runtime
+        data_sql = f"""
+            SELECT DISTINCT m.*, m.poster_file AS poster_path,
+                            s.vote_avg AS rating, s.vote_count, s.runtime
             FROM movies m
             LEFT JOIN statistic s ON m.id = s.movie_id
-        """
-
-        sql = f"""
-            {base_select}
-            {join_genre}
-            {where_genre}
-            {order_clause}
+            {join_sql}
+            {where_sql}
+            {order_sql}
             LIMIT %s OFFSET %s
         """
 
-        movies = execute_query(sql, params_data, fetch=True) or []
+        data_params = tuple(params + [per_page, offset])
+        movies = execute_query(data_sql, data_params, fetch=True) or []
 
-        return Pagination(items=movies, page=page, per_page=per_page, total_count=total_count), None
+        return Pagination(items=movies,
+                          page=page,
+                          per_page=per_page,
+                          total_count=total_count), None
 
     except Exception as e:
-        print(f"DB Error: {e}")
+        print("DB Error:", e)
         return Pagination(items=[], page=page, per_page=per_page, total_count=0), str(e)
 
 def get_movie_details_full_db(movie_id: int):

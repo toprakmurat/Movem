@@ -3,53 +3,128 @@
 {% block content %}
 <section class="mx-auto max-w-6xl">
   <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-    <div>
-      <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Library</p>
-      <h1 class="mt-2 text-3xl font-semibold">Movies</h1>
-      <p class="text-slate-400">Browse curated titles or filter by genre, release year, and popularity.</p>
-    </div>
-    <form class="flex flex-wrap gap-3 text-sm">
+  
+  <div>
+    <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Library</p>
+    <h1 class="mt-2 text-3xl font-semibold">Movies</h1>
+    <p class="text-slate-400">Browse curated titles or filter by genre, release year, and popularity.</p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+
+    <!-- SEARCH BAR -->
+    <form method="get" action="{{ url_for('movies.movies_page') }}" class="flex items-center">
+    <input 
+      type="text" 
+      name="search" 
+      placeholder="Search movies..." 
+      value="{{ request.args.get('search', '') }}"
+      class="form-field w-64 h-[48px] px-4 py-3"
+    />
+
+    <!-- preserve selected filters when performing a search -->
+    {% if request.args.get('genre') %}
+      <input type="hidden" name="genre" value="{{ request.args.get('genre') }}">
+    {% endif %}
+    {% if request.args.get('sort') %}
+      <input type="hidden" name="sort" value="{{ request.args.get('sort') }}">
+    {% endif %}
+    {% if request.args.get('page') %}
+      <input type="hidden" name="page" value="{{ request.args.get('page') }}">
+    {% endif %}
+  </form>
+
+    <!-- FILTER BUTTON -->
+    <button id="filterToggle" 
+            class="flex items-center gap-2 text-sm btn-secondary px-4 py-3 h-[48px]">
+      Filters
+      <svg id="filterIcon" class="w-4 h-4 transition-transform" 
+           fill="none" stroke="currentColor" stroke-width="2" 
+           viewBox="0 0 24 24">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+
+  </div>
+</div>
+
+
+
+  <!--FILTER PANEL -->
+  <div id="filterPanel"
+     class="overflow-hidden transition-all duration-300 max-h-0">
+    <form method="get" action="{{ url_for('movies.movies_page') }}" class="mt-4 flex flex-wrap gap-3 text-sm">
+      <!-- Preserve search query when applying filters -->
+      {% if request.args.get('search') %}
+        <input type="hidden" name="search" value="{{ request.args.get('search') }}">
+      {% endif %}
+      <!-- Preserve current page (optional) -->
+      {% if request.args.get('page') %}
+        <input type="hidden" name="page" value="{{ request.args.get('page') }}">
+      {% endif %}
+
       <select name="genre" class="form-field w-48">
-      <option value="">All genres</option>
-      {% for genre in genres %}
-        <option value="{{ genre['id'] }}" 
-                {% if request.args.get('genre') and genre['id'] == request.args.get('genre')|int %}selected{% endif %}>
+        <option value="">All genres</option>
+        {% for genre in genres %}
+          <option value="{{ genre['id'] }}" 
+            {% if request.args.get('genre') and genre['id'] == request.args.get('genre')|int %}selected{% endif %}>
             {{ genre['genre_name'] }}
-        </option>
-      {% endfor %}
-    </select>
-      <select name="sort" class="form-field w-48">
-      <option value="rating_desc" {% if request.args.get('sort') == 'rating_desc' %}selected{% endif %}>Highest Rated</option>
-      <option value="rating_asc" {% if request.args.get('sort') == 'rating_asc' %}selected{% endif %}>Lowest Rated</option>
-      
-      <option value="release_desc" {% if request.args.get('sort') == 'release_desc' %}selected{% endif %}>Newest First</option>
-      <option value="release_asc" {% if request.args.get('sort') == 'release_asc' %}selected{% endif %}>Oldest First</option>
+          </option>
+        {% endfor %}
       </select>
-      <button class="btn-secondary">Apply</button>
+
+      <select name="sort" class="form-field w-48">
+        <option value="rating_desc" {% if request.args.get('sort') == 'rating_desc' %}selected{% endif %}>Highest Rated</option>
+        <option value="rating_asc" {% if request.args.get('sort') == 'rating_asc' %}selected{% endif %}>Lowest Rated</option>
+        <option value="release_desc" {% if request.args.get('sort') == 'release_desc' %}selected{% endif %}>Newest First</option>
+        <option value="release_asc" {% if request.args.get('sort') == 'release_asc' %}selected{% endif %}>Oldest First</option>
+      </select>
+
+      <button type="submit" class="btn-secondary">Apply</button>
+
+      <!-- Optionally add a 'Clear filters' link that keeps the search query but clears filters -->
+      <a class="btn-secondary" href="{{ url_for('movies.movies_page', search=request.args.get('search')) }}">Clear filters</a>
     </form>
   </div>
+
+  <!-- MOVIES GRID -->
   <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     {% for movie in movies.items %}
-      {% set movie = movie %}
       {% include 'partials/movie_card.html' with context %}
     {% else %}
-    <p class="text-slate-400">No movies found for your filters. Try adjusting your search.</p>
+      <p class="text-slate-400">No movies found for your filters. Try adjusting your search.</p>
     {% endfor %}
   </div>
+
+  <!-- PAGINATION -->
   <div class="mt-8 flex items-center justify-between text-sm text-slate-400">
     <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
     <div class="flex gap-3">
-      
       {% if movies.has_prev %}
       <a href="{{ url_for('movies.movies_page', page=movies.prev_num, genre=request.args.get('genre'), sort=request.args.get('sort')) }}" class="btn-secondary">Previous</a>
       {% endif %}
-
       {% if movies.has_next %}
       <a href="{{ url_for('movies.movies_page', page=movies.next_num, genre=request.args.get('genre'), sort=request.args.get('sort')) }}" class="btn-primary">Next</a>
       {% endif %}
-
     </div>
   </div>
-
 </section>
+
+<script>
+  const toggle = document.getElementById("filterToggle");
+  const panel  = document.getElementById("filterPanel");
+  const icon   = document.getElementById("filterIcon");
+
+  toggle.addEventListener("click", () => {
+    const isOpen = panel.style.maxHeight && panel.style.maxHeight !== "0px";
+
+    if (isOpen) {
+      panel.style.maxHeight = "0px";
+      icon.style.transform = "rotate(0deg)";
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+      icon.style.transform = "rotate(180deg)";
+    }
+  });
+</script>
 {% endblock %}

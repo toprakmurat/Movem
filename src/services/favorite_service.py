@@ -120,3 +120,28 @@ def is_movie_favorite_for_user(user_id: int, movie_id: int) -> bool:
         return False
 
 
+def get_favorite_movies_detailed_for_user_db(user_id: int):
+    """
+    Return detailed favorites for a specific user
+    """
+    try:
+        favs = execute_query(
+            """
+            SELECT
+                f.id,
+                f.user_id,
+                f.movie_id,
+                m.title AS movie_title,
+                m.poster_file AS movie_poster,
+                f.created_at
+            FROM favorites f
+            JOIN movies m ON m.id = f.movie_id
+            WHERE f.user_id = %s
+            ORDER BY f.created_at DESC
+            """,
+            (user_id,),
+            fetch=True
+        )
+        return favs, None
+    except Exception as e:
+        return None, str(e)

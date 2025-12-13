@@ -14,7 +14,7 @@
       <div class="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
 
       <div class="relative z-10 flex h-full flex-col justify-center gap-5 p-8 sm:p-12 lg:p-16 text-white">
-        <p class="text-sm font-semibold uppercase tracking-[0.4em] text-brand-400">Now streaming</p>
+        <p class="text-sm font-semibold uppercase tracking-[0.4em] text-brand-400">Top Rated Picks</p>
         <h1 class="max-w-3xl text-5xl font-display uppercase tracking-[0.08em]">
           {{ movie.title }}
         </h1>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="flex flex-wrap gap-4 text-sm text-zinc-300 mt-2">
-          <span class="rounded border border-white/20 px-3 py-1 text-xs uppercase tracking-widest">Exclusive</span>
+          <span class="rounded border border-white/20 px-3 py-1 text-xs uppercase tracking-widest">Featured</span>
           <span>{{ movie.release_date }}</span>
           <span>{{ movie.genre_list | join(' • ') }}</span>
         </div>
@@ -233,16 +233,16 @@
     {% endfor %}
 
   {# -------------------- TOP REVIEWERS / COMMUNITY RAIL -------------------- #}
-<section class="mt-12">
-    <div class="flex items-center justify-between">
-      <h2 class="text-2xl font-semibold text-white">Top Reviewers</h2>
+<section class="mb-12 mx-auto max-w-6xl">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Top Reviewers</h2>
       <div class="flex gap-3">
         <button class="btn-icon" type="button" data-rail-nav data-direction="prev" data-rail-target="reviewers">&larr;</button>
         <button class="btn-icon" type="button" data-rail-nav data-direction="next" data-rail-target="reviewers">&rarr;</button>
       </div>
     </div>
 
-    <div class="rail-scroll" data-rail="reviewers">
+    <div class="rail-scroll " data-rail="reviewers">
       {% for reviewer in top_reviewers %}
       <article class="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
         
