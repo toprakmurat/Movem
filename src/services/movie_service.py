@@ -489,9 +489,9 @@ def get_genres_db():
         FROM genres
         """,
         fetch=True)
-        if genres:
+        if genres is not None:
             return genres, None
-        return None, None
+        return [], None
     except Exception as e:
         return None, str(e)
     

@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     game_score INTEGER,
-    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg'
+    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg',
+    reset_token VARCHAR(100),
+    reset_token_expiry TIMESTAMP
 );
 
 ------------------------------------------------------------

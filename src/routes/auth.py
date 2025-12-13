@@ -4,9 +4,22 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
-from src.services.users_service import create_user_db, get_user_by_email_db, update_user_db, get_user_by_id_db
+from datetime import datetime, timedelta
+import secrets
+
+from src.services.users_service import (
+    create_user_db, 
+    get_user_by_email_db, 
+    update_user_db, 
+    get_user_by_id_db, 
+    update_password_db,
+    set_reset_token_db,
+    get_user_by_reset_token_db,
+    clear_reset_token_db
+)
 from src.models.user_model import User
 from src.services.comments_service import get_comments_by_user
+from src.utils.file_utils import save_profile_picture
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -62,13 +75,19 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
+        profile_pic_path = 'img/placeholder_avatar.svg'
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file and file.filename != '':
+                profile_pic_path = save_profile_picture(file)
+
         user_data = {
             'username': username,
             'email': email,
             'first_name': first_name,
             'last_name': last_name,
             'password_hash': hashed_password,
-            'profile_picture': 'img/placeholder_avatar.svg'
+            'profile_picture': profile_pic_path
         }
 
         new_user, error = create_user_db(user_data)
@@ -102,6 +121,12 @@ def account():
             'last_name': request.form.get('last_name'),
             'bio': request.form.get('bio')
         }
+
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file and file.filename != '':
+                picture_file = save_profile_picture(file)
+                update_data['profile_picture'] = picture_file
 
         updated_user_data, err = update_user_db(int(current_user.id), update_data)
         if not err:
@@ -160,3 +185,97 @@ def public_profile(user_id):
         is_public=True,
         favorites=[]
     )
+
+@auth_bp.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+
+    # Verify current password
+    user_data, _ = get_user_by_id_db(int(current_user.id))
+    if not user_data or not check_password_hash(user_data['password_hash'], current_password):
+        flash('Incorrect current password.', 'error')
+        return redirect(url_for('auth.account'))
+
+    if new_password != confirm_password:
+        flash('New passwords do not match.', 'error')
+        return redirect(url_for('auth.account'))
+
+    new_hash = generate_password_hash(new_password)
+    success, err = update_password_db(int(current_user.id), new_hash)
+
+    if success:
+        flash('Password changed successfully.', 'success')
+    else:
+        flash('Error changing password.', 'error')
+    
+    return redirect(url_for('auth.account'))
+
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('auth.account'))
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user, err = get_user_by_email_db(email)
+        
+        if user:
+            # Generate token
+            token = secrets.token_urlsafe(32)
+            # Expiry in 1 hour
+            expiry = datetime.now() + timedelta(hours=1)
+            
+
+            success, err = set_reset_token_db(email, token, expiry)
+
+            if success:
+                # In a real app, send email here. For this task, print to console.
+                reset_url = url_for('auth.reset_password', token=token, _external=True)
+                print(f"\n{'='*50}\nPASSWORD RESET LINK: {reset_url}\n{'='*50}\n", flush=True)
+                flash('If an account exists with that email, a reset link has been sent (check server console).', 'success')
+            else:
+                flash('Error generating reset token.', 'error')
+        else:
+            print(f"\n[DEBUG] Password reset requested for {email}, but no user found.\n", flush=True)
+            # Don't reveal if user exists or not, but for this simple app maybe we don't care about timing attacks
+            flash('If an account exists with that email, a reset link has been sent (check server console).', 'success')
+
+        return redirect(url_for('auth.login'))
+
+    return render_template('auth/forgot_password.html')
+
+
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('auth.account'))
+        
+    user, err = get_user_by_reset_token_db(token)
+    
+    if not user:
+        flash('Invalid or expired reset token.', 'error')
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('auth/reset_password.html', token=token) # Keep on page?
+            
+        hashed_password = generate_password_hash(password)
+        success, err = update_password_db(user['id'], hashed_password)
+        
+        if success:
+            clear_reset_token_db(user['id'])
+            flash('Password reset successfully. You can now login.', 'success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Error resetting password.', 'error')
+
+    return render_template('auth/reset_password.html', token=token)

@@ -150,3 +150,47 @@ def get_most_active_curators_db():
         return result, None
     except Exception as e:
         return None, str(e)
+
+
+def update_password_db(user_id: int, new_hash: str):
+    """Update user password"""
+    try:
+        query = "UPDATE users SET password_hash = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s RETURNING id"
+        result = execute_query(query, (new_hash, user_id), fetch=True)
+        if result:
+            return True, None
+        return False, "User not found"
+    except Exception as e:
+        return False, str(e)
+
+def set_reset_token_db(email: str, token: str, expiry):
+    """Set reset token for user"""
+    try:
+        query = "UPDATE users SET reset_token = %s, reset_token_expiry = %s WHERE email = %s RETURNING id"
+        result = execute_query(query, (token, expiry, email), fetch=True)
+        if result:
+            return True, None
+        return False, "User not found"
+    except Exception as e:
+        return False, str(e)
+
+def get_user_by_reset_token_db(token: str):
+    """Find user by valid reset token"""
+    try:
+        # Check if token exists and is not expired
+        query = "SELECT * FROM users WHERE reset_token = %s AND reset_token_expiry > CURRENT_TIMESTAMP"
+        users = execute_query(query, (token,), fetch=True)
+        if users:
+            return users[0], None
+        return None, "Invalid or expired token"
+    except Exception as e:
+        return None, str(e)
+
+def clear_reset_token_db(user_id: int):
+    """Clear reset token after successful reset"""
+    try:
+        query = "UPDATE users SET reset_token = NULL, reset_token_expiry = NULL WHERE id = %s"
+        execute_query(query, (user_id,), fetch=False)
+        return True, None
+    except Exception as e:
+        return False, str(e)
