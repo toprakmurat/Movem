@@ -143,39 +143,50 @@
     </div>
   </div>
 
-  <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">Favorites</h2>
-    <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ favorites | length }} saved</span>
+{% if favorites %}
+<section class="mt-10">
+  <div class="mb-6 flex items-center justify-between">
+    <h3 class="text-xl font-semibold uppercase tracking-[0.3em] text-white">Favorites</h3>
+    <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ favorites | length }} Entries</span>
   </div>
 
-  <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-    {% if favorites %}
-      {% for fav in favorites %}
-        <div class="group relative overflow-hidden rounded-lg bg-white/5 shadow-sm transition hover:shadow-lg">
-          <a href="{{ url_for('movies.movies_details_page', movie_id=fav.movie_id) }}" class="block">
-            <div class="aspect-[2/3] w-full overflow-hidden rounded-t-lg bg-black">
-              <img
-                src="{{ url_for('static', filename='img/' ~ (fav.movie_poster or 'placeholder_poster.svg')) }}"
-                alt="{{ fav.movie_title }}"
-                loading="lazy"
-                onerror="this.src='{{ url_for('static', filename='img/placeholder_poster.svg') }}'"
-                class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
-            <div class="p-2 text-center">
-              <h3 class="text-sm font-semibold text-white line-clamp-2">{{ fav.movie_title }}</h3>
-            </div>
-          </a>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div class="flex items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 py-12 text-center col-span-full">
-        <p class="text-lg font-medium text-white">No favorites yet</p>
+  <div class="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    {% for fav in favorites %}
+
+    <a href="{{ url_for('movies.movies_details_page', movie_id=fav.movie_id) }}" 
+       class="group relative block w-full transition-transform duration-300 hover:scale-105"
+       style="text-decoration: none; overflow: hidden; border-radius: 0.75rem;">
+
+      {% set placeholder = url_for('static', filename='img/placeholder_poster.svg') %}
+
+      <div class="relative w-full aspect-[2/3] bg-slate-800">
+        <img
+          src="{{ url_for('static', filename='img/' ~ (fav.movie_poster or 'placeholder_poster.svg')) }}"
+          onerror="this.onerror=null;this.src='{{ placeholder }}'"
+          alt="{{ fav.movie_title }}"
+          loading="lazy"
+          class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"
+        />
       </div>
-    {% endif %}
+
+      <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none z-10"></div>
+
+      <div class="absolute bottom-0 left-0 right-0 p-4 text-left z-20">
+        <p class="text-base font-bold truncate drop-shadow-md leading-tight text-white"
+           style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+          {{ fav.movie_title }}
+        </p>
+
+        <p class="text-xs uppercase tracking-wider font-medium mt-1" style="color: #cbd5e1 !important; opacity: 0.9;">
+          {{ fav.release_date.year if fav.release_date else 'Unknown' }}
+        </p>
+      </div>
+
+    </a>
+    {% endfor %}
   </div>
 </section>
+{% endif %}
 
   <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
     <div class="flex items-center justify-between mb-6">

@@ -41,16 +41,16 @@ def home():
         }
     ]
 
-    best_movies, _ = get_best_movies_detailed_db(3)
+    best_movies, _ = get_best_movies_detailed_db(8)
     featured_movies, _ = get_random_movies_detailed_db(8)
-    genres_available, _ = get_genres_db()
+    genres_available, _ = get_top_genres_db(10)
     genres_available = [g['genre_name'] for g in genres_available]
 
     featured_people, _ = get_featured_people_db(4)
     if not featured_people:
         featured_people = []
     
-    best_movies_for_genres, _ = get_best_movies_detailed_db(60)
+    best_movies_for_genres, _ = get_best_movies_for_genres_detailed_db(10,10)
     best_movies_for_genres = [dict(m) for m in best_movies_for_genres]
 
     top_reviewers, err = get_top_reviewers(limit=10)
@@ -59,7 +59,7 @@ def home():
 
     data = {
         "trending_movies": best_movies,
-        "featured_movies": featured_movies,
+        "random_movies": featured_movies,
         "genres": genres_available,
         "featured_collections": [
             {"id": 1, "title": "Award Winners", "count": 12},

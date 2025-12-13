@@ -12,29 +12,24 @@
 
   <div class="flex flex-wrap items-center gap-3">
 
-    <!-- SEARCH BAR -->
     <form method="get" action="{{ url_for('movies.movies_page') }}" class="flex items-center">
-    <input 
-      type="text" 
-      name="search" 
-      placeholder="Search movies..." 
-      value="{{ request.args.get('search', '') }}"
-      class="form-field w-64 h-[48px] px-4 py-3"
-    />
+      <input 
+        type="text" 
+        name="search" 
+        placeholder="Search movies..." 
+        value="{{ request.args.get('search', '') }}"
+        class="form-field w-64 h-[48px] px-4 py-3"
+      />
 
-    <!-- preserve selected filters when performing a search -->
-    {% if request.args.get('genre') %}
-      <input type="hidden" name="genre" value="{{ request.args.get('genre') }}">
-    {% endif %}
-    {% if request.args.get('sort') %}
-      <input type="hidden" name="sort" value="{{ request.args.get('sort') }}">
-    {% endif %}
-    {% if request.args.get('page') %}
-      <input type="hidden" name="page" value="{{ request.args.get('page') }}">
-    {% endif %}
-  </form>
+      {% if request.args.get('genre') %}
+        <input type="hidden" name="genre" value="{{ request.args.get('genre') }}">
+      {% endif %}
+      {% if request.args.get('sort') %}
+        <input type="hidden" name="sort" value="{{ request.args.get('sort') }}">
+      {% endif %}
+      
+      </form>
 
-    <!-- FILTER BUTTON -->
     <button id="filterToggle" 
             class="flex items-center gap-2 text-sm btn-secondary px-4 py-3 h-[48px]">
       Filters
@@ -48,21 +43,14 @@
   </div>
 </div>
 
-
-
-  <!--FILTER PANEL -->
   <div id="filterPanel"
      class="overflow-hidden transition-all duration-300 max-h-0">
     <form method="get" action="{{ url_for('movies.movies_page') }}" class="mt-4 flex flex-wrap gap-3 text-sm">
-      <!-- Preserve search query when applying filters -->
+      
       {% if request.args.get('search') %}
         <input type="hidden" name="search" value="{{ request.args.get('search') }}">
       {% endif %}
-      <!-- Preserve current page (optional) -->
-      {% if request.args.get('page') %}
-        <input type="hidden" name="page" value="{{ request.args.get('page') }}">
-      {% endif %}
-
+      
       <select name="genre" class="form-field w-48">
         <option value="">All genres</option>
         {% for genre in genres %}
@@ -81,30 +69,29 @@
       </select>
 
       <button type="submit" class="btn-secondary">Apply</button>
-
-      <!-- Optionally add a 'Clear filters' link that keeps the search query but clears filters -->
       <a class="btn-secondary" href="{{ url_for('movies.movies_page', search=request.args.get('search')) }}">Clear filters</a>
     </form>
   </div>
 
-  <!-- MOVIES GRID -->
   <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     {% for movie in movies.items %}
-      {% include 'partials/movie_card.html' with context %}
+      {% include 'partials/movie_card.html' %}
     {% else %}
-      <p class="text-slate-400">No movies found for your filters. Try adjusting your search.</p>
+      <p class="text-slate-400 col-span-full text-center py-10">
+        No movies found for your filters. Try adjusting your search.
+      </p>
     {% endfor %}
   </div>
 
-  <!-- PAGINATION -->
   <div class="mt-8 flex items-center justify-between text-sm text-slate-400">
     <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
     <div class="flex gap-3">
       {% if movies.has_prev %}
-      <a href="{{ url_for('movies.movies_page', page=movies.prev_num, genre=request.args.get('genre'), sort=request.args.get('sort')) }}" class="btn-secondary">Previous</a>
+      <a href="{{ url_for('movies.movies_page', page=movies.prev_num, genre=request.args.get('genre'), sort=request.args.get('sort'), search=request.args.get('search')) }}" class="btn-secondary">Previous</a>
       {% endif %}
+      
       {% if movies.has_next %}
-      <a href="{{ url_for('movies.movies_page', page=movies.next_num, genre=request.args.get('genre'), sort=request.args.get('sort')) }}" class="btn-primary">Next</a>
+      <a href="{{ url_for('movies.movies_page', page=movies.next_num, genre=request.args.get('genre'), sort=request.args.get('sort'), search=request.args.get('search')) }}" class="btn-primary">Next</a>
       {% endif %}
     </div>
   </div>

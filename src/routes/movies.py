@@ -40,24 +40,32 @@ def movies_page():
 
 @movies_bp.route('/<int:movie_id>', methods=['GET'])
 def movies_details_page(movie_id):
-    movie_detail, err = get_movie_details_full_db(movie_id)
-    
+    """ Returns corresponding page for movies """
+    current_uid = current_user.id if current_user.is_authenticated else None
+    movie_detail, err = get_movie_details_full_db(movie_id, current_uid)
+
     if err:
         return f"Error fetching movie details: {err}", 500
 
     if not movie_detail:
         return "Movie not found", 404
-    
-    current_uid = current_user.id if current_user.is_authenticated else None
-    
-    all_comments, comm_err = get_comments_for_movie(movie_id, user_id=current_uid)    
-    if not all_comments:
-        all_comments = []
 
-    movie_detail['reviews'] = all_comments
-    movie_detail['total_reviews_count'] = len(all_comments)
+    director = get_movie_director(movie_id)
+    cast_list = get_movie_actors(movie_id, limit=15)
 
-    return render_template('movie_detail.html', **movie_detail)
+    all_comments, comm_err = get_comments_for_movie(movie_id, user_id=current_uid)
+    all_comments = all_comments or []
+
+    similar_movies_list = get_recommendations_db(movie_id, current_uid)
+
+    movie_detail["similar_movies"] = similar_movies_list
+    movie_detail["director"] = director
+    movie_detail["cast"] = cast_list
+    movie_detail["reviews"] = all_comments
+    movie_detail["total_reviews_count"] = len(all_comments)
+
+    return render_template("movie_detail.html", **movie_detail)
+
 
 @movies_bp.route('/<int:movie_id>/favorite', methods=['POST'])
 def toggle_favorite(movie_id):

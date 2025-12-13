@@ -1,23 +1,41 @@
-<article class="group relative flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 shadow-lg transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-brand-500/20">
-  <a href="{{ url_for('movies.movies_details_page', movie_id=movie.id) }}" class="absolute inset-0 z-10" aria-label="View {{ movie.title }}"></a>
-  <div class="aspect-[2/3] w-full overflow-hidden">
-    <img src="{{ url_for('static', filename='img/' ~ (movie.poster_file or 'placeholder_poster.svg')) }}"
-     alt="{{ movie.title }} poster"
-     class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+<article class="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/50 shadow-lg transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
 
+  <!-- Poster & overlay -->
+  <div class="relative aspect-[2/3] w-full overflow-hidden">
+    <img src="{{ url_for('static', filename='img/' ~ (movie.poster_file or 'placeholder_poster.svg')) }}"
+         alt="{{ movie.title }} poster"
+         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+    <!-- Release date overlay -->
+    <span class="absolute top-2 right-2 rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-300">{{ movie.release_date.year }}</span>
   </div>
-  <div class="flex flex-1 flex-col gap-3 p-4">
-    <div class="flex items-start justify-between">
-      <div>
-        <p class="text-xs uppercase tracking-wide text-brand-300">{{ movie.genre_list | join(', ') }}</p>
-        <h3 class="mt-1 text-lg font-semibold text-white">{{ movie.title }}</h3>
-      </div>
-      <span class="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-300">{{ movie.release_date }}</span>
+
+  <!-- Content -->
+  <div class="flex flex-1 flex-col gap-3 p-4 bg-slate-900/60">
+    <!-- Genre badges -->
+    <div class="flex flex-wrap gap-1 mb-1">
+      {% for genre in movie.genre_list %}
+        <span class="bg-brand-800 text-brand-300 text-[0.65rem] uppercase px-2 py-0.5 rounded-full">{{ genre }}</span>
+      {% endfor %}
     </div>
+
+    <!-- Title -->
+    <h3 class="text-lg font-semibold text-white line-clamp-2">{{ movie.title }}</h3>
+
+    <!-- Tagline -->
     <p class="line-clamp-3 text-sm text-slate-400">{{ movie.tagline or "No tagline provided"}}</p>
-    <div class="mt-auto flex items-center justify-between text-xs text-slate-400">
-      <span>Score: <span class="text-brand-300 font-semibold">{{ movie.rating or 'NR' }}</span></span>
-      <span>{{ movie.runtime }} min</span>
+
+    <!-- Score & runtime -->
+    <div class="mt-auto flex items-center justify-between gap-2 text-xs">
+      <span class="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2 py-1 text-brand-300 font-semibold">
+        ⭐ {{ movie.rating or 'NR' }}
+      </span>
+      <span class="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2 py-1 text-slate-300">
+        ⏱ {{ movie.runtime }} min
+      </span>
     </div>
   </div>
+
+  <!-- Clickable link overlay -->
+  <a href="{{ url_for('movies.movies_details_page', movie_id=movie.id) }}" class="absolute inset-0 z-10" aria-label="View {{ movie.title }}"></a>
 </article>

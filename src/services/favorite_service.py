@@ -128,20 +128,43 @@ def get_favorite_movies_detailed_for_user_db(user_id: int):
         favs = execute_query(
             """
             SELECT
-                f.id,
+                f.id AS favorite_id,
                 f.user_id,
                 f.movie_id,
                 m.title AS movie_title,
                 m.poster_file AS movie_poster,
-                f.created_at
+                m.release_date,
+                s.vote_avg,
+                s.runtime
             FROM favorites f
             JOIN movies m ON m.id = f.movie_id
+            LEFT JOIN statistic s ON m.id = s.movie_id
             WHERE f.user_id = %s
             ORDER BY f.created_at DESC
             """,
             (user_id,),
             fetch=True
         )
-        return favs, None
+
+        if not favs:
+            return [], None
+
+        fav_list = []
+        for f in favs:
+            fav_list.append({
+                "favorite_id": f["favorite_id"],
+                "user_id": f["user_id"],
+                "movie_id": f["movie_id"],
+                "movie_title": f["movie_title"],
+                "movie_poster": f["movie_poster"],
+                "release_date": f["release_date"],
+                "rating": float(f.get("vote_avg") or 0),
+                "runtime": float(f.get("runtime") or 0)
+            })
+
+        return fav_list, None
+
     except Exception as e:
         return None, str(e)
+
+

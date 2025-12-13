@@ -90,7 +90,8 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
             SELECT DISTINCT m.*, m.poster_file AS poster_path,
                             s.vote_avg AS rating, s.vote_count, s.runtime
             FROM movies m
-            LEFT JOIN statistic s ON m.id = s.movie_id
+            LEFT JOIN statistic s 
+                ON m.id = s.movie_id
             {join_sql}
             {where_sql}
             {order_sql}
@@ -109,152 +110,228 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
         print("DB Error:", e)
         return Pagination(items=[], page=page, per_page=per_page, total_count=0), str(e)
 
-def get_movie_details_full_db(movie_id: int):
-    """
-    Get detailed page for movies 
-    """
+def get_movie_details_full_db(movie_id: int, current_user_id: int):
+    """ Get movies, statistics, genres, platform and favorite_count data as movie_data"""
+
     try:
-        sql_movie = """
-            SELECT 
-                m.id, m.title, m.overview, m.tagline, m.release_date, 
-                m.poster_file, m.banner_file,
-                s.runtime, s.vote_avg, s.vote_count, s.budget, s.revenue,
-                p.platform_name, p.logo_path as platform_logo
-            FROM movies m
-            LEFT JOIN statistic s ON m.id = s.movie_id
-            LEFT JOIN platforms p ON m.platform_id = p.id
-            WHERE m.id = %s
-        """
-        movie_rows = execute_query(sql_movie, (movie_id,), fetch=True)
-        
-        if not movie_rows:
-            return None, "Movie not found"
-
-        row = movie_rows[0]
-
-        sql_genres = """
-            SELECT g.genre_name 
-            FROM genres g
-            JOIN movies_genres mg ON g.id = mg.genre_id
-            WHERE mg.movie_id = %s
-        """
-        genre_rows = execute_query(sql_genres, (movie_id,), fetch=True)
-        genre_list = [g['genre_name'] for g in genre_rows] if genre_rows else []
-
-        try:
-            sql_reviews = """
-                SELECT author, rating, comment, created_at 
-                FROM reviews WHERE movie_id = %s 
-                ORDER BY created_at DESC LIMIT 5
+        detailed_movies = execute_query(
             """
-            reviews_list = execute_query(sql_reviews, (movie_id,), fetch=True) or []
-        except:
-            reviews_list = []
+            SELECT
+                m.id            AS id,
+                m.title         AS title,
+                m.overview      AS overview,
+                m.tagline       AS tagline,
+                m.release_date  AS release_date,
+                m.poster_file   AS poster,
+                m.banner_file   AS banner,
 
-        try:
-            sql_fav = "SELECT COUNT(*) as count FROM favorites WHERE movie_id = %s"
-            fav_data = execute_query(sql_fav, (movie_id,), fetch=True)
-            fav_count = fav_data[0]['count'] if fav_data else 0
-        except:
-            fav_count = 0
+                (
+                    SELECT COUNT(DISTINCT f.user_id)
+                    FROM favorites f
+                    WHERE f.movie_id = m.id
+                )               AS favorite_count,
 
+                s.runtime       AS runtime,
+                s.vote_avg      AS vote_avg,
+                s.vote_count    AS vote_count,
+                s.budget        AS budget,
+                s.revenue       AS revenue,
+
+                p.platform_name AS platform_name,
+                p.logo_path     AS platform_logo
+
+            FROM movies m
+            LEFT JOIN statistic s
+                ON s.movie_id = m.id
+            LEFT JOIN platforms p
+                ON p.id = m.platform_id
+            WHERE m.id = %s
+            """,
+            (movie_id,),
+            fetch=True)
+        
+        if not detailed_movies:
+            return None, "Movie not found!"
+        
+        row = detailed_movies[0]
+        
+        genres_for_movies = execute_query(
+            """
+            SELECT 
+                g.genre_name 
+
+            FROM genres g
+            JOIN movies_genres mg 
+                ON g.id = mg.genre_id
+            WHERE mg.movie_id = %s
+
+            """,
+            (movie_id,),
+            fetch=True)
+        
+        genre_list = [g["genre_name"] for g in genres_for_movies]
+        
+        if current_user_id:
+            is_favorite = is_movie_favorite_for_user(current_user_id, movie_id)
+        else:
+            is_favorite = False
 
         movie_data = {
-            'id': row['id'],
-            'title': row['title'],
-            'overview': row['overview'],
-            'tagline': row['tagline'],
-            'release_date': row['release_date'],
-            'poster_file': row['poster_file'],  
-            'banner_file': row['banner_file'],
-            'genre_list': genre_list,
-            'is_favorite': False
+            "id": row["id"],
+            "title": row["title"],
+            "overview": row["overview"],
+            "tagline": row["tagline"],
+            "release_date": row["release_date"],
+            "poster_file": row["poster"],
+            "banner_file": row["banner"],
+
+            # genres & favorite
+            "genre_list": genre_list,
+            "is_favorite": is_favorite,
+            "favorite_count": row["favorite_count"],
+
+            # statistics
+            "runtime": row["runtime"],
+            "vote_avg": row["vote_avg"],
+            "vote_count": row["vote_count"],
+            "budget": (
+                f"${row['budget']:,.0f}".replace(",", ".")
+                if row["budget"] is not None
+                else "Unknown"
+            ),
+            "revenue": (
+                f"${row['revenue']:,.0f}".replace(",", ".")
+                if row["revenue"] is not None
+                else "Unknown"
+            ),
+
+            # providers
+            "platform_name": row["platform_name"],
+            "platform_logo": row["platform_logo"]
         }
 
-        if current_user.is_authenticated:
-            movie_data['is_favorite'] = is_movie_favorite_for_user(current_user.id, movie_id)
-        else:
-            movie_data['is_favorite'] = False
-
-        statistic_data = {
-            'runtime': row['runtime'],
-            'vote_avg': row['vote_avg'],
-            'vote_count': row['vote_count'],
-            'budget': f"${row['budget']:,.0f}" if row['budget'] else "Unknown",
-            'revenue': f"${row['revenue']:,.0f}" if row['revenue'] else "Unknown"
-        }
-
-        providers_data = []
-        if row['platform_name']:
-            providers_data.append({
-                'name': row['platform_name'],
-                'logo': row['platform_logo']
-            })
-
-        director = get_movie_director(movie_id)
-        cast_list = get_movie_actors(movie_id, limit=15)
-
-        full_context = {
-            'movie': movie_data,
-            'statistic': statistic_data,
-            'cast': cast_list,
-            'reviews': reviews_list,
-            'providers': providers_data,
-            'favorite_count': fav_count,
-            'director': director, 
-            'total_reviews_count': len(reviews_list)
-        }
-
-        return full_context, None
-
+        return movie_data, None
     except Exception as e:
-        print(f"DB Detailed Error: {e}")
         return None, str(e)
+
+def get_recommendations_db(movie_id: int, current_user_id: int):
+    # Scoring Logic:
+    # 1. Similar Users: +5 points (If another user favorited this movie, their other favorites get points)
+    # 2. Same Director: +30 points
+    # 3. Same Genre:    +10 points (Cumulative for each matching genre)
+    # 4. Same Platform: +3 points
+    # Max score is 100
     
-def get_movies_db():
-    """Get all movies"""
-    try:
-        movies = execute_query(
-            """
-            SELECT id, title, overview, tagline, release_date, poster_file, banner_file, platform_id 
-            FROM movies
-            ORDER BY title
-            """,
-            fetch=True
-        )
-        return movies, None
-    except Exception as e:
-        return None, str(e)
+    sql = """
+    SELECT 
+        m.id,
+        m.title,
+        m.poster_file,
+        m.release_date,
+        s.vote_avg,
+        STRING_AGG(DISTINCT g.genre_name, ', ') as genres,
+        
+        LEAST(final_scores.total_score, 100) as match_score
 
-def get_best_movies_detailed_db(limit: int = 3):
+    FROM (
+        SELECT 
+            movie_id, 
+            SUM(score) as total_score 
+        FROM (
+            -- Other favorites of favorited users
+            SELECT f2.movie_id, 5 as score
+            FROM favorites f1
+            JOIN favorites f2 ON f1.user_id = f2.user_id
+            WHERE f1.movie_id = %s AND f2.movie_id != %s
+            
+            UNION ALL
+            
+            -- Same director
+            SELECT mc2.movie_id, 30 as score
+            FROM movie_cast mc1
+            JOIN movie_cast mc2 ON mc1.person_id = mc2.person_id
+            WHERE mc1.movie_id = %s 
+              AND mc2.movie_id != %s
+              AND mc1.role = 'Director' 
+              AND mc2.role = 'Director'
+            
+            UNION ALL
+            
+            -- Same genres
+            SELECT mg2.movie_id, 10 as score
+            FROM movies_genres mg1
+            JOIN movies_genres mg2 ON mg1.genre_id = mg2.genre_id
+            WHERE mg1.movie_id = %s AND mg2.movie_id != %s
+
+            UNION ALL
+            
+            -- Same platform
+            SELECT m2.id as movie_id, 3 as score
+            FROM movies m1
+            JOIN movies m2 ON m1.platform_id = m2.platform_id
+            WHERE m1.id = %s AND m2.id != %s
+        ) raw_scores
+        GROUP BY movie_id
+    ) AS final_scores
+    
+    JOIN movies m
+        ON final_scores.movie_id = m.id
+    LEFT JOIN statistic s 
+        ON m.id = s.movie_id
+    JOIN movies_genres mg
+        ON m.id = mg.movie_id
+    JOIN genres g
+        ON mg.genre_id = g.id
+    
+    WHERE m.id NOT IN (
+        SELECT movie_id FROM favorites WHERE user_id = %s
+    ) AND s.vote_count>1000
+    
+    GROUP BY m.id, m.title, m.poster_file, m.release_date, s.vote_avg, final_scores.total_score
+    ORDER BY match_score DESC, s.vote_avg DESC
+    LIMIT 5;
     """
-    Get top rated movies with statistics and genres.
+    
+    params = (movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, current_user_id)
+    
+    return execute_query(sql, params, fetch=True)
+
+def get_best_movies_detailed_db(limit: int = 10):
+    """
+    Get top trending movies by vote_avg
     """
     try:
         movies = execute_query("""
-            SELECT m.id, m.title, m.overview, m.tagline,
-                   m.poster_file as poster_url, m.banner_file as backdrop_url,
-                   m.release_date, s.vote_avg, s.vote_count, s.runtime, s.budget, s.revenue
-            FROM movies m
-            JOIN statistic s ON m.id = s.movie_id
-            ORDER BY s.vote_avg DESC
-            LIMIT %s
-        """, (limit,), fetch=True)
-        
+        SELECT 
+            m.id, m.title, m.tagline,
+            m.poster_file as poster_url, m.banner_file as backdrop_url,
+            m.release_date, s.vote_avg, s.runtime
+        FROM movies m
+        JOIN statistic s
+            ON m.id = s.movie_id
+        WHERE s.vote_count > 1000
+        ORDER BY s.vote_avg DESC, s.vote_count DESC
+        LIMIT %s;
+        """,
+        (limit,),
+        fetch=True)
+
         if not movies:
             return [], None
 
-        movie_ids = [m["id"] for m in movies]
-        genre_rows = execute_query("""
-            SELECT mg.movie_id, g.genre_name
-            FROM movies_genres mg
-            JOIN genres g ON mg.genre_id = g.id
-            WHERE mg.movie_id = ANY(%s)
-        """, (movie_ids,), fetch=True)
-
+        movie_ids = [movie["id"] for movie in movies]
+        
         genre_map = {}
-        for row in genre_rows:
-            genre_map.setdefault(row["movie_id"], []).append(row["genre_name"])
+        if movie_ids:
+            genre_rows = execute_query("""
+                SELECT mg.movie_id, g.genre_name
+                FROM movies_genres mg
+                JOIN genres g ON mg.genre_id = g.id
+                WHERE mg.movie_id = ANY(%s)
+            """, (movie_ids,), fetch=True)
+
+            for row in genre_rows:
+                genre_map.setdefault(row["movie_id"], []).append(row["genre_name"])
 
         movie_list = []
         for m in movies:
@@ -262,22 +339,77 @@ def get_best_movies_detailed_db(limit: int = 3):
                 "id": m["id"],
                 "title": m["title"],
                 "release_date": m["release_date"],
-                "overview": m.get("overview"),
                 "tagline": m.get("tagline"),
                 "poster_file": m.get("poster_url"),
                 "banner_file": m.get("backdrop_url"),
                 "rating": float(m.get("vote_avg") or 0),
-                "vote_count": m.get("vote_count"),
                 "runtime": float(m.get("runtime") or 0),
-                "budget": m.get("budget"),
-                "revenue": m.get("revenue"),
                 "genre_list": genre_map.get(m["id"], [])
             })
         
         return movie_list, None
 
     except Exception as e:
-        return None, str(e)
+        return [], str(e)
+
+
+def get_best_movies_for_genres_detailed_db(limit_per_genre: int = 10, top_genres_limit: int = 6):
+    """
+    Get top-rated movies from the most popular genres.
+    """
+    try:
+        top_genres, error = get_top_genres_db(limit=top_genres_limit)
+        
+        if error:
+            return [], error
+        if not top_genres:
+            return [], None
+
+        all_movies = []
+        seen_movie_ids = set()  
+
+        for genre in top_genres:
+            gid = genre['genre_id']
+            
+            movie_sql = """
+            SELECT 
+                m.id, m.title, m.tagline, m.overview,
+                m.poster_file, m.banner_file, m.release_date,
+                COALESCE(s.vote_avg, 0) as rating,
+                COALESCE(s.runtime, 0) as runtime,
+                COALESCE(s.budget, 0) as budget,      
+                COALESCE(s.revenue, 0) as revenue,   
+                array_agg(DISTINCT g.genre_name) as genre_list
+
+            FROM movies m
+            LEFT JOIN statistic s
+                ON m.id = s.movie_id
+            LEFT JOIN movies_genres mg
+                ON m.id = mg.movie_id
+            JOIN genres g
+                ON mg.genre_id = g.id
+            
+            WHERE m.id IN (
+                SELECT movie_id FROM movies_genres WHERE genre_id = %s
+            ) 
+            AND s.vote_count > 1000
+            
+            GROUP BY m.id, s.id
+            ORDER BY s.vote_avg DESC
+            LIMIT %s;
+            """
+            
+            genre_movies = execute_query(movie_sql, (gid, limit_per_genre), fetch=True) or []
+
+            for movie in genre_movies:
+                if movie["id"] not in seen_movie_ids:
+                    all_movies.append(movie)
+                    seen_movie_ids.add(movie["id"])
+
+        return all_movies, None
+
+    except Exception as e:
+        return [], str(e)
 
 
 def get_random_movies_detailed_db(limit: int = 8):
@@ -286,9 +418,9 @@ def get_random_movies_detailed_db(limit: int = 8):
     """
     try:
         movies = execute_query("""
-            SELECT m.id, m.title, m.overview, m.tagline,
+            SELECT m.id, m.title, m.tagline,
                    m.poster_file as poster_url, m.banner_file as backdrop_url,
-                   m.release_date, s.vote_avg, s.vote_count, s.runtime, s.budget, s.revenue
+                   m.release_date, s.vote_avg, s.runtime
             FROM movies m
             LEFT JOIN statistic s ON m.id = s.movie_id
             ORDER BY RANDOM()
@@ -316,22 +448,17 @@ def get_random_movies_detailed_db(limit: int = 8):
                 "id": m["id"],
                 "title": m["title"],
                 "release_date": m["release_date"],
-                "overview": m.get("overview"),
                 "tagline": m.get("tagline"),
                 "poster_file": m.get("poster_url"),
                 "banner_file": m.get("backdrop_url"),
                 "rating": float(m.get("vote_avg") or 0),
-                "vote_count": m.get("vote_count"),
                 "runtime": float(m.get("runtime") or 0),
-                "budget": m.get("budget"),
-                "revenue": m.get("revenue"),
                 "genre_list": genre_map.get(m["id"], [])
             })
 
         return movie_list, None
 
     except Exception as e:
-        print(f"DB Error (Random Movies): {e}")
         return None, str(e)
     
     
@@ -372,6 +499,22 @@ def toggle_favorite_db(user_id: int, movie_id: int):
             "favorite": new_fav
         }, None
 
+    except Exception as e:
+        return None, str(e)
+
+######################### MOVIES CRUD ##########################
+def get_movies_db():
+    """Get all movies"""
+    try:
+        movies = execute_query(
+            """
+            SELECT id, title, overview, tagline, release_date, poster_file, banner_file, platform_id 
+            FROM movies
+            ORDER BY title
+            """,
+            fetch=True
+        )
+        return movies, None
     except Exception as e:
         return None, str(e)
 
@@ -485,6 +628,56 @@ def delete_movie_db(id: int):
         return None, str(e)
 
 ######################### GENRES ##########################
+def get_top_genres_db(limit: int = 5):
+    """
+    Get top genres by number of movies in each genre.
+    """
+    try:
+        top_genres = execute_query(
+            """
+            SELECT 
+                g.id AS genre_id,
+                g.genre_name,
+                COUNT(mg.movie_id) AS movie_count
+            FROM genres g
+            LEFT JOIN movies_genres mg ON g.id = mg.genre_id
+            GROUP BY g.id, g.genre_name
+            ORDER BY movie_count DESC, g.genre_name ASC
+            LIMIT %s;
+            """,
+            (limit,),
+            fetch=True
+        )
+        if top_genres is not None:
+            return top_genres, None
+        return [], None
+    except Exception as e:
+        return None, str(e)
+
+
+def get_genres_for_movie(movie_id: int):
+    """
+    Returns a list of genre names for a given movie.
+    Example: ["Action", "Drama", "Sci-Fi"]
+    """
+    try:
+        rows = execute_query(
+            """
+            SELECT g.genre_name
+            FROM genres g
+            JOIN movies_genres mg
+                ON mg.genre_id = g.id
+            WHERE mg.movie_id = %s
+            """,
+            (movie_id,),
+            fetch=True
+        ) or []
+
+        return [row["genre_name"] for row in rows]
+
+    except Exception as e:
+        return []
+    
 def get_genres_db():
     """Get all genres"""
     try:
@@ -492,6 +685,7 @@ def get_genres_db():
         """
         SELECT *
         FROM genres
+        ORDER BY genre_name ASC
         """,
         fetch=True)
         if genres is not None:
