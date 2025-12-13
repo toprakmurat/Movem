@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from src.services.movie_cast_service import (
     get_movie_cast_paginated_db,
     get_movie_cast_by_id_db,
@@ -13,6 +13,19 @@ movie_cast_bp = Blueprint('movie_cast', __name__)
 
 # Column names are written explicitly on purpose in SELECT statements.
 # This makes debugging easier in case the database table changes.
+
+@movie_cast_bp.route('/page/<int:movie_id>', methods=['GET'])
+def movie_cast_page(movie_id):
+    """Get all people (cast members) and render the movie_cast.html template"""
+    people, error = get_cast_by_movie_db(movie_id)
+    
+    if error:
+        return render_template('movie_cast.html', people=[], error=error)
+    
+    # Convert to list of dicts for template
+    people_list = [dict(person) for person in people]
+    
+    return render_template('movie_cast.html', people=people_list)
 
 @movie_cast_bp.route('/', methods=['GET'])
 def get_movie_cast():

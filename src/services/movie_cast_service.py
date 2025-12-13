@@ -96,17 +96,19 @@ def get_cast_by_movie_db(movie_id: int):
         cast_entries = execute_query(
             """
             SELECT 
-                mc.id,
-                mc.movie_id,
-                mc.person_id,
+                p.id,
+                p.name,
+                p.birth_date,
+                p.biography,
+                p.photo_url,
                 mc.role,
-                mc.character_name,
-                p.name AS person_name,
-                p.photo_url AS person_photo
+                mc.character_name
             FROM movie_cast mc
             JOIN people p ON mc.person_id = p.id
             WHERE mc.movie_id = %s
-            ORDER BY mc.id
+            ORDER BY 
+                CASE WHEN mc.role = 'Director' THEN 0 ELSE 1 END,
+                mc.id
             """,
             (movie_id,),
             fetch=True

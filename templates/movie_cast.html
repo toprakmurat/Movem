@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Movie Cast • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-7xl space-y-8">
+  <div class="flex items-center justify-between">
+    <h1 class="text-4xl font-display tracking-widest text-white sm:text-5xl">Movie Cast</h1>
+    <span class="text-sm uppercase tracking-[0.4em] text-white/60">{{ people | length }} people</span>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for person in people %}
+      {% include 'partials/person_card.html' %}
+    {% else %}
+    <p class="col-span-full text-center text-white/60">No cast members found.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

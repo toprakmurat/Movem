@@ -129,7 +129,7 @@
   <section class="mt-10">
     <div class="mb-6 flex items-center justify-between">
       <h3 class="text-xl font-semibold uppercase tracking-[0.3em]">Cast & Crew</h3>
-      <a href="{{ url_for('actors.get_actors') }}" class="text-xs uppercase tracking-[0.2em] text-brand-400 hover:text-white transition">View Full Cast</a>
+          <a href="{{ url_for('movie_cast.movie_cast_page', movie_id=movie.id) }}" class="text-xs uppercase tracking-[0.2em] text-brand-400 hover:text-white transition">View Full Cast</a>
     </div>
     <div class="mt-4 rail-scroll pb-4"> 
       {% for member in cast %}
