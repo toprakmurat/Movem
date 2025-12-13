@@ -1,6 +1,50 @@
 {% extends 'base.html' %}
 {% block title %}Nexus • MoveM{% endblock %}
 {% block content %}
+
+<style>
+  /* Simple twinkling star pattern */
+  .space-stars {
+    background-image: 
+      radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+    background-size: 200px 200px;
+    background-repeat: repeat;
+    opacity: 0.3;
+    animation: twinkle 5s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -20px) scale(1.1); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+  
+  @keyframes twinkle {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.5; }
+  }
+
+  .nebula-cloud {
+    animation: drift 20s ease-in-out infinite;
+  }
+  
+  /* Search Results Dropdown Animation */
+  .search-results-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  .search-results-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.2s ease-out;
+  }
+</style>
+
 <section class="mx-auto max-w-7xl space-y-8">
   <header class="flex flex-col items-center justify-between gap-4 md:flex-row">
     <div class="text-center md:text-left">
@@ -9,19 +53,61 @@
       <p class="mt-2 text-slate-400">Explore creative collaborations and connections.</p>
     </div>
     
-    <div class="flex items-center gap-3">
-      <button class="btn-icon" title="Random movie" onclick="window.location.href='{{ url_for('nexus.nexus', random=1) }}'">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      </button>
+    <div class="flex flex-col items-end gap-3 md:flex-row md:items-center">
+      
+      <div class="relative w-full md:w-64">
+        <div class="relative">
+            <input 
+                type="text" 
+                id="movie-search"
+                placeholder="Search movie..." 
+                oninput="handleSearch(this.value)"
+                onblur="setTimeout(() => hideResults(), 200)"
+                class="w-full rounded-full border border-slate-700 bg-slate-900/50 px-4 py-2 pl-10 text-sm text-white placeholder-slate-500 backdrop-blur focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+            <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+        </div>
+        
+        <div id="search-results" class="absolute left-0 right-0 top-12 z-50 hidden overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-xl shadow-black/80">
+            </div>
+      </div>
+
+      <div id="default-controls" class="flex gap-2">
+         <button onclick="toggleSelectionMode(true)" class="rounded-full border border-brand-500/50 bg-brand-500/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-brand-300 transition-colors hover:bg-brand-500 hover:text-white">
+            Select Connections
+         </button>
+         <button class="btn-icon" title="Random movie" onclick="window.location.href='{{ url_for('nexus.nexus', random=1) }}'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+         </button>
+      </div>
+
+      <div id="selection-controls" class="hidden gap-2">
+         <span class="flex items-center text-xs font-bold text-slate-400 mr-2">
+            <span id="selection-count">0</span> selected
+         </span>
+         <button onclick="submitSelection()" class="rounded-full bg-brand-600 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-brand-500 shadow-lg shadow-brand-900/50">
+            Find Shared Movies
+         </button>
+         <button onclick="toggleSelectionMode(false)" class="rounded-full border border-slate-600 bg-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-300 transition-colors hover:bg-slate-700">
+            Cancel
+         </button>
+      </div>
     </div>
   </header>
 
-  <!-- Graph Container -->
-  <div class="relative min-h-[800px] rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900/60 to-black/60 p-8 backdrop-blur">
+  <div class="relative min-h-[800px] overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-8 shadow-2xl transition-all duration-500" id="graph-container">
     
-    <!-- Central Movie Node -->
+    <div class="absolute inset-0 pointer-events-none z-0">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-[#0B0F19] to-black opacity-90"></div>
+      <div class="nebula-cloud absolute -left-20 -top-20 h-[600px] w-[600px] rounded-full bg-brand-900/10 blur-[100px] mix-blend-screen"></div>
+      <div class="nebula-cloud absolute -bottom-20 -right-20 h-[500px] w-[500px] rounded-full bg-purple-900/10 blur-[100px] mix-blend-screen" style="animation-delay: -5s;"></div>
+      <div class="space-stars absolute inset-0"></div>
+    </div>
+
     <div class="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
       <div class="group relative flex flex-col items-center">
         <div class="relative overflow-hidden rounded-3xl border-2 border-brand-500 bg-slate-900 shadow-2xl shadow-brand-900/50 transition-all duration-300 hover:scale-105 hover:shadow-brand-900/70">
@@ -36,20 +122,23 @@
             <p class="mt-1 text-sm text-brand-300">{{ movie.year }}</p>
           </div>
         </div>
-        <div class="mt-3 rounded-full border border-slate-700 bg-slate-950/90 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-400">
+        <div class="mt-3 rounded-full border border-slate-700 bg-slate-950/90 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-400 shadow-lg shadow-black/50">
           Featured
         </div>
       </div>
     </div>
 
-    <!-- Director Node (Top Center) -->
     {% if director %}
     <div class="absolute left-1/2 top-4 z-10 -translate-x-1/2">
       <div class="flex flex-col items-center">
-        <div class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <div class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400 backdrop-blur-sm">
           Director
         </div>
-        <a href="{{ url_for('actors.person_detail', person_id=director.id) }}" class="mt-2 group relative flex flex-col items-center transition-transform hover:scale-105">
+        <a href="{{ url_for('actors.person_detail', person_id=director.id) }}" 
+           class="person-node mt-2 group relative flex flex-col items-center transition-transform hover:scale-105"
+           data-id="{{ director.id }}"
+           onclick="handleNodeClick(event, this)">
+          <div class="selection-ring absolute -inset-1 hidden rounded-full border-2 border-brand-400 opacity-0 transition-opacity duration-300"></div>
           <div class="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 transition-all duration-300 hover:border-brand-400 hover:shadow-lg hover:shadow-brand-900/30">
           {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
           <img src="{{ url_for('static', filename='img/people/' ~ director.id ~ '.jpg') }}" 
@@ -58,37 +147,32 @@
               class="h-24 w-24 object-cover opacity-85 transition-opacity duration-300 group-hover:opacity-100"
             />
           </div>
-          <p class="mt-1.5 max-w-[110px] text-center text-xs font-semibold text-white leading-tight">{{ director.name }}</p>
+          <p class="mt-1.5 max-w-[110px] text-center text-xs font-semibold text-white leading-tight drop-shadow-md">{{ director.name }}</p>
           {% if director.collaborations %}
           <p class="text-[10px] text-brand-400">{{ director.collaborations }} collab{{ 's' if director.collaborations != 1 else '' }}</p>
           {% endif %}
         </a>
       </div>
     </div>
-
-    <!-- Connection Line: Director to Movie -->
     <svg class="absolute left-0 top-0 h-full w-full pointer-events-none" style="z-index: 1;">
       <line x1="50%" y1="170" x2="50%" y2="calc(50% - 175px)" stroke="rgba(229, 9, 20, 0.3)" stroke-width="2" stroke-dasharray="5,5" />
     </svg>
     {% endif %}
 
-    <!-- Actor Nodes (Evenly distributed in a circle) -->
     {% set positions = [
-      {'x': 30, 'y': 25},
-      {'x': 70, 'y': 25},
-      {'x': 20, 'y': 50},
-      {'x': 80, 'y': 50},
-      {'x': 30, 'y': 75},
-      {'x': 70, 'y': 75}
+      {'x': 30, 'y': 25}, {'x': 70, 'y': 25},
+      {'x': 20, 'y': 50}, {'x': 80, 'y': 50},
+      {'x': 30, 'y': 75}, {'x': 70, 'y': 75}
     ] %}
-
-    
     {% for actor in actors %}
     {% set pos = positions[loop.index0] if loop.index0 < positions|length else {'x': 50, 'y': 15} %}
-    
     <div class="absolute z-10" style="left: {{ pos.x }}%; top: {{ pos.y }}%; transform: translate(-50%, -50%);">
       <div class="flex flex-col items-center">
-        <a href="{{ url_for('actors.person_detail', person_id=actor.id) }}" class="group relative flex flex-col items-center transition-transform hover:scale-110">
+        <a href="{{ url_for('actors.person_detail', person_id=actor.id) }}" 
+           class="person-node group relative flex flex-col items-center transition-transform hover:scale-110"
+           data-id="{{ actor.id }}"
+           onclick="handleNodeClick(event, this)">
+          <div class="selection-ring absolute -inset-2 hidden rounded-2xl border-2 border-brand-400 opacity-0 transition-opacity duration-300"></div>
           <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-900 transition-all duration-300 hover:border-brand-400 hover:shadow-lg hover:shadow-brand-900/30">
           {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
           <img src="{{ url_for('static', filename='img/people/' ~ actor.id ~ '.jpg') }}" 
@@ -97,88 +181,45 @@
               class="h-20 w-20 object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
             />
           </div>
-          <p class="mt-2 max-w-[100px] text-center text-xs font-semibold text-white leading-tight">{{ actor.name }}</p>
-          <p class="max-w-[100px] text-center text-xs text-slate-500 leading-tight">{{ actor.character }}</p>
+          <p class="mt-2 max-w-[100px] text-center text-xs font-semibold text-white leading-tight drop-shadow-md">{{ actor.name }}</p>
+          <p class="max-w-[100px] text-center text-xs text-slate-400 leading-tight">{{ actor.character }}</p>
           {% if actor.collaborations %}
           <p class="text-xs text-brand-400">{{ actor.collaborations }} film{{ 's' if actor.collaborations != 1 else '' }}</p>
           {% endif %}
         </a>
       </div>
     </div>
-
-    <!-- Connection Line: Movie to Actor -->
     <svg class="absolute left-0 top-0 h-full w-full pointer-events-none" style="z-index: 1;">
       <line x1="50%" y1="50%" x2="{{ pos.x }}%" y2="{{ pos.y }}%" stroke="rgba(229, 9, 20, 0.2)" stroke-width="1.5" stroke-dasharray="3,3" />
     </svg>
     {% endfor %}
 
-    <!-- Legend -->
     <div class="absolute bottom-6 right-6 rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
       <h3 class="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">Legend</h3>
-
-      <!-- 2x2 grid -->
       <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs">
-
-        <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-full border-2 border-brand-500"></div>
-          <span class="text-slate-300">Movie</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded border border-slate-700 bg-slate-900"></div>
-          <span class="text-slate-300">Director</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <div class="h-3 w-3 rounded-sm border border-slate-700 bg-slate-900"></div>
-          <span class="text-slate-300">Actor</span>
-        </div>
-
-        <div class="flex items-center gap-0">
-          <svg width="20" height="2">
-            <line x1="0" y1="1" x2="15" y2="1" stroke="rgba(229, 9, 20, 0.3)" stroke-width="2" stroke-dasharray="3,3" />
-          </svg>
-          <span class="text-slate-300">Connection</span>
-        </div>
-
+        <div class="flex items-center gap-2"><div class="h-3 w-3 rounded-full border-2 border-brand-500"></div><span class="text-slate-300">Movie</span></div>
+        <div class="flex items-center gap-2"><div class="h-3 w-3 rounded border border-slate-700 bg-slate-900"></div><span class="text-slate-300">Director</span></div>
+        <div class="flex items-center gap-2"><div class="h-3 w-3 rounded-sm border border-slate-700 bg-slate-900"></div><span class="text-slate-300">Actor</span></div>
+        <div class="flex items-center gap-0"><svg width="20" height="2"><line x1="0" y1="1" x2="15" y2="1" stroke="rgba(229, 9, 20, 0.3)" stroke-width="2" stroke-dasharray="3,3" /></svg><span class="text-slate-300">Connection</span></div>
       </div>
     </div>
-
-
-    <!-- Info Card -->
     <div class="absolute bottom-6 left-6 max-w-2xl rounded-2xl border border-slate-800 bg-slate-950/80 p-4 backdrop-blur">
       <h3 class="mb-2 text-sm font-bold uppercase tracking-widest text-brand-300">About</h3>
-      <p class="text-xs leading-relaxed text-slate-00">
-        This visualization shows the relationships between the featured movie, its director, and key cast members. 
-        Each node represents a person or film, and the connecting lines show their collaborations.
-      </p>
+      <p class="text-xs leading-relaxed text-slate-300">This visualization shows the relationships between the featured movie, its director, and key cast members.</p>
     </div>
   </div>
 
-  <!-- Movie Details Section -->
   <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-8">
     <div class="grid gap-8 md:grid-cols-2">
-      <!-- Movie Info -->
       <div>
         <h2 class="mb-4 text-2xl font-bold text-white">{{ movie.title }}</h2>
         <p class="mb-4 text-slate-300">{{ movie.overview }}</p>
         <div class="space-y-2 text-sm">
-          <div class="flex gap-2">
-            <span class="font-semibold text-brand-300">Release:</span>
-            <span class="text-slate-400">{{ movie.release_date }}</span>
-          </div>
-          <div class="flex gap-2">
-            <span class="font-semibold text-brand-300">Genres:</span>
-            <span class="text-slate-400">{{ movie.genre_list | join(', ') }}</span>
-          </div>
-          <div class="flex gap-2">
-            <span class="font-semibold text-brand-300">Rating:</span>
-            <span class="text-slate-400">{{ movie.rating }}/10</span>
-          </div>
+          <div class="flex gap-2"><span class="font-semibold text-brand-300">Release:</span><span class="text-slate-400">{{ movie.release_date }}</span></div>
+          <div class="flex gap-2"><span class="font-semibold text-brand-300">Genres:</span><span class="text-slate-400">{{ movie.genre_list | join(', ') }}</span></div>
+          <div class="flex gap-2"><span class="font-semibold text-brand-300">Rating:</span><span class="text-slate-400">{{ movie.rating }}/10</span></div>
         </div>
       </div>
-
-      <!-- Cast & Crew Info -->
       <div>
         <h3 class="mb-4 text-xl font-bold text-white">Cast & Crew</h3>
         <div class="space-y-3">
@@ -186,20 +227,13 @@
           <div class="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
             <p class="text-xs font-semibold uppercase tracking-wider text-brand-300">Director</p>
             <p class="mt-1 text-white">{{ director.name }}</p>
-            {% if director.collaborations %}
-            <p class="mt-1 text-xs text-slate-500">{{ director.collaborations }} collaboration{{ 's' if director.collaborations != 1 else '' }} with this cast</p>
-            {% endif %}
           </div>
           {% endif %}
-          
           <div class="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
             <p class="text-xs font-semibold uppercase tracking-wider text-brand-300">Main Cast</p>
             <div class="mt-2 space-y-1">
               {% for actor in actors %}
-              <div class="flex justify-between text-sm">
-                <span class="text-white">{{ actor.name }}</span>
-                <span class="text-slate-500">as {{ actor.character }}</span>
-              </div>
+              <div class="flex justify-between text-sm"><span class="text-white">{{ actor.name }}</span><span class="text-slate-500">as {{ actor.character }}</span></div>
               {% endfor %}
             </div>
           </div>
@@ -208,27 +242,211 @@
     </div>
   </div>
 
-  <!-- Related Collaborations Section -->
-  {% if related_movies %}
-  <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-8">
-    <h3 class="mb-6 text-2xl font-bold text-white">Other Collaborations</h3>
-    <p class="mb-4 text-sm text-slate-400">Movies featuring members of this cast and crew working together</p>
-    
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {% for related in related_movies %}
-      <a href="{{ url_for('nexus.nexus', movie_id=related.id) }}" class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all hover:border-brand-500 hover:shadow-lg hover:shadow-brand-900/30">
-        <img src="{{ url_for('static', filename='img/' ~ (related.poster_url or 'placeholder_poster.svg')) }}"
-             alt="{{ related.title }}" 
-             class="h-64 w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-4">
-          <h4 class="font-bold text-white">{{ related.title }}</h4>
-          <p class="mt-1 text-xs text-brand-300">{{ related.shared_people }} shared cast/crew</p>
-        </div>
-      </a>
-      {% endfor %}
+  <div id="related-section" class="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 transition-all">
+    <h3 id="related-title" class="mb-6 text-2xl font-bold text-white">Other Collaborations</h3>
+    <p id="related-subtitle" class="mb-4 text-sm text-slate-400">Movies featuring members of this cast and crew working together</p>
+    <div id="related-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {% if related_movies %}
+        {% for related in related_movies %}
+        <a href="{{ url_for('nexus.nexus', movie_id=related.id) }}" class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all hover:border-brand-500 hover:shadow-lg hover:shadow-brand-900/30">
+            <img src="{{ url_for('static', filename='img/' ~ (related.poster_url or 'placeholder_poster.svg')) }}" alt="{{ related.title }}" class="h-64 w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-4"><h4 class="font-bold text-white">{{ related.title }}</h4><p class="mt-1 text-xs text-brand-300">{{ related.shared_people }} shared cast/crew</p></div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <p class="col-span-full text-center text-slate-500 italic">No other major collaborations found for this specific group.</p>
+      {% endif %}
     </div>
   </div>
-  {% endif %}
 </section>
+
+<script>
+    // --- SEARCH LOGIC ---
+    let searchTimeout = null;
+    const resultsContainer = document.getElementById('search-results');
+
+    function handleSearch(query) {
+        // Clear existing timeout
+        if (searchTimeout) clearTimeout(searchTimeout);
+        
+        if (query.length < 2) {
+            hideResults();
+            return;
+        }
+
+        // Debounce: Wait 300ms before searching
+        searchTimeout = setTimeout(() => {
+            fetchSearch(query);
+        }, 300);
+    }
+
+    async function fetchSearch(query) {
+        try {
+            const response = await fetch(`{{ url_for('nexus.search') }}?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            displayResults(data.results);
+        } catch (error) {
+            console.error("Search failed:", error);
+        }
+    }
+
+    function displayResults(movies) {
+        if (!movies || movies.length === 0) {
+            hideResults();
+            return;
+        }
+
+        let html = '<ul class="divide-y divide-slate-800">';
+        movies.forEach(movie => {
+            const url = `{{ url_for('nexus.nexus') }}?movie_id=${movie.id}`;
+            const poster = movie.poster_url ? `{{ url_for('static', filename='img/') }}${movie.poster_url}` : `{{ url_for('static', filename='img/placeholder_poster.svg') }}`;
+            
+            html += `
+                <li>
+                    <a href="${url}" class="flex items-center gap-3 bg-slate-900 p-3 transition-colors hover:bg-slate-800">
+                        <img src="${poster}" class="h-12 w-8 rounded object-cover" alt="${movie.title}">
+                        <div>
+                            <p class="font-bold text-white text-sm">${movie.title}</p>
+                            <p class="text-xs text-slate-500">${movie.year}</p>
+                        </div>
+                    </a>
+                </li>
+            `;
+        });
+        html += '</ul>';
+
+        resultsContainer.innerHTML = html;
+        resultsContainer.classList.remove('hidden');
+        resultsContainer.classList.add('search-results-active');
+    }
+
+    function hideResults() {
+        resultsContainer.classList.add('hidden');
+        resultsContainer.classList.remove('search-results-active');
+        resultsContainer.innerHTML = '';
+    }
+
+    // --- SELECTION LOGIC (Existing) ---
+    let isSelectionMode = false;
+    let selectedIds = new Set();
+    
+    function toggleSelectionMode(active) {
+        isSelectionMode = active;
+        selectedIds.clear();
+        updateSelectionUI();
+        
+        const defaultControls = document.getElementById('default-controls');
+        const selectControls = document.getElementById('selection-controls');
+        const graphContainer = document.getElementById('graph-container');
+        
+        if (active) {
+            defaultControls.classList.add('hidden');
+            selectControls.classList.remove('hidden');
+            selectControls.classList.add('flex');
+            graphContainer.classList.add('border-brand-500/50'); 
+        } else {
+            defaultControls.classList.remove('hidden');
+            selectControls.classList.add('hidden');
+            selectControls.classList.remove('flex');
+            graphContainer.classList.remove('border-brand-500/50');
+            resetVisuals();
+        }
+    }
+    
+    function handleNodeClick(event, element) {
+        if (!isSelectionMode) return; 
+        
+        event.preventDefault(); 
+        const id = element.getAttribute('data-id');
+        
+        if (selectedIds.has(id)) {
+            selectedIds.delete(id);
+            element.querySelector('.selection-ring').classList.add('hidden');
+            element.querySelector('.selection-ring').classList.remove('opacity-100');
+            element.classList.remove('scale-110'); 
+        } else {
+            selectedIds.add(id);
+            const ring = element.querySelector('.selection-ring');
+            ring.classList.remove('hidden');
+            setTimeout(() => ring.classList.add('opacity-100'), 10);
+            element.classList.add('scale-110'); 
+        }
+        
+        updateSelectionUI();
+    }
+    
+    function updateSelectionUI() {
+        document.getElementById('selection-count').innerText = selectedIds.size;
+    }
+    
+    function resetVisuals() {
+        document.querySelectorAll('.person-node').forEach(el => {
+            el.classList.remove('scale-110');
+            const ring = el.querySelector('.selection-ring');
+            if(ring) {
+                ring.classList.add('hidden');
+                ring.classList.remove('opacity-100');
+            }
+        });
+    }
+
+    async function submitSelection() {
+        if (selectedIds.size === 0) {
+            alert("Please select at least one person.");
+            return;
+        }
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "Searching...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch("{{ url_for('nexus.get_shared_content') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ person_ids: Array.from(selectedIds) })
+            });
+            
+            const data = await response.json();
+            updateRelatedSection(data.movies);
+            toggleSelectionMode(false);
+            document.getElementById('related-section').scrollIntoView({ behavior: 'smooth' });
+        } catch (error) {
+            console.error('Error fetching shared movies:', error);
+            alert('Failed to fetch connections.');
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    function updateRelatedSection(movies) {
+        const title = document.getElementById('related-title');
+        const subtitle = document.getElementById('related-subtitle');
+        const grid = document.getElementById('related-grid');
+        
+        title.innerText = "Shared Filmography";
+        subtitle.innerText = `Found ${movies.length} movies featuring your selected connections.`;
+        subtitle.classList.add('text-brand-300');
+        grid.innerHTML = '';
+        
+        if (movies.length === 0) {
+            grid.innerHTML = '<p class="col-span-full text-center text-slate-500 italic">No movies found where all selected people appear together.</p>';
+            return;
+        }
+
+        movies.forEach(movie => {
+            const url = `{{ url_for('nexus.nexus') }}?movie_id=${movie.id}`;
+            const poster = movie.poster_url ? `{{ url_for('static', filename='img/') }}${movie.poster_url}` : `{{ url_for('static', filename='img/placeholder_poster.svg') }}`;
+            const card = `
+                <a href="${url}" class="group relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/60 transition-all hover:border-brand-500 hover:shadow-lg hover:shadow-brand-900/30">
+                    <img src="${poster}" alt="${movie.title}" class="h-64 w-full object-cover opacity-80 transition-opacity group-hover:opacity-100" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4"><h4 class="font-bold text-white">${movie.title}</h4><p class="mt-1 text-xs text-brand-300">Shared Cast</p></div>
+                </a>`;
+            grid.innerHTML += card;
+        });
+    }
+</script>
 {% endblock %}

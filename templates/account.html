@@ -159,6 +159,40 @@
   </div>
 
   <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">Favorites</h2>
+    <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ favorites | length }} saved</span>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    {% if favorites %}
+      {% for fav in favorites %}
+        <div class="group relative overflow-hidden rounded-lg bg-white/5 shadow-sm transition hover:shadow-lg">
+          <a href="{{ url_for('movies.movies_details_page', movie_id=fav.movie_id) }}" class="block">
+            <div class="aspect-[2/3] w-full overflow-hidden rounded-t-lg bg-black">
+              <img
+                src="{{ url_for('static', filename='img/' ~ (fav.movie_poster or 'placeholder_poster.svg')) }}"
+                alt="{{ fav.movie_title }}"
+                loading="lazy"
+                onerror="this.src='{{ url_for('static', filename='img/placeholder_poster.svg') }}'"
+                class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div class="p-2 text-center">
+              <h3 class="text-sm font-semibold text-white line-clamp-2">{{ fav.movie_title }}</h3>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="flex items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 py-12 text-center col-span-full">
+        <p class="text-lg font-medium text-white">No favorites yet</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+  <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">My Reviews & Ratings</h2>
       <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ user_reviews|length }} entries</span>

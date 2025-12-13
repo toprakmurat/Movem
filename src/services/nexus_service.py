@@ -158,3 +158,74 @@ def get_nexus_data(movie_id):
         'actors': get_movie_actors(movie_id),
         'related_movies': get_related_movies(movie_id)
     }
+
+def get_shared_movies_by_people(person_ids):
+    """
+    Find movies where ALL selected people appear together (Intersection).
+    """
+    if not person_ids:
+        return []
+    
+    # Format the array for Postgres syntax
+    person_ids_tuple = tuple(person_ids)
+    
+    query = """
+        SELECT 
+            m.id,
+            m.title,
+            m.poster_file as poster_url,
+            COUNT(DISTINCT mc.person_id) as shared_count
+        FROM movies m
+        JOIN movie_cast mc ON m.id = mc.movie_id
+        WHERE mc.person_id IN %s
+        GROUP BY m.id, m.title, m.poster_file
+        HAVING COUNT(DISTINCT mc.person_id) = %s
+        ORDER BY m.release_date DESC
+        LIMIT 10
+    """
+    
+    # Check for single item tuple quirk in Python (1,) vs (1)
+    if len(person_ids) == 1:
+        # If only one person, we strictly want their movies
+        query = """
+            SELECT 
+                m.id,
+                m.title,
+                m.poster_file as poster_url,
+                1 as shared_count
+            FROM movies m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            WHERE mc.person_id = %s
+            ORDER BY m.release_date DESC
+            LIMIT 10
+        """
+        params = (person_ids[0],)
+    else:
+        params = (person_ids_tuple, len(person_ids))
+
+    result = execute_query(query, params, fetch=True)
+    
+    return [dict(r) for r in result] if result else []
+
+def search_movies(query_text, limit=3):
+    """Search for movies by title for the autocomplete"""
+    if not query_text:
+        return []
+        
+    result = execute_query(
+        """
+        SELECT 
+            id,
+            title,
+            EXTRACT(YEAR FROM release_date) as year,
+            poster_file as poster_url
+        FROM movies 
+        WHERE title ILIKE %s
+        ORDER BY title ASC
+        LIMIT %s
+        """,
+        (f'%{query_text}%', limit),
+        fetch=True
+    )
+    
+    return [dict(r) for r in result] if result else []

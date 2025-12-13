@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify
 from src.services.nexus_service import (
     get_random_movie_id,
-    get_nexus_data
+    get_nexus_data,
+    get_shared_movies_by_people,
+    search_movies
 )
 
 nexus_bp = Blueprint('nexus', __name__)
@@ -53,4 +55,24 @@ def nexus():
                               actors=nexus_data['actors'],
                               related_movies=nexus_data['related_movies'])
 
+@nexus_bp.route('/shared', methods=['POST'])
+def get_shared_content():
+    """API Endpoint to get movies shared by specific people"""
+    data = request.get_json()
+    person_ids = data.get('person_ids', [])
+    
+    if not person_ids:
+        return jsonify({'movies': []})
+        
+    movies = get_shared_movies_by_people(person_ids)
+    return jsonify({'movies': movies})
 
+@nexus_bp.route('/search', methods=['GET'])
+def search():
+    """API Endpoint for live movie search"""
+    query = request.args.get('q', '')
+    if len(query) < 2:
+        return jsonify({'results': []})
+        
+    results = search_movies(query, limit=3)
+    return jsonify({'results': results})
