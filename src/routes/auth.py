@@ -16,8 +16,11 @@ from src.services.users_service import (
     set_reset_token_db,
     get_user_by_reset_token_db,
     clear_reset_token_db,
-    delete_user_db
+    delete_user_db,
+    get_user_favorite_genre_stats_db,
+    get_user_favorite_actor_stats_db
 )
+from src.services.list_service import create_custom_list_db, get_lists_by_user_db
 from src.models.user_model import User
 from src.services.comments_service import get_comments_by_user
 from src.utils.file_utils import save_profile_picture
@@ -117,25 +120,38 @@ def logout():
 def account():
 
     if request.method == 'POST':
-        update_data = {
-            'first_name': request.form.get('first_name'),
-            'last_name': request.form.get('last_name'),
-            'bio': request.form.get('bio')
-        }
-
-        if 'profile_picture' in request.files:
-            file = request.files['profile_picture']
-            if file and file.filename != '':
-                picture_file = save_profile_picture(file)
-                update_data['profile_picture'] = picture_file
-
-        updated_user_data, err = update_user_db(int(current_user.id), update_data)
-        if not err:
-            flash('Profile updated successfully!', 'success')
-
-            return redirect(url_for('auth.account'))
+        # Handle List Creation
+        if 'create_list' in request.form:
+            list_name = request.form.get('list_name')
+            is_public = True if request.form.get('is_public') else False
+            if list_name:
+                _, err = create_custom_list_db(int(current_user.id), list_name, is_public)
+                if err:
+                    flash(f'Error creating list: {err}', 'error')
+                else:
+                    flash(f'List "{list_name}" created successfully!', 'success')
+                    return redirect(url_for('auth.account'))
+        
+        # Handle Profile Update
         else:
-            flash('Error updating profile.', 'error')
+            update_data = {
+                'first_name': request.form.get('first_name'),
+                'last_name': request.form.get('last_name'),
+                'bio': request.form.get('bio')
+            }
+
+            if 'profile_picture' in request.files:
+                file = request.files['profile_picture']
+                if file and file.filename != '':
+                    picture_file = save_profile_picture(file)
+                    update_data['profile_picture'] = picture_file
+
+            updated_user_data, err = update_user_db(int(current_user.id), update_data)
+            if not err:
+                flash('Profile updated successfully!', 'success')
+                return redirect(url_for('auth.account'))
+            else:
+                flash('Error updating profile.', 'error')
 
     stats = {
         'score': current_user.game_score,
@@ -143,6 +159,14 @@ def account():
         'accuracy': 0,
         'games_played': 0
     }
+
+    # Fetch User Stats
+    genre_stats, _ = get_user_favorite_genre_stats_db(current_user.id)
+    actor_stats = get_user_favorite_actor_stats_db(current_user.id)
+    
+    # Fetch User Lists
+    user_lists, _ = get_lists_by_user_db(current_user.id)
+    if not user_lists: user_lists = []
 
     user_reviews, err = get_comments_by_user(current_user.id)
     if not user_reviews:
@@ -158,7 +182,10 @@ def account():
         stats=stats,
         favorites=favorites,
         sessions=sessions,
-        user_reviews=user_reviews
+        user_reviews=user_reviews,
+        genre_stats=genre_stats,
+        actor_stats=actor_stats,
+        user_lists=user_lists
     )
 
 
@@ -180,13 +207,24 @@ def public_profile(user_id):
         'best_streak': 0 
     }
 
+    # Fetch User Stats
+    genre_stats, _ = get_user_favorite_genre_stats_db(user_id)
+    actor_stats = get_user_favorite_actor_stats_db(user_id)
+    
+    # Fetch User Lists
+    user_lists, _ = get_lists_by_user_db(user_id)
+    if not user_lists: user_lists = []
+
     return render_template(
         'account.html', 
         current_user=target_user, 
         user_reviews=user_reviews, 
         stats=stats, 
         is_public=True,
-        favorites=[]
+        favorites=[],
+        genre_stats=genre_stats,
+        actor_stats=actor_stats,
+        user_lists=user_lists
     )
 
 @auth_bp.route('/change-password', methods=['POST'])

@@ -143,9 +143,11 @@ def get_movie_details_full_db(movie_id: int):
 
         try:
             sql_reviews = """
-                SELECT author, rating, comment, created_at 
-                FROM reviews WHERE movie_id = %s 
-                ORDER BY created_at DESC LIMIT 5
+                SELECT u.username as author, c.rating, c.body as comment, c.created_at 
+                FROM comments c
+                JOIN users u ON c.user_id = u.id
+                WHERE c.movie_id = %s 
+                ORDER BY c.created_at DESC LIMIT 5
             """
             reviews_list = execute_query(sql_reviews, (movie_id,), fetch=True) or []
         except:

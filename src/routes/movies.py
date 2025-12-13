@@ -4,6 +4,7 @@ from src.services.movie_service import *
 from src.services.favorite_service import *
 from flask_login import current_user
 from src.services.comments_service import get_comments_for_movie
+from src.services.list_service import get_lists_by_user_db
 
 movies_bp = Blueprint('movies', __name__)
 
@@ -56,6 +57,14 @@ def movies_details_page(movie_id):
 
     movie_detail['reviews'] = all_comments
     movie_detail['total_reviews_count'] = len(all_comments)
+    
+    # Fetch User Lists for 'Add to List' dropdown
+    user_lists = []
+    if current_user.is_authenticated:
+        user_lists, _ = get_lists_by_user_db(current_user.id)
+        if not user_lists: user_lists = []
+    
+    movie_detail['user_lists'] = user_lists
 
     return render_template('movie_detail.html', **movie_detail)
 

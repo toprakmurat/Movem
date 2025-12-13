@@ -112,9 +112,10 @@ def get_list_details_db(list_id: int):
         # Get the movies inside by joining with movies table
         movies_query = """
         SELECT 
-            m.id, m.title, m.poster_file, m.release_date, m.vote_avg, li.added_at
+            m.id, m.title, m.poster_file, m.release_date, s.vote_avg, li.added_at
         FROM list_items li
         JOIN movies m ON li.movie_id = m.id
+        LEFT JOIN statistic s ON m.id = s.movie_id
         WHERE li.list_id = %s
         ORDER BY li.added_at DESC
         """
