@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from flask_login import current_user, login_required
 from src.services.comments_service import (
     get_all_comments,
@@ -11,8 +11,14 @@ from src.services.comments_service import (
     like_comment,
     dislike_comment,
     toggle_comment_vote_db,
-    get_user_vote_status
+    get_user_vote_status,
+    create_vote,
+    get_vote_by_id,
+    update_vote,
+    delete_vote,
+    get_controversial_movies
 )
+from src.services.movie_service import get_movies_paginated_db
 
 comments_bp = Blueprint('comments', __name__)
 
@@ -150,3 +156,131 @@ def vote_comment_route(comment_id):
         'dislikes': comment_data.get('comment_dislikes', 0),
         'user_status': status
     }), 200
+
+
+@comments_bp.route('/battleground', methods=['GET', 'POST'])
+def battleground_page():
+    """
+    Renders the 'Polarization Matrix' page.
+    GET: Shows top 6 controversial movies.
+    POST: Handles 'Manual Targeting' search to analyze a specific movie.
+    """
+    movies, err = get_controversial_movies()
+    top_movies = [dict(m) for m in movies] if (not err and movies) else []
+    searched_movie = None
+    search_error = False
+    if request.method == 'POST':
+        query = request.form.get('search_query')
+        if query:
+            result, err = get_movies_paginated_db(page=1, per_page=1, search=query)
+            found_items = []
+            if hasattr(result, 'items'):
+                found_items = result.items
+            elif isinstance(result, dict) and 'items' in result:
+                found_items = result['items']
+            elif isinstance(result, list): 
+                found_items = result
+            if found_items:
+                movie = found_items[0]
+                movie_dict = dict(movie) if not isinstance(movie, dict) else movie.copy()
+                comments, _ = get_comments_for_movie(movie_dict['id'])
+                if not comments: comments = []
+                total_comments = len(comments)
+                interactions = 0
+                ratings = []
+                for c in comments:
+                    c_dict = dict(c)
+                    likes = c_dict.get('comment_likes') or 0
+                    dislikes = c_dict.get('comment_dislikes') or 0
+                    interactions += (likes + dislikes)
+                    if c_dict.get('rating') is not None:
+                        ratings.append(float(c_dict['rating']))
+                if len(ratings) > 1:
+                    mean = sum(ratings) / len(ratings)
+                    variance = sum((x - mean) ** 2 for x in ratings) / len(ratings)
+                    score = variance
+                else:
+                    score = 0.0
+                movie_dict['movie_id'] = movie_dict['id']
+                movie_dict['total_comments'] = total_comments
+                movie_dict['community_tension'] = interactions
+                movie_dict['polarization_score'] = round(score, 2) 
+                searched_movie = movie_dict
+            else:
+                search_error = True
+    return render_template(
+        'battleground.html', 
+        movies=top_movies, 
+        searched_movie=searched_movie, 
+        search_error=search_error
+    )
+
+
+# comment_votes CRUD routes
+
+@comments_bp.route('/votes/<int:vote_id>', methods=['GET'])
+@login_required
+def get_vote_route(vote_id):
+    """Get a single vote by its ID"""
+    vote, err = get_vote_by_id(vote_id)
+    if err:
+        return jsonify({"error": err}), 404
+    return jsonify(dict(vote)), 200
+
+
+@comments_bp.route('/votes', methods=['POST'])
+@login_required
+def create_vote_route():
+    """
+    Directly create a vote record (Admin/API use).
+    Unlike toggle, this will fail if vote already exists.
+    Expects JSON: { "comment_id": 1, "vote_type": "like" }
+    """
+    data = request.get_json()
+    comment_id = data.get('comment_id')
+    vote_type = data.get('vote_type')
+    if not comment_id or not vote_type:
+        return jsonify({'error': 'Missing comment_id or vote_type'}), 400
+    if vote_type not in ['like', 'dislike']:
+        return jsonify({'error': 'Invalid vote type'}), 400
+    new_vote, err = create_vote(current_user.id, comment_id, vote_type)
+    if err:
+        return jsonify({"error": err}), 400
+    return jsonify(dict(new_vote)), 201
+
+
+@comments_bp.route('/votes/<int:vote_id>', methods=['PUT', 'PATCH'])
+@login_required
+def update_vote_route(vote_id):
+    """
+    Update a vote (e.g. change 'like' to 'dislike').
+    Expects JSON: { "vote_type": "dislike" }
+    """
+    vote, err = get_vote_by_id(vote_id)
+    if err:
+        return jsonify({"error": "Vote not found"}), 404   
+    if vote['user_id'] != current_user.id and current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    new_type = data.get('vote_type')
+    if new_type not in ['like', 'dislike']:
+        return jsonify({"error": "Invalid vote type"}), 400
+    updated_vote, err = update_vote(vote_id, new_type)
+    if err:
+        return jsonify({"error": err}), 500
+    return jsonify(dict(updated_vote)), 200
+
+
+@comments_bp.route('/votes/<int:vote_id>', methods=['DELETE'])
+@login_required
+def delete_vote_route(vote_id):
+    """Delete a vote permanently"""
+    vote, err = get_vote_by_id(vote_id)
+    if err:
+        return jsonify({"error": "Vote not found"}), 404
+    if vote['user_id'] != current_user.id and current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+    deleted, err = delete_vote(vote_id)
+    if err:
+        return jsonify({"error": err}), 500   
+    return jsonify({"message": "Vote deleted successfully", "vote": dict(deleted)}), 200
