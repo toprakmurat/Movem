@@ -75,6 +75,13 @@ def movies_details_page(movie_id):
 
     similar_movies_list = get_recommendations_db(movie_id, current_uid)
 
+    user_lists = []
+    if current_user.is_authenticated:
+        lists_data, list_err = get_lists_by_user_db(current_uid)
+        if not list_err and lists_data:
+            user_lists = lists_data
+
+    movie_detail["user_lists"] = user_lists
     movie_detail["similar_movies"] = similar_movies_list
     movie_detail["director"] = director
     movie_detail["cast"] = cast_list
