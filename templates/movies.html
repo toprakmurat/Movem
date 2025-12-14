@@ -3,83 +3,196 @@
 {% block content %}
 <section class="mx-auto max-w-6xl">
   <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-  
-  <div>
-    <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Library</p>
-    <h1 class="mt-2 text-3xl font-semibold">Movies</h1>
-    <p class="text-slate-400">Browse curated titles or filter by genre, release year, and popularity.</p>
-  </div>
 
-  <div class="flex flex-wrap items-center gap-3">
+    <div>
+      <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Library</p>
+      <h1 class="mt-2 text-3xl font-semibold">Movies</h1>
+      <p class="text-slate-400">Browse curated titles or filter by genre, release year, and popularity.</p>
+    </div>
 
-    <form method="get" action="{{ url_for('movies.movies_page') }}" class="flex items-center">
-      <input 
-        type="text" 
-        name="search" 
-        placeholder="Search movies..." 
-        value="{{ request.args.get('search', '') }}"
-        class="form-field w-64 h-[48px] px-4 py-3"
-      />
-
-      {% if request.args.get('genre') %}
-        <input type="hidden" name="genre" value="{{ request.args.get('genre') }}">
-      {% endif %}
-      {% if request.args.get('sort') %}
-        <input type="hidden" name="sort" value="{{ request.args.get('sort') }}">
-      {% endif %}
-      
+    <div class="flex flex-wrap items-center gap-3">
+      <form method="get" action="{{ url_for('movies.movies_page') }}" class="flex items-center">
+        <input type="text" name="search" placeholder="Search movies..." value="{{ request.args.get('search', '') }}"
+          class="form-field w-64 h-[48px] px-4 py-3" />
+        {% if request.args.get('genre') %}<input type="hidden" name="genre" value="{{ request.args.get('genre') }}">{%
+        endif %}
+        {% if request.args.get('sort') %}<input type="hidden" name="sort" value="{{ request.args.get('sort') }}">{%
+        endif %}
       </form>
 
-    <button id="filterToggle" 
-            class="flex items-center gap-2 text-sm btn-secondary px-4 py-3 h-[48px]">
-      Filters
-      <svg id="filterIcon" class="w-4 h-4 transition-transform" 
-           fill="none" stroke="currentColor" stroke-width="2" 
-           viewBox="0 0 24 24">
-        <path d="M6 9l6 6 6-6"/>
-      </svg>
-    </button>
-
+      <button id="filterToggle" class="flex items-center gap-2 text-sm btn-secondary px-4 py-3 h-[48px]">
+        Filters
+        <svg id="filterIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+    </div>
   </div>
-</div>
 
-  <div id="filterPanel"
-     class="overflow-hidden transition-all duration-300 max-h-0">
-    <form method="get" action="{{ url_for('movies.movies_page') }}" class="mt-4 flex flex-wrap gap-3 text-sm">
-      
-      {% if request.args.get('search') %}
-        <input type="hidden" name="search" value="{{ request.args.get('search') }}">
-      {% endif %}
-      
-      <select name="genre" class="form-field w-48">
-        <option value="">All genres</option>
-        {% for genre in genres %}
-          <option value="{{ genre['id'] }}" 
-            {% if request.args.get('genre') and genre['id'] == request.args.get('genre')|int %}selected{% endif %}>
+  <div id="filterPanel" class="overflow-hidden transition-all duration-300 max-h-0">
+    <form method="get" action="{{ url_for('movies.movies_page') }}"
+      class="mt-4 flex flex-wrap gap-6 text-sm items-end bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+
+      <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-slate-400 uppercase">Genre</label>
+        <select name="genre" class="form-field w-48">
+          <option value="">All genres</option>
+          {% for genre in genres %}
+          <option value="{{ genre['id'] }}" {% if request.args.get('genre') and
+            genre['id']==request.args.get('genre')|int %}selected{% endif %}>
             {{ genre['genre_name'] }}
           </option>
-        {% endfor %}
-      </select>
+          {% endfor %}
+        </select>
+      </div>
 
-      <select name="sort" class="form-field w-48">
-        <option value="rating_desc" {% if request.args.get('sort') == 'rating_desc' %}selected{% endif %}>Highest Rated</option>
-        <option value="rating_asc" {% if request.args.get('sort') == 'rating_asc' %}selected{% endif %}>Lowest Rated</option>
-        <option value="release_desc" {% if request.args.get('sort') == 'release_desc' %}selected{% endif %}>Newest First</option>
-        <option value="release_asc" {% if request.args.get('sort') == 'release_asc' %}selected{% endif %}>Oldest First</option>
-      </select>
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-slate-400 uppercase">Sort By</label>
+        <select name="sort" class="form-field w-48">
+          <option value="rating_desc" {% if request.args.get('sort')=='rating_desc' %}selected{% endif %}>Highest Rated
+          </option>
+          <option value="rating_asc" {% if request.args.get('sort')=='rating_asc' %}selected{% endif %}>Lowest Rated
+          </option>
+          <option value="release_desc" {% if request.args.get('sort')=='release_desc' %}selected{% endif %}>Newest First
+          </option>
+          <option value="release_asc" {% if request.args.get('sort')=='release_asc' %}selected{% endif %}>Oldest First
+          </option>
+        </select>
+      </div>
 
-      <button type="submit" class="btn-secondary">Apply</button>
-      <a class="btn-secondary" href="{{ url_for('movies.movies_page', search=request.args.get('search')) }}">Clear filters</a>
+      <style>
+        .range-slider {
+          position: relative;
+          width: 100%;
+          height: 35px;
+          text-align: center;
+        }
+
+        .range-slider input[type="range"] {
+          pointer-events: none;
+          position: absolute;
+          -webkit-appearance: none;
+          appearance: none;
+          border: none;
+          border-radius: 14px;
+          background: none;
+          box-shadow: none;
+          left: 0;
+          top: 12px;
+          width: 100%;
+          outline: none;
+          height: 5px;
+          margin: 0;
+          padding: 0;
+        }
+
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+          pointer-events: all;
+          position: relative;
+          z-index: 1;
+          outline: 0;
+          -webkit-appearance: none;
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          border: none;
+          border-radius: 50%;
+          background: #e50914;
+          cursor: pointer;
+          transition: transform 0.1s ease;
+        }
+
+        .range-slider input[type="range"]::-moz-range-thumb {
+          pointer-events: all;
+          position: relative;
+          z-index: 10;
+          -moz-appearance: none;
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          border: none;
+          border-radius: 50%;
+          background: #e50914;
+          cursor: pointer;
+          transition: transform 0.1s ease;
+        }
+
+        .range-slider input[type="range"]::-webkit-slider-thumb:hover,
+        .range-slider input[type="range"]::-moz-range-thumb:hover {
+          transform: scale(1.2);
+        }
+
+        .slider-track {
+          position: absolute;
+          width: 100%;
+          height: 4px;
+          background: #e2e8f0;
+          border-radius: 4px;
+          top: 14px;
+          z-index: 0;
+        }
+
+        .slider-range {
+          position: absolute;
+          height: 4px;
+          background: #e50914;
+          z-index: 0;
+          border-radius: 4px;
+          top: 14px;
+        }
+
+        .slider-title {
+          font-size: 0.8rem;
+          font-weight: 600;
+          text-align: left;
+          margin-bottom: -8px;
+          display: block;
+          width: 100%;
+          color: #cbd5e1;
+        }
+      </style>
+
+      <div class="flex flex-col gap-1 w-48">
+        <span class="slider-title">Rating: <span id="rating-val">0 - 10</span></span>
+        <div class="range-slider">
+          <div class="slider-track"></div>
+          <div class="slider-range" id="rating-track-active"></div>
+          <input type="range" min="0" max="10" step="0.1" value="{{ request.args.get('rating_min', 0) }}"
+            id="rating-min" name="rating_min">
+          <input type="range" min="0" max="10" step="0.1" value="{{ request.args.get('rating_max', 10) }}"
+            id="rating-max" name="rating_max">
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1 w-48">
+        <span class="slider-title">Runtime: <span id="runtime-val">0 - 300</span> min</span>
+        <div class="range-slider">
+          <div class="slider-track"></div>
+          <div class="slider-range" id="runtime-track-active"></div>
+          <input type="range" min="0" max="300" step="5" value="{{ request.args.get('runtime_min', 0) }}"
+            id="runtime-min" name="runtime_min">
+          <input type="range" min="0" max="300" step="5" value="{{ request.args.get('runtime_max', 300) }}"
+            id="runtime-max" name="runtime_max">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto">
+        <a class="btn-secondary" href="{{ url_for('movies.movies_page', search=request.args.get('search')) }}">Clear</a>
+        <button type="submit" class="btn-primary">Apply Filters</button>
+      </div>
     </form>
   </div>
 
   <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     {% for movie in movies.items %}
-      {% include 'partials/movie_card.html' %}
+    {% include 'partials/movie_card.html' %}
     {% else %}
-      <p class="text-slate-400 col-span-full text-center py-10">
-        No movies found for your filters. Try adjusting your search.
-      </p>
+    <p class="text-slate-400 col-span-full text-center py-10">
+      No movies found for your filters. Try adjusting your search.
+    </p>
     {% endfor %}
   </div>
 
@@ -87,11 +200,29 @@
     <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
     <div class="flex gap-3">
       {% if movies.has_prev %}
-      <a href="{{ url_for('movies.movies_page', page=movies.prev_num, genre=request.args.get('genre'), sort=request.args.get('sort'), search=request.args.get('search')) }}" class="btn-secondary">Previous</a>
+      <a href="{{ url_for('movies.movies_page', 
+                  page=movies.prev_num, 
+                  genre=request.args.get('genre'), 
+                  sort=request.args.get('sort'), 
+                  search=request.args.get('search'),
+                  rating_min=request.args.get('rating_min'),
+                  rating_max=request.args.get('rating_max'),
+                  runtime_min=request.args.get('runtime_min'),
+                  runtime_max=request.args.get('runtime_max')
+                  ) }}" class="btn-secondary">Previous</a>
       {% endif %}
-      
+
       {% if movies.has_next %}
-      <a href="{{ url_for('movies.movies_page', page=movies.next_num, genre=request.args.get('genre'), sort=request.args.get('sort'), search=request.args.get('search')) }}" class="btn-primary">Next</a>
+      <a href="{{ url_for('movies.movies_page', 
+                  page=movies.next_num, 
+                  genre=request.args.get('genre'), 
+                  sort=request.args.get('sort'), 
+                  search=request.args.get('search'),
+                  rating_min=request.args.get('rating_min'),
+                  rating_max=request.args.get('rating_max'),
+                  runtime_min=request.args.get('runtime_min'),
+                  runtime_max=request.args.get('runtime_max')
+                  ) }}" class="btn-primary">Next</a>
       {% endif %}
     </div>
   </div>
@@ -99,12 +230,11 @@
 
 <script>
   const toggle = document.getElementById("filterToggle");
-  const panel  = document.getElementById("filterPanel");
-  const icon   = document.getElementById("filterIcon");
+  const panel = document.getElementById("filterPanel");
+  const icon = document.getElementById("filterIcon");
 
   toggle.addEventListener("click", () => {
     const isOpen = panel.style.maxHeight && panel.style.maxHeight !== "0px";
-
     if (isOpen) {
       panel.style.maxHeight = "0px";
       icon.style.transform = "rotate(0deg)";
@@ -112,6 +242,47 @@
       panel.style.maxHeight = panel.scrollHeight + "px";
       icon.style.transform = "rotate(180deg)";
     }
+  });
+
+  function initSlider(minInputId, maxInputId, trackId, labelValId, minVal, maxVal, step, unit = '') {
+    const minInput = document.getElementById(minInputId);
+    const maxInput = document.getElementById(maxInputId);
+    const track = document.getElementById(trackId);
+    const label = document.getElementById(labelValId);
+    const minGap = step;
+
+    function updateSlider() {
+      if (parseFloat(maxInput.value) - parseFloat(minInput.value) <= minGap) {
+        if (this === minInput) {
+          minInput.value = parseFloat(maxInput.value) - minGap;
+        } else {
+          maxInput.value = parseFloat(minInput.value) + minGap;
+        }
+      }
+      fillTrack();
+      updateLabel();
+    }
+
+    function fillTrack() {
+      const percent1 = (minInput.value / maxInput.max) * 100;
+      const percent2 = (maxInput.value / maxInput.max) * 100;
+      track.style.left = percent1 + "%";
+      track.style.width = (percent2 - percent1) + "%";
+    }
+
+    function updateLabel() {
+      label.textContent = `${minInput.value} - ${maxInput.value}${unit}`;
+    }
+
+    minInput.addEventListener('input', updateSlider);
+    maxInput.addEventListener('input', updateSlider);
+    fillTrack();
+    updateLabel();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initSlider('rating-min', 'rating-max', 'rating-track-active', 'rating-val', 0, 10, 0.5);
+    initSlider('runtime-min', 'runtime-max', 'runtime-track-active', 'runtime-val', 0, 300, 10);
   });
 </script>
 {% endblock %}

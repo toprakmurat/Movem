@@ -22,9 +22,25 @@ def movies_page():
     search = request.args.get("search", type=str)
     genre_id = request.args.get("genre", type=int)
     sort_by = request.args.get("sort")
+    
+    rating_min = request.args.get("rating_min", default=0, type=float)
+    rating_max = request.args.get("rating_max", default=10, type=float)
+    runtime_min = request.args.get("runtime_min", default=0, type=int)
+    runtime_max = request.args.get("runtime_max", default=300, type=int)
 
     # Paginated movies
-    pagination, err_movies = get_movies_paginated_db(page=page, per_page=per_page, genre_id=genre_id, sort_by=sort_by, search=search)
+    
+    pagination, err_movies = get_movies_paginated_db(
+        page=page, 
+        per_page=per_page, 
+        genre_id=genre_id, 
+        sort_by=sort_by,
+        search=search,
+        rating_min=rating_min,
+        rating_max=rating_max,
+        runtime_min=runtime_min,
+        runtime_max=runtime_max
+    )
     if err_movies:
         return f"Error fetching movies: {err_movies}", 500
 
