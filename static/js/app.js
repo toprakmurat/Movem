@@ -17,11 +17,16 @@ function initCarousel() {
   const showSlide = (i) => {
     index = (i + slides.length) % slides.length;
     slides.forEach((slide, idx) => {
-      slide.classList.toggle('opacity-100', idx === index);
-      slide.classList.toggle('pointer-events-auto', idx === index);
-      slide.classList.toggle('translate-x-0', idx === index);
-      slide.classList.toggle('opacity-0', idx !== index);
-      slide.classList.toggle('-translate-x-4', idx !== index);
+      const isActive = idx === index;
+
+      slide.classList.toggle('opacity-100', isActive);
+      slide.classList.toggle('translate-x-0', isActive);
+      slide.classList.toggle('pointer-events-auto', isActive);
+      slide.classList.toggle('z-20', isActive); 
+      slide.classList.toggle('opacity-0', !isActive);
+      slide.classList.toggle('-translate-x-4', !isActive);
+      slide.classList.toggle('pointer-events-none', !isActive);
+      slide.classList.toggle('z-10', !isActive); 
     });
     buttons.forEach((btn, idx) => {
       btn.setAttribute('aria-current', idx === index);

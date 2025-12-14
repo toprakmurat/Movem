@@ -9,8 +9,8 @@
 
     {% for movie in trending_movies %}
     <div data-slide
-      class="absolute inset-0 h-full w-full transition-all duration-700 ease-in-out 
-                  {% if loop.first %}opacity-100 translate-x-0 z-20 pointer-events-auto{% else %}opacity-0 translate-x-4 z-10 pointer-events-none{% endif %}">
+  class="absolute inset-0 h-full w-full transition-all duration-700 ease-in-out 
+                  {% if loop.first %}z-20 opacity-100 translate-x-0 pointer-events-auto{% else %}z-10 opacity-0 translate-x-4 pointer-events-none{% endif %}">
 
       <img src="{{ url_for('static', filename='img/' ~ (movie.banner_file or 'placeholder_banner.svg')) }}"
         alt="{{ movie.title }} backdrop" class="absolute inset-0 h-full w-full object-cover" />
