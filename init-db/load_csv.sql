@@ -21,6 +21,9 @@
 -- comments
 \copy comments(user_id, movie_id, body, rating, created_at, comment_likes, comment_dislikes) FROM '/docker-entrypoint-initdb.d/csv/db_comments.csv' DELIMITER ',' CSV HEADER
 
+-- Comment Votes
+\copy comment_votes(user_id, comment_id, vote_type) FROM '/docker-entrypoint-initdb.d/csv/db_comment_votes.csv' DELIMITER ',' CSV HEADER
+
 -- question_types
 \copy question_types(id, question_type_name) FROM '/docker-entrypoint-initdb.d/csv/db_question_types.csv' DELIMITER ',' CSV HEADER
 
