@@ -4,8 +4,10 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from src.services.favorite_service import get_favorite_movies_detailed_for_user_db
+from src.utils.pagination_utils import Pagination
 from datetime import datetime, timedelta
 import secrets
+import math
 
 from src.services.users_service import (
     create_user_db, 
@@ -336,3 +338,41 @@ def delete_account():
     else:
         flash(f'Error deleting account: {err}', 'error')
         return redirect(url_for('auth.account'))
+
+@auth_bp.route('/account/favorites', methods=['GET'])
+@login_required
+def favorites_page():
+    """
+    Return favorites for user
+    """
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  
+
+    all_favorites, err = get_favorite_movies_detailed_for_user_db(int(current_user.id))
+    
+    if err or not all_favorites:
+        all_favorites = []
+
+    total_items = len(all_favorites)
+    
+    total_pages = math.ceil(total_items / per_page) if total_items > 0 else 1
+
+    if page < 1: page = 1
+    if page > total_pages: page = total_pages
+
+    start = (page - 1) * per_page
+    end = start + per_page
+    current_page_favorites = all_favorites[start:end]
+
+    pagination = Pagination(
+        items=current_page_favorites,
+        page=page,
+        per_page=per_page,
+        total_count=total_items
+    )
+
+    return render_template(
+        'favorites.html',  
+        favorites=current_page_favorites,
+        pagination=pagination
+    )

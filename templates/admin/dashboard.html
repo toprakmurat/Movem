@@ -307,4 +307,215 @@
     </section>
 
 </section>
+
+
+ <!-- ===== Movies CRUD ===== -->
+    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movies Management</h2>
+        <div class="grid lg:grid-cols-2 gap-8">
+
+            <!-- Create Movie Form -->
+            <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">Create New Movie</h4>
+                <form action="{{ url_for('movies.create_movie') }}" method="post" class="space-y-4">
+                    <input name="title" placeholder="Title"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                    <input name="release_date" type="date"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                    <textarea name="overview" placeholder="Overview"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
+                    <button class="btn-primary w-full py-2 rounded-xl">Create Movie</button>
+                </form>
+            </div>
+
+            <!-- Movies Table -->
+            <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">Movies List</h4>
+                <table class="w-full text-left text-sm text-white/70 border-collapse">
+                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                        <tr>
+                            <th class="px-4 py-2">ID</th>
+                            <th class="px-4 py-2">Title</th>
+                            <th class="px-4 py-2">Release Date</th>
+                            <th class="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for movie in movies %}
+                        <tr class="hover:bg-white/10 transition">
+                            <td class="px-4 py-2 font-mono text-white/50">{{ movie.id }}</td>
+                            <td class="px-4 py-2">{{ movie.title }}</td>
+                            <td class="px-4 py-2">{{ movie.release_date }}</td>
+                            <td class="px-4 py-2 flex gap-2">
+                                <form action="{{ url_for('movies.update_movie', id=movie.id) }}" method="post">
+                                    <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                            <path d="M12.854.146a.5.5 0 0 1 .11.638l-.057.07-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10a.5.5 0 0 1 .707 0z"/>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('movies.delete_movie', id=movie.id) }}" method="post" onsubmit="return confirm('Delete this movie?');">
+                                    <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                            <path d="M2.5 1a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1H15a.5.5 0 0 1 0 1h-1.5v12a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V2H1a.5.5 0 0 1 0-1h1.5z"/>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== Genres CRUD ===== -->
+    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Genres Management</h2>
+        <div class="grid lg:grid-cols-2 gap-8">
+
+            <!-- Create Genre Form -->
+            <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">Create New Genre</h4>
+                <form action="{{ url_for('movies.create_genre') }}" method="post" class="space-y-4">
+                    <input name="genre_name" placeholder="Genre Name" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                    <button class="btn-primary w-full py-2 rounded-xl">Create Genre</button>
+                </form>
+            </div>
+
+            <!-- Genres Table -->
+            <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">Genres List</h4>
+                <table class="w-full text-left text-sm text-white/70 border-collapse">
+                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                        <tr>
+                            <th class="px-4 py-2">ID</th>
+                            <th class="px-4 py-2">Genre Name</th>
+                            <th class="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for genre in genres %}
+                        <tr class="hover:bg-white/10 transition">
+                            <td class="px-4 py-2 font-mono text-white/50">{{ genre.id }}</td>
+                            <td class="px-4 py-2">{{ genre.genre_name }}</td>
+                            <td class="px-4 py-2 flex gap-2">
+                                <form action="{{ url_for('movies.update_genre', id=genre.id) }}" method="post">
+                                    <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
+                                        Edit
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('movies.delete_genre', id=genre.id) }}" method="post" onsubmit="return confirm('Delete this genre?');">
+                                    <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== Movie-Genre CRUD ===== -->
+    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movie-Genre Relations</h2>
+        <div class="grid lg:grid-cols-2 gap-8">
+
+            <!-- Create Relation Form -->
+            <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">Add Movie-Genre Relation</h4>
+                <form action="{{ url_for('movies.create_movies_genres') }}" method="post" class="space-y-4">
+                    <input name="movie_id" type="number" placeholder="Movie ID" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                    <input name="genre_id" type="number" placeholder="Genre ID" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                    <button class="btn-primary w-full py-2 rounded-xl">Add Relation</button>
+                </form>
+            </div>
+
+            <!-- Relations Table -->
+            <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">Relations List</h4>
+                <table class="w-full text-left text-sm text-white/70 border-collapse">
+                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                        <tr>
+                            <th class="px-4 py-2">ID</th>
+                            <th class="px-4 py-2">Movie ID</th>
+                            <th class="px-4 py-2">Genre ID</th>
+                            <th class="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for mg in movies_genres %}
+                        <tr class="hover:bg-white/10 transition">
+                            <td class="px-4 py-2 font-mono text-white/50">{{ mg.id }}</td>
+                            <td class="px-4 py-2">{{ mg.movie_id }}</td>
+                            <td class="px-4 py-2">{{ mg.genre_id }}</td>
+                            <td class="px-4 py-2 flex gap-2">
+                                <form action="{{ url_for('movies.update_movies_genres', id=mg.id) }}" method="post">
+                                    <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
+                                        Edit
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('movies.delete_movies_genres', id=mg.id) }}" method="post" onsubmit="return confirm('Delete this relation?');">
+                                    <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== Favorites CRUD ===== -->
+    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Favorites Management</h2>
+        <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
+            <h4 class="text-lg font-semibold text-white mb-4">Favorites List</h4>
+            <table class="w-full text-left text-sm text-white/70 border-collapse">
+                <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                    <tr>
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">User ID</th>
+                        <th class="px-4 py-2">Movie ID</th>
+                        <th class="px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for fav in favorites %}
+                    <tr class="hover:bg-white/10 transition">
+                        <td class="px-4 py-2 font-mono text-white/50">{{ fav.id }}</td>
+                        <td class="px-4 py-2">{{ fav.user_id }}</td>
+                        <td class="px-4 py-2">{{ fav.movie_id }}</td>
+                        <td class="px-4 py-2 flex gap-2">
+                            <form action="{{ url_for('movies.update_favorite', id=fav.id) }}" method="post">
+                                <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
+                                    Edit
+                                </button>
+                            </form>
+                            <form action="{{ url_for('movies.delete_favorite', id=fav.id) }}" method="post" onsubmit="return confirm('Delete this favorite?');">
+                                <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</section>
 {% endblock %}
