@@ -258,3 +258,58 @@ def delete_question_db(id):
         return None, "Question not found"
     except Exception as e:
         return None, str(e)
+
+
+def get_leaderboard_db(limit=50):
+    """Get top players by game score"""
+    try:
+        query = """
+            SELECT 
+                id, 
+                username, 
+                game_score as score, 
+                profile_picture as avatar, 
+                role 
+            FROM users 
+            WHERE game_score > 0 
+            ORDER BY game_score DESC 
+            LIMIT %s
+        """
+        leaderboard = execute_query(query, (limit,), fetch=True)
+        # Add rank and other display fields if needed, or handle in template
+        # The template expects: user.score, user.best_streak, user.games_played
+        # Our DB currently only has game_score. 
+        # We can pass what we have.
+        return leaderboard, None
+    except Exception as e:
+        return None, str(e)
+
+
+def update_user_score_db(user_id, new_score):
+    """
+    Update user's high score. 
+    Only updates if new_score is higher than existing game_score.
+    """
+    try:
+        # First get current score
+        query_get = "SELECT game_score FROM users WHERE id = %s"
+        current = execute_query(query_get, (user_id,), fetch=True)
+        
+        if not current:
+            return False, "User not found"
+            
+        current_score = current[0]['game_score']
+        if current_score is None: 
+            current_score = 0
+            
+        if new_score > current_score:
+            query_update = "UPDATE users SET game_score = %s WHERE id = %s RETURNING game_score"
+            updated = execute_query(query_update, (new_score, user_id), fetch=True)
+            if updated:
+                return True, None
+            return False, "Failed to update score"
+            
+        return False, "Score not higher than best"
+        
+    except Exception as e:
+        return False, str(e)

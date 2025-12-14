@@ -6,14 +6,42 @@ from src.services.game_service import (
     get_question_by_id_db,
     create_question_db,
     update_question_db,
-    delete_question_db
+    delete_question_db,
+    get_leaderboard_db,
+    update_user_score_db
 )
+from flask_login import current_user
 
 game_bp = Blueprint('game', __name__)
 
 @game_bp.route('/')
 def lobby():
     return render_template('lobby.html')
+
+@game_bp.route('/leaderboard')
+def leaderboard():
+    leaderboard_data, err = get_leaderboard_db()
+    if err:
+        flash(f"Error loading leaderboard: {err}", "error")
+        leaderboard_data = []
+    
+    # Process leaderboard data to ensure fields match template expectations
+    # Template uses: score, best_streak, games_played
+    # DB provides: score (from game_score), avatar, username
+    # We will fill missing fields with defaults or available data
+    processed_leaderboard = []
+    if leaderboard_data:
+        for user in leaderboard_data:
+            processed_leaderboard.append({
+                'username': user.get('username'),
+                'avatar': user.get('avatar'),
+                'score': user.get('score', 0),
+                'best_streak': 0, # Not currently tracked in DB
+                'games_played': 0, # Not currently tracked in DB
+                'country': None
+            })
+            
+    return render_template('leaderboard.html', leaderboard=processed_leaderboard)
 
 @game_bp.route('/start', methods=['POST'])
 def start_game():
@@ -70,6 +98,12 @@ def answer():
         session['score'] = session.get('score', 0) + 100
     else:
         session['game_over'] = True
+        # Update user high score if logged in
+        if current_user.is_authenticated:
+            final_score = session.get('score', 0)
+            updated, msg = update_user_score_db(current_user.id, final_score)
+            if updated:
+                flash("New High Score!", "success")
         
     #fetch the question again by ID
     question, _ = get_question_by_id_db(question_id)

@@ -8,6 +8,8 @@ from src.services.actors_service import get_featured_people_db
 home_bp = Blueprint('home', __name__)
 
 
+from src.services.statistic_service import get_cinemetrics_movies_db
+
 @home_bp.route('/')
 @home_bp.route('/home')
 def home():
@@ -38,8 +40,28 @@ def home():
             "subtitle": "Top Earners",
             "image": base_image,
             "link_param": "revenue"
+        },
+        {
+            "title": "Time Capsule",
+            "subtitle": "Best of Every Year",
+            "image": base_image,
+            "link_param": "time_capsule"
+        },
+        {
+            "title": "Timeless",
+            "subtitle": "Old but Gold",
+            "image": base_image,
+            "link_param": "timeless"
         }
     ]
+
+    # fetch dynamic images for cinemetrics cards
+    for option in discovery_options:
+        movies_paginated, err = get_cinemetrics_movies_db(option['link_param'], page=1, per_page=1)
+        if movies_paginated and movies_paginated.items:
+            first_movie = movies_paginated.items[0]
+            if first_movie.get('poster_file') or first_movie.get('poster_path'):
+                option['image'] = url_for('static', filename='img/' + (first_movie.get('poster_file') or first_movie.get('poster_path')))
 
     best_movies, _ = get_best_movies_detailed_db(8)
     featured_movies, _ = get_random_movies_detailed_db(8)

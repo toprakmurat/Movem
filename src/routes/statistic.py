@@ -1,13 +1,47 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from src.services.statistic_service import (
     get_statistics_db,
     get_statistic_by_id_db,
     create_statistic_db,
     update_statistic_db,
-    delete_statistic_db
+    delete_statistic_db,
+    get_cinemetrics_movies_db
 )
 
 statistic_bp = Blueprint('statistic', __name__)
+
+@statistic_bp.route('/cinemetrics/<string:metric_type>', methods=['GET'])
+def cinemetrics_page(metric_type):
+    """Render the cinemetrics page for a specific metric"""
+    
+    # Validation mapping
+    valid_metrics = {
+        'hidden_gems': ('Hidden Gems', 'Underrated movies with high ratings but lower popularity.'),
+        'short': ('Short & Sweet', 'Movies under 90 minutes perfect for a quick watch.'),
+        'critics': ("Critics' Choice", 'Highly acclaimed movies with over 8.0 rating.'),
+        'revenue': ('Box Office Hits', 'Top grossing movies of all time.'),
+        'time_capsule': ('The Time Capsule', 'The highest rated movie from every year.'),
+        'timeless': ('Timeless Trending', 'Old classics active right now.')
+    }
+    
+    if metric_type not in valid_metrics:
+        return render_template('404.html'), 404
+        
+    title, subtitle = valid_metrics[metric_type]
+    page = request.args.get('page', 1, type=int)
+    
+    movies, err = get_cinemetrics_movies_db(metric_type, page=page)
+    
+    if err:
+        return render_template('500.html', error=err), 500
+        
+    return render_template(
+        'cinemetrics.html', 
+        movies=movies, 
+        title=title, 
+        subtitle=subtitle, 
+        metric_type=metric_type
+    )
 
 @statistic_bp.route('/', methods=['GET'])
 def get_statistics():
