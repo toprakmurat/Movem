@@ -230,18 +230,20 @@
             style="display: block;" 
           />
           
+          
           {% if sim_movie.match_score %}
-          <div class="absolute top-2 left-2 z-30 flex items-center justify-center rounded bg-green-600/90 px-2 py-1 shadow-md backdrop-blur-sm">
-            <span class="text-[10px] font-bold text-white uppercase tracking-wider">
-              {{ sim_movie.match_score }}% Match
-            </span>
+          <div class="absolute top-2 left-2 z-30 flex items-center justify-center rounded-lg overflow-hidden shadow-md">
+              <div class="flex items-center justify-center bg-green-600/90 px-2 py-1 backdrop-blur-sm">
+                <span class="text-[10px] font-bold text-white uppercase tracking-wider">
+                  {{ sim_movie.match_score }}% Match
+                </span>
+              </div>
           </div>
           {% endif %}
-
-          {% if sim_movie.vote_avg %}
+          
+          {% if sim_movie.release_date %}
           <div class="absolute top-2 right-2 z-30 flex items-center gap-1 rounded bg-black/60 px-2 py-1 backdrop-blur-md">
-            <svg class="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-            <span class="text-xs font-bold text-white">{{ sim_movie.vote_avg }}</span>
+            <span class="text-xs font-bold text-white">{{ sim_movie.release_date.year }}</span>
           </div>
           {% endif %}
         </div>
@@ -256,10 +258,14 @@
           </p>
           
           <div class="flex flex-col gap-1 mt-1.5">
-              <p class="text-xs uppercase tracking-wider font-medium" 
-                 style="color: #cbd5e1 !important; opacity: 0.9;">
-                {{ sim_movie.release_date.year if sim_movie.release_date else 'Unknown' }}
+              
+              {% if sim_movie.vote_avg %}
+              <p class="text-xs uppercase tracking-wider font-medium text-yellow-400 flex items-center gap-1" 
+                 style="opacity: 0.9;">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  {{ sim_movie.vote_avg }}
               </p>
+              {% endif %}
 
               <p class="text-[11px] truncate font-light text-white/70">
                 {{ sim_movie.genres }}
@@ -274,16 +280,6 @@
   {% endif %}
 {# -------------------- COMMUNITY REVIEWS -------------------- #}
 <section class="mt-8 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
-  
-  <div class="mb-6 flex items-center justify-between">
-    <h3 class="flex items-center gap-3 text-xl font-semibold uppercase tracking-widest text-white">
-      <span class="h-2 w-2 rounded-full bg-brand-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></span>
-      Community Reviews
-    </h3>
-    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium tracking-widest text-white/60">
-      {{ total_reviews_count if total_reviews_count is defined else reviews|length }} ENTRIES
-    </span>
-  </div>
 
     <div class="mb-6 flex items-center justify-between">
       <h3 class="flex items-center gap-3 text-xl font-semibold uppercase tracking-widest text-white">
