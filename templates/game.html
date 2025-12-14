@@ -3,38 +3,9 @@
 {% block content %}
 <section class="mx-auto max-w-5xl space-y-8 relative">
 
-  {% if game_over %}
-  <!-- Game Over Modal Overlay -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div
-      class="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center shadow-2xl shadow-brand-900/20">
-      <div class="mb-6 flex justify-center">
-        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-red-500/10 text-red-500">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-        </div>
-      </div>
 
-      <h2 class="text-3xl font-bold text-white">Game Over</h2>
-      <p class="mt-2 text-slate-400">You made a wrong choice!</p>
 
-      <div class="my-8 rounded-2xl bg-slate-800 p-6">
-        <p class="text-xs uppercase tracking-wide text-slate-400">Final Score</p>
-        <p class="text-5xl font-display text-brand-500 mt-2">{{ score }}</p>
-      </div>
-
-      <a href="{{ url_for('game.lobby') }}" class="btn-primary w-full py-4 text-lg shadow-lg shadow-brand-500/20">
-        Play Again
-      </a>
-    </div>
-  </div>
-  {% endif %}
-
-  <div
-    class="flex flex-col items-center justify-between gap-4 border-b border-slate-800 pb-6 md:flex-row {{ 'blur-sm pointer-events-none' if game_over }}">
+  <div class="flex flex-col items-center justify-between gap-4 border-b border-slate-800 pb-6 md:flex-row">
     <div class="text-center md:text-left">
       <p class="text-xs uppercase tracking-wide text-slate-400">Current Score</p>
       <p class="text-4xl font-display text-brand-500 animate-pulse">{{ score }}</p>
@@ -71,8 +42,7 @@
   </div>
 
   {% if question %}
-  <form action="{{ url_for('game.answer') }}" method="post"
-    class="w-full {{ 'blur-sm pointer-events-none' if game_over }}">
+  <form action="{{ url_for('game.answer') }}" method="post" class="w-full">
     <input type="hidden" name="question_id" value="{{ question.question_id }}">
     <div class="grid gap-6 md:grid-cols-2">
 
@@ -164,6 +134,28 @@
   </form>
   {% endif %}
 
+  {% if game_over %}
+  <!-- Game Over Section (Moved Below) -->
+  <div
+    class="mx-auto w-full max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center shadow-2xl shadow-brand-900/20 mt-8">
+    <div class="mb-6 flex justify-center">
+      <!-- Icon removed -->
+    </div>
+
+    <h2 class="text-3xl font-bold text-white">Game Over</h2>
+    <p class="mt-2 text-slate-400">You made a wrong choice!</p>
+
+    <div class="my-8 rounded-2xl bg-slate-800 p-6">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Final Score</p>
+      <p class="text-5xl font-display text-brand-500 mt-2">{{ score }}</p>
+    </div>
+
+    <a href="{{ url_for('game.lobby') }}" class="btn-primary w-full py-4 text-lg shadow-lg shadow-brand-500/20">
+      Play Again
+    </a>
+  </div>
+  {% endif %}
+
   {% if result and not game_over %}
   <div class="flex justify-center pt-8">
     <a href="{{ url_for('game.play') }}"
@@ -175,7 +167,7 @@
 
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-  <div class="mt-8 space-y-4 {{ 'blur-sm pointer-events-none' if game_over }}">
+  <div class="mt-8 space-y-4">
     {% for category, message in messages %}
     <div
       class="p-4 rounded-lg {{ 'bg-green-500/20 text-green-400 border border-green-500/50' if category == 'success' else 'bg-red-500/20 text-red-400 border border-red-500/50' }}">

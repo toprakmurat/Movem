@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} • MoveM{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-8">
+        <div>
+            <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Cinemetrics</p>
+            <h1 class="mt-2 text-3xl font-semibold">{{ title }}</h1>
+            <p class="text-slate-400 mt-2">{{ subtitle }}</p>
+        </div>
+
+        <div class="flex gap-3">
+            <a href="{{ url_for('home.home') }}" class="btn-secondary flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {% for movie in movies.items %}
+        {% include 'partials/movie_card.html' %}
+        {% else %}
+        <p class="text-slate-400 col-span-full text-center py-10">
+            No movies found for this category.
+        </p>
+        {% endfor %}
+    </div>
+
+    <div class="mt-8 flex items-center justify-between text-sm text-slate-400">
+        <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
+        <div class="flex gap-3">
+            {% if movies.has_prev %}
+            <a href="{{ url_for('statistic.cinemetrics_page', metric_type=metric_type, page=movies.prev_num) }}"
+                class="btn-secondary">Previous</a>
+            {% endif %}
+
+            {% if movies.has_next %}
+            <a href="{{ url_for('statistic.cinemetrics_page', metric_type=metric_type, page=movies.next_num) }}"
+                class="btn-primary">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

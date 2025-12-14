@@ -87,13 +87,11 @@ function initRailControls() {
       const rail = document.querySelector(`[data-rail="${target}"]`);
       if (!rail) return;
 
-      // Look for article elements (movie cards) or fall back to rail-card
-      const card = rail.querySelector('article') || rail.querySelector('.rail-card');
+      const card = rail.firstElementChild;
       if (!card) return;
 
-      // Calculate one card width + gap (1.5rem = 24px)
       const cardWidth = card.getBoundingClientRect().width;
-      const gap = 24; // 1.5rem gap
+      const gap = 24;
       const scrollAmount = cardWidth + gap;
 
       rail.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
