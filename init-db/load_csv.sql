@@ -9,6 +9,9 @@
 -- Movies 
 \copy movies(id, title, overview, tagline, release_date, poster_file, banner_file, platform_id) FROM '/docker-entrypoint-initdb.d/csv/db_movies.csv' DELIMITER ',' CSV HEADER
 
+-- Favorites
+\copy favorites(user_id, movie_id) FROM '/docker-entrypoint-initdb.d/csv/db_favorites.csv' DELIMITER ',' CSV HEADER
+
 -- people
 \copy people(id, name, biography, birth_date, photo_url, created_at) FROM '/docker-entrypoint-initdb.d/csv/db_people.csv' DELIMITER ',' CSV HEADER
 
