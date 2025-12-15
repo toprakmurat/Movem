@@ -272,7 +272,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5">
-                        {% for u in users[:100] %}
+                        {% for u in users %}
                         <tr
                             class="hover:bg-white/5 transition {{ 'bg-blue-900/10' if selected_user and selected_user.id == u.id }}">
                             <td class="px-4 py-3 font-mono text-white/50">{{ u.id }}</td>

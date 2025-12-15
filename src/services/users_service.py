@@ -136,14 +136,16 @@ def get_user_favorite_genre_stats_db(user_id: int):
 
 def get_user_favorite_actor_stats_db(user_id):
     """
-   Finds user's favorite actor from collections
+    [4+ TABLE JOIN + GROUP BY]
+    Finds user's favorite people (actors/directors) from their collections.
+    Uses COUNT(DISTINCT) to avoid double-counting when a person has multiple roles in the same movie.
     """
     query = """
         SELECT 
             p.id,
             p.name, 
             p.photo_url, 
-            COUNT(*) as appearance_count
+            COUNT(DISTINCT li.movie_id) as appearance_count
         FROM user_lists ul
         JOIN list_items li ON ul.id = li.list_id
         JOIN movie_cast mc ON li.movie_id = mc.movie_id
@@ -173,7 +175,11 @@ def get_user_favorite_actor_stats_db(user_id):
         return None
 
 def get_most_active_curators_db():
-    """Users who created the most collections"""
+    """
+    [NESTED QUERY + GROUP BY]
+    Users who curated at least as many movies as the average curator.
+    Uses a subquery to calculate the average number of movies per curator.
+    """
     try:
         query = """
         SELECT u.username, u.profile_picture, COUNT(li.movie_id) as total_movies
@@ -181,8 +187,17 @@ def get_most_active_curators_db():
         JOIN user_lists ul ON u.id = ul.user_id
         JOIN list_items li ON ul.id = li.list_id
         GROUP BY u.id, u.username, u.profile_picture
-        HAVING COUNT(li.movie_id) > 0
-        ORDER BY total_movies DESC LIMIT 5;
+        HAVING COUNT(li.movie_id) >= COALESCE((
+            SELECT AVG(movie_count) FROM (
+                SELECT COUNT(li2.movie_id) as movie_count
+                FROM users u2
+                JOIN user_lists ul2 ON u2.id = ul2.user_id
+                JOIN list_items li2 ON ul2.id = li2.list_id
+                GROUP BY u2.id
+            ) AS curator_counts
+        ), 0)
+        ORDER BY total_movies DESC 
+        LIMIT 5;
         """
         result = execute_query(query, fetch=True)
         return result, None

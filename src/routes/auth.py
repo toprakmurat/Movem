@@ -156,10 +156,7 @@ def account():
                 flash('Error updating profile.', 'error')
 
     stats = {
-        'score': current_user.game_score,
-        'best_streak': 0,
-        'accuracy': 0,
-        'games_played': 0
+        'score': current_user.game_score
     }
 
     # Fetch User Stats
@@ -203,10 +200,7 @@ def public_profile(user_id):
         user_reviews = []
 
     stats = {
-        'score': target_user.get('game_score', 0),
-        'games_played': 0, 
-        'accuracy': 0,
-        'best_streak': 0 
+        'score': target_user.get('game_score', 0)
     }
 
     # Fetch User Stats
