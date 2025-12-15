@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, url_for
 from src.services.movie_service import *
 from src.services.users_service import *
 from src.routes.actors import *
+from src.services.list_service import get_public_admin_lists_db
 from src.services.comments_service import get_top_reviewers
 from src.services.actors_service import get_featured_people_db
 
@@ -79,14 +80,18 @@ def home():
     if not top_reviewers:
         top_reviewers = []
 
+    # Fetch public lists from admin users for Collections Spotlight
+    admin_lists, _ = get_public_admin_lists_db(limit=6)
+    featured_collections = [
+        {"id": lst['id'], "title": lst['list_name'], "count": lst['movie_count'], "curator": lst['curator_name']}
+        for lst in admin_lists
+    ] if admin_lists else []
+
     data = {
         "trending_movies": best_movies,
         "random_movies": featured_movies,
         "genres": genres_available,
-        "featured_collections": [
-            {"id": 1, "title": "Award Winners", "count": 12},
-            {"id": 2, "title": "Family Night", "count": 8},
-        ],
+        "featured_collections": featured_collections,
         "featured_people": featured_people,
         "top_reviewers": top_reviewers,
         "home_movies": best_movies_for_genres,

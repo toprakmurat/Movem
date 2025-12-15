@@ -130,3 +130,31 @@ def get_list_details_db(list_id: int):
         return result, None
     except Exception as e:
         return None, str(e)
+
+
+def get_public_admin_lists_db(limit: int = 6):
+    """
+    [JOIN QUERY]
+    Get public lists created by admin users for the Collections Spotlight.
+    Joins user_lists with users to filter by admin role.
+    """
+    try:
+        query = """
+        SELECT 
+            ul.id,
+            ul.list_name,
+            ul.created_at,
+            u.username as curator_name,
+            COUNT(li.movie_id) as movie_count
+        FROM user_lists ul
+        JOIN users u ON ul.user_id = u.id
+        LEFT JOIN list_items li ON ul.id = li.list_id
+        WHERE ul.is_public = true AND u.role = 'admin'
+        GROUP BY ul.id, ul.list_name, ul.created_at, u.username
+        ORDER BY ul.created_at DESC
+        LIMIT %s
+        """
+        result = execute_query(query, (limit,), fetch=True)
+        return result if result else [], None
+    except Exception as e:
+        return [], str(e)
