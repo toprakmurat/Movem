@@ -25,6 +25,28 @@ from src.services.list_service import (
     get_list_details_db
 )
 
+from src.services.movie_service import (
+    get_movies_db,
+    get_genres_db,
+    get_movies_genres_db
+)
+
+from src.services.comments_service import (
+    get_all_comments
+)
+
+from src.services.actors_service import (
+    get_actors_paginated_db
+)
+
+from src.services.statistic_service import (
+    get_statistics_db
+)
+
+from src.services.favorite_service import (
+    get_favorites_db
+)
+
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.before_request
@@ -46,6 +68,18 @@ def dashboard():
     user_stats = {}
     genre_stats = None
     actor_stats = None
+
+    # Fetch all data for tabs
+    movies, _ = get_movies_db()
+    genres, _ = get_genres_db()
+    movies_genres, _ = get_movies_genres_db()
+    comments, _ = get_all_comments()
+    # For actors, get_actors_paginated_db returns (actors, error)
+    actors_pagination, _ = get_actors_paginated_db(page=1, per_page=100) 
+    actors = actors_pagination['actors'] if actors_pagination else []
+    
+    statistics, _ = get_statistics_db()
+    favorites, _ = get_favorites_db()
     
     # Handle simple lookups via GET parameters (for result persistence after action)
     if request.args.get('view_user_id'):
@@ -66,8 +100,16 @@ def dashboard():
         selected_user=selected_user,
         selected_list=selected_list,
         genre_stats=genre_stats,
-        actor_stats=actor_stats
+        actor_stats=actor_stats,
+        movies=movies,
+        genres=genres,
+        movies_genres=movies_genres,
+        comments=comments,
+        actors=actors,
+        statistics=statistics,
+        favorites=favorites
     )
+    
 
 # --- USER MANAGEMENT ROUTES ---
 

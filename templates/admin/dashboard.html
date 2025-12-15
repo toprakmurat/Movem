@@ -23,499 +23,748 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-4xl font-display text-white mb-2">Admin Dashboard</h1>
-                <p class="text-white/60">Manage users, lists, and system data.</p>
+                <p class="text-white/60">Manage users, movies, people, and system data.</p>
             </div>
             <div class="space-x-4">
                 <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-sm">
                     Total Users: {{ users|length if users else 0 }}
                 </span>
+                <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-sm">
+                    Total Movies: {{ movies|length if movies else 0 }}
+                </span>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- TABS NAVIGATION -->
+    <div class="flex flex-wrap gap-4 border-b border-white/10 pb-4">
+        <button onclick="openTab(event, 'tab-users')"
+            class="tab-btn active px-6 py-2 rounded-full text-sm font-medium transition bg-white/10 text-white"
+            id="defaultOpen">Users</button>
+        <button onclick="openTab(event, 'tab-movies')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Movies</button>
+        <button onclick="openTab(event, 'tab-comments')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Comments</button>
+        <button onclick="openTab(event, 'tab-people')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">People</button>
+        <button onclick="openTab(event, 'tab-stats')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Game
+            Statistic</button>
+        <button onclick="openTab(event, 'tab-favorites')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Favorites</button>
+    </div>
 
-        <!-- LEFT COLUMN -->
-        <div class="space-y-8">
-
-            <!-- Quick User Lookup -->
-            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
-                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">User Lookup</h2>
-                <form action="{{ url_for('admin.lookup_user') }}" method="post"
-                    class="grid gap-4 sm:grid-cols-[1fr,2fr,1fr]">
-                    <select name="method"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
-                        <option value="id">ID</option>
-                        <option value="username">Username</option>
-                        <option value="email">Email</option>
-                    </select>
-                    <input type="text" name="value" placeholder="Search value..."
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
-                    <button class="btn-primary py-2 px-4 rounded-xl">Search</button>
-                </form>
-            </section>
-
-            <!-- User Management (Visible if selected_user is present) -->
-            {% if selected_user %}
-            <section class="rounded-3xl border border-blue-500/30 bg-blue-900/10 p-6 space-y-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h2 class="text-xl font-semibold uppercase tracking-widest text-blue-300">User Details: {{
-                            selected_user.username }}</h2>
-                        <p class="text-xs text-white/40">ID: {{ selected_user.id }} | Role: {{ selected_user.role }}</p>
-                    </div>
-                    <img src="{{ url_for('static', filename=selected_user.profile_picture) }}"
-                        class="w-16 h-16 rounded-full border border-white/10">
-                </div>
-
-                <!-- Stats -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-black/40 rounded-xl p-4 border border-white/5">
-                        <h4 class="text-xs uppercase text-white/50 mb-2">Favorite Genres</h4>
-                        {% if genre_stats %}
-                        <ul class="text-sm text-white/80 space-y-1">
-                            {% for g in genre_stats %}
-                            <li>{{ g.genre_name }}: {{ g.genre_count }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p class="text-xs text-white/40">No stats available</p>
-                        {% endif %}
-                    </div>
-                    <div class="bg-black/40 rounded-xl p-4 border border-white/5">
-                        <h4 class="text-xs uppercase text-white/50 mb-2">Favorite Actor</h4>
-                        {% if actor_stats %}
-                        <div class="flex items-center gap-3">
-                            <img src="https://image.tmdb.org/t/p/w200{{ actor_stats.image }}"
-                                class="w-10 h-10 rounded-full object-cover">
-                            <div>
-                                <p class="text-sm text-white">{{ actor_stats.name }}</p>
-                                <p class="text-xs text-white/40">{{ actor_stats.count }} appearances</p>
-                            </div>
-                        </div>
-                        {% else %}
-                        <p class="text-xs text-white/40">No stats available</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Update Form -->
-                <form action="{{ url_for('admin.update_user') }}" method="post"
-                    class="space-y-4 border-t border-white/10 pt-4">
-                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
-                    <h4 class="text-sm font-semibold text-white">Edit User</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input name="first_name" value="{{ selected_user.first_name }}" placeholder="First Name"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
-                        <input name="last_name" value="{{ selected_user.last_name }}" placeholder="Last Name"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
-                    </div>
-                    <input name="email" value="{{ selected_user.email }}" placeholder="Email (ReadOnly)"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white/50 text-sm"
-                        readonly>
-                    <input name="bio" value="{{ selected_user.bio or '' }}" placeholder="Bio"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
-                    <button
-                        class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
-                        User</button>
-                </form>
-
-                <!-- Delete User -->
-                <form action="{{ url_for('admin.delete_user') }}" method="post"
-                    onsubmit="return confirm('Delete this user?');">
-                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
-                    <button
-                        class="w-full bg-red-600/20 hover:bg-red-600/40 text-red-200 border border-red-500/30 rounded-xl py-2 font-medium transition">Delete
-                        User</button>
-                </form>
-
-                <!-- Lists Action -->
-                <form action="{{ url_for('admin.create_list') }}" method="post"
-                    class="space-y-3 border-t border-white/10 pt-4">
-                    <h4 class="text-sm font-semibold text-white">Create List for User</h4>
-                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
-                    <div class="flex gap-2">
-                        <input name="list_name" placeholder="List Name"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm w-full"
-                            required>
-                        <label class="flex items-center gap-2 text-white/60 text-xs whitespace-nowrap">
-                            <input type="checkbox" name="is_public" checked> Public
-                        </label>
-                    </div>
-                    <button
-                        class="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 font-medium transition text-sm">Create
-                        List</button>
-                </form>
-
-            </section>
-            {% endif %}
-
-            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
-                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Create New User</h2>
-                <form action="{{ url_for('admin.create_user') }}" method="post" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input name="username" placeholder="Username"
+    <!-- TAB CONTENT: USERS (Uses Standard Form Submit as User Routes are in Admin) -->
+    <div id="tab-users" class="tab-content space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- LEFT COLUMN -->
+            <div class="space-y-8">
+                <!-- User Lookup -->
+                <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                    <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">User Lookup</h2>
+                    <form action="{{ url_for('admin.lookup_user') }}" method="post"
+                        class="grid gap-4 sm:grid-cols-[1fr,2fr,1fr]">
+                        <select name="method"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                            <option value="id">ID</option>
+                            <option value="username">Username</option>
+                            <option value="email">Email</option>
+                        </select>
+                        <input type="text" name="value" placeholder="Search value..."
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
                             required>
-                        <input name="email" type="email" placeholder="Email"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
-                            required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input name="first_name" placeholder="First Name"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
-                        <input name="last_name" placeholder="Last Name"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
-                    </div>
-                    <input name="password" type="password" placeholder="Password"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
-                    <button class="w-full btn-secondary">Create User</button>
-                </form>
-            </section>
+                        <button class="btn-primary py-2 px-4 rounded-xl">Search</button>
+                    </form>
+                </section>
 
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div class="space-y-8">
-
-            <!-- Active Curators -->
-            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
-                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Most Active Curators</h2>
-                <ul class="space-y-3">
-                    {% if active_curators %}
-                    {% for curator in active_curators %}
-                    <li class="flex items-center justify-between bg-white/5 rounded-xl p-3 px-4">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ url_for('static', filename=curator.profile_picture) }}"
-                                class="w-8 h-8 rounded-full">
-                            <span class="text-white font-medium">{{ curator.username }}</span>
-                        </div>
-                        <span class="text-white/60 text-sm">{{ curator.total_movies }} movies curated</span>
-                    </li>
-                    {% endfor %}
-                    {% else %}
-                    <p class="text-white/40 italic">No activity yet.</p>
-                    {% endif %}
-                </ul>
-            </section>
-
-            <!-- List Lookup / Management -->
-            <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
-                <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">List Management</h2>
-                <form action="{{ url_for('admin.view_list') }}" method="post" class="flex gap-4 mb-6">
-                    <input type="number" name="list_id" placeholder="List ID"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
-                        required>
-                    <button class="btn-primary py-2 px-4 rounded-xl">View</button>
-                </form>
-
-                {% if selected_list %}
-                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-4">
+                <!-- User Management -->
+                {% if selected_user %}
+                <section class="rounded-3xl border border-blue-500/30 bg-blue-900/10 p-6 space-y-6">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="text-lg font-bold text-white">{{ selected_list.list_info.list_name }}</h3>
-                            <p class="text-xs text-white/50">ID: {{ selected_list.list_info.id }} | Public: {{
-                                selected_list.list_info.is_public }}</p>
+                            <h2 class="text-xl font-semibold uppercase tracking-widest text-blue-300">User Details: {{
+                                selected_user.username }}</h2>
+                            <p class="text-xs text-white/40">ID: {{ selected_user.id }} | Role: {{ selected_user.role }}
+                            </p>
                         </div>
-                        <form action="{{ url_for('admin.delete_list') }}" method="post"
-                            onsubmit="return confirm('Delete this list?');">
+                        <img src="{{ url_for('static', filename=selected_user.profile_picture) }}"
+                            class="w-16 h-16 rounded-full border border-white/10">
+                    </div>
+
+                    <!-- Update Form -->
+                    <form action="{{ url_for('admin.update_user') }}" method="post"
+                        class="space-y-4 border-t border-white/10 pt-4">
+                        <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                        <h4 class="text-sm font-semibold text-white">Edit User</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input name="first_name" value="{{ selected_user.first_name }}" placeholder="First Name"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
+                            <input name="last_name" value="{{ selected_user.last_name }}" placeholder="Last Name"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
+                        </div>
+                        <input name="email" value="{{ selected_user.email }}" placeholder="Email (ReadOnly)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white/50 text-sm"
+                            readonly>
+                        <input name="bio" value="{{ selected_user.bio or '' }}" placeholder="Bio"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm">
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            User</button>
+                    </form>
+
+                    <!-- Delete User -->
+                    <form action="{{ url_for('admin.delete_user') }}" method="post"
+                        onsubmit="return confirm('Delete this user?');">
+                        <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                        <button
+                            class="w-full bg-red-600/20 hover:bg-red-600/40 text-red-200 border border-red-500/30 rounded-xl py-2 font-medium transition">Delete
+                            User</button>
+                    </form>
+
+                    <!-- Lists Action -->
+                    <form action="{{ url_for('admin.create_list') }}" method="post"
+                        class="space-y-3 border-t border-white/10 pt-4">
+                        <h4 class="text-sm font-semibold text-white">Create List for User</h4>
+                        <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                        <div class="flex gap-2">
+                            <input name="list_name" placeholder="List Name"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm w-full"
+                                required>
+                            <label class="flex items-center gap-2 text-white/60 text-xs whitespace-nowrap">
+                                <input type="checkbox" name="is_public" checked> Public
+                            </label>
+                        </div>
+                        <button
+                            class="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-2 font-medium transition text-sm">Create
+                            List</button>
+                    </form>
+                </section>
+                {% endif %}
+
+                <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                    <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Create New User</h2>
+                    <form action="{{ url_for('admin.create_user') }}" method="post" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input name="username" placeholder="Username"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
+                                required>
+                            <input name="email" type="email" placeholder="Email"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
+                                required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input name="first_name" placeholder="First Name"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                            <input name="last_name" placeholder="Last Name"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                        </div>
+                        <input name="password" type="password" placeholder="Password"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
+                            required>
+                        <button class="w-full btn-secondary">Create User</button>
+                    </form>
+                </section>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="space-y-8">
+                <!-- Active Curators -->
+                <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                    <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Most Active Curators
+                    </h2>
+                    <ul class="space-y-3">
+                        {% if active_curators %}
+                        {% for curator in active_curators %}
+                        <li class="flex items-center justify-between bg-white/5 rounded-xl p-3 px-4">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ url_for('static', filename=curator.profile_picture) }}"
+                                    class="w-8 h-8 rounded-full">
+                                <span class="text-white font-medium">{{ curator.username }}</span>
+                            </div>
+                            <span class="text-white/60 text-sm">{{ curator.total_movies }} movies curated</span>
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        <p class="text-white/40 italic">No activity yet.</p>
+                        {% endif %}
+                    </ul>
+                </section>
+
+                <!-- List Lookup / Management -->
+                <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+                    <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">List Management</h2>
+                    <form action="{{ url_for('admin.view_list') }}" method="post" class="flex gap-4 mb-6">
+                        <input type="number" name="list_id" placeholder="List ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button class="btn-primary py-2 px-4 rounded-xl">View</button>
+                    </form>
+
+                    {% if selected_list %}
+                    <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold text-white">{{ selected_list.list_info.list_name }}</h3>
+                                <p class="text-xs text-white/50">ID: {{ selected_list.list_info.id }} | Public: {{
+                                    selected_list.list_info.is_public }}</p>
+                            </div>
+                            <form action="{{ url_for('admin.delete_list') }}" method="post"
+                                onsubmit="return confirm('Delete this list?');">
+                                <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
+                                <button
+                                    class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-trash-2">
+                                        <path d="M3 6h18" />
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
+                                        <line x1="10" x2="10" y1="11" y2="17" />
+                                        <line x1="14" x2="14" y1="11" y2="17" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-xs uppercase text-white/40">Movies in List</h4>
+                            {% for movie in selected_list.movies %}
+                            <div
+                                class="flex items-center justify-between text-sm text-white/80 bg-black/20 p-2 rounded-lg">
+                                <span>{{ movie.title }} (ID: {{ movie.id }})</span>
+                                <form action="{{ url_for('admin.remove_movie') }}" method="post">
+                                    <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
+                                    <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                                    <button class="text-red-400 hover:text-red-300 text-xs">Remove</button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <form action="{{ url_for('admin.add_movie') }}" method="post"
+                            class="flex gap-2 pt-2 border-t border-white/5">
                             <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
-                            <button class="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-trash-2">
-                                    <path d="M3 6h18" />
-                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                                    <path d="M8 6V4c0-1 1-2 2-2h4c0 1 1 2 2 2v2" />
-                                    <line x1="10" x2="10" y1="11" y2="17" />
-                                    <line x1="14" x2="14" y1="11" y2="17" />
-                                </svg>
-                            </button>
+                            <input type="number" name="movie_id" placeholder="Movie ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-white text-sm w-full"
+                                required>
+                            <button
+                                class="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-lg border border-green-500/30">Add</button>
                         </form>
                     </div>
-
-                    <div class="space-y-2">
-                        <h4 class="text-xs uppercase text-white/40">Movies in List</h4>
-                        {% for movie in selected_list.movies %}
-                        <div class="flex items-center justify-between text-sm text-white/80 bg-black/20 p-2 rounded-lg">
-                            <span>{{ movie.title }} (ID: {{ movie.id }})</span>
-                            <form action="{{ url_for('admin.remove_movie') }}" method="post">
-                                <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
-                                <input type="hidden" name="movie_id" value="{{ movie.id }}">
-                                <button class="text-red-400 hover:text-red-300 text-xs">Remove</button>
-                            </form>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <form action="{{ url_for('admin.add_movie') }}" method="post"
-                        class="flex gap-2 pt-2 border-t border-white/5">
-                        <input type="hidden" name="list_id" value="{{ selected_list.list_info.id }}">
-                        <input type="number" name="movie_id" placeholder="Movie ID"
-                            class="form-field bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-white text-sm w-full"
-                            required>
-                        <button
-                            class="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-lg border border-green-500/30">Add</button>
-                    </form>
-                </div>
-                {% endif %}
-            </section>
-
+                    {% endif %}
+                </section>
+            </div>
         </div>
+
+        <!-- Full User Table -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 overflow-hidden">
+            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Users</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-white/70">
+                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                        <tr>
+                            <th class="px-4 py-3">ID</th>
+                            <th class="px-4 py-3">Username</th>
+                            <th class="px-4 py-3">Email</th>
+                            <th class="px-4 py-3">Role</th>
+                            <th class="px-4 py-3">Game Score</th>
+                            <th class="px-4 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for u in users[:100] %}
+                        <tr
+                            class="hover:bg-white/5 transition {{ 'bg-blue-900/10' if selected_user and selected_user.id == u.id }}">
+                            <td class="px-4 py-3 font-mono text-white/50">{{ u.id }}</td>
+                            <td class="px-4 py-3 font-medium text-white">{{ u.username }}</td>
+                            <td class="px-4 py-3">{{ u.email }}</td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="px-2 py-1 rounded-md text-xs {{ 'bg-purple-500/20 text-purple-300' if u.role == 'admin' else 'bg-white/10 text-white/60' }}">
+                                    {{ u.role }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">{{ u.game_score }}</td>
+                            <td class="px-4 py-3">
+                                <form action="{{ url_for('admin.dashboard') }}" method="get">
+                                    <input type="hidden" name="view_user_id" value="{{ u.id }}">
+                                    <button class="text-brand-400 hover:text-brand-300">Manage</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 
-    <!-- Full User Table -->
-    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 overflow-hidden">
-        <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Users</h2>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-white/70">
-                <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                    <tr>
-                        <th class="px-4 py-3">ID</th>
-                        <th class="px-4 py-3">Username</th>
-                        <th class="px-4 py-3">Email</th>
-                        <th class="px-4 py-3">Role</th>
-                        <th class="px-4 py-3">Game Score</th>
-                        <th class="px-4 py-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                    {% for u in users %}
-                    <tr
-                        class="hover:bg-white/5 transition {{ 'bg-blue-900/10' if selected_user and selected_user.id == u.id }}">
-                        <td class="px-4 py-3 font-mono text-white/50">{{ u.id }}</td>
-                        <td class="px-4 py-3 font-medium text-white">{{ u.username }}</td>
-                        <td class="px-4 py-3">{{ u.email }}</td>
-                        <td class="px-4 py-3">
-                            <span
-                                class="px-2 py-1 rounded-md text-xs {{ 'bg-purple-500/20 text-purple-300' if u.role == 'admin' else 'bg-white/10 text-white/60' }}">
-                                {{ u.role }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">{{ u.game_score }}</td>
-                        <td class="px-4 py-3">
-                            <form action="{{ url_for('admin.dashboard') }}" method="get">
-                                <input type="hidden" name="view_user_id" value="{{ u.id }}">
-                                <button class="text-brand-400 hover:text-brand-300">Manage</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
+    <!-- TAB CONTENT: MOVIES (API JS) -->
+    <div id="tab-movies" class="tab-content hidden space-y-8">
+        <!-- Movies Management -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movies Management</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Create Movie Form -->
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Movie</h4>
+                    <form onsubmit="handleApiSubmit(event, '/movies/', 'POST')" class="space-y-4">
+                        <input name="title" placeholder="Title"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="release_date" type="date"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <textarea name="overview" placeholder="Overview"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="runtime" type="number" placeholder="Runtime (min)"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="vote_avg" step="0.1" type="number" placeholder="Vote Avg"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <input name="poster_file" placeholder="Poster Path"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button class="btn-primary w-full py-2 rounded-xl">Create Movie</button>
+                    </form>
+                    <br>
+                    <h4 class="text-lg font-semibold text-white mb-4">Update Movie</h4>
+                    <form onsubmit="handleUpdateMovie(event)" class="space-y-4 pt-4 border-t border-white/10">
+                        <input name="id" type="number" placeholder="ID to Update"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="title" placeholder="Title"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input name="release_date" type="date"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Movie</button>
+                    </form>
+                </div>
+                <!-- Movies Table -->
+                <div
+                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
+                    <h4 class="text-lg font-semibold text-white mb-4">Movies List</h4>
+                    <table class="w-full text-left text-sm text-white/70 border-collapse">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                            <tr>
+                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2">Title</th>
+                                <th class="px-4 py-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for movie in movies[:100] %}
+                            <tr class="hover:bg-white/10 transition">
+                                <td class="px-4 py-2 font-mono text-white/50">{{ movie.id }}</td>
+                                <td class="px-4 py-2">{{ movie.title }}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteResource('/movies/{{ movie.id }}')"
+                                        class="text-red-400 hover:text-red-300 text-xs">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Genre Management -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Genres Management</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Genre</h4>
+                    <form onsubmit="handleApiSubmit(event, '/movies/genre', 'POST')" class="space-y-4">
+                        <input name="id" type="number" placeholder="Genre ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="genre_name" placeholder="Genre Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button class="btn-primary w-full py-2 rounded-xl">Create Genre</button>
+                    </form>
+                </div>
+                <div
+                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[300px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-white/70">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                            <tr>
+                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2">Name</th>
+                                <th class="px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for g in genres[:100] %}
+                            <tr>
+                                <td class="px-4 py-2">{{ g.id }}</td>
+                                <td class="px-4 py-2">{{ g.genre_name }}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteResource('/movies/genre/{{ g.id }}')"
+                                        class="text-red-400 text-xs">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Movie-Genre Relations -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movie-Genre Relations</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <form onsubmit="handleApiSubmit(event, '/movies/movies-genres', 'POST')" class="space-y-4">
+                        <input name="movie_id" type="number" placeholder="Movie ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="genre_id" type="number" placeholder="Genre ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button class="btn-primary w-full py-2 rounded-xl">Link Genre</button>
+                    </form>
+                </div>
+                <div
+                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[300px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-white/70">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                            <tr>
+                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2">Movie ID</th>
+                                <th class="px-4 py-2">Genre ID</th>
+                                <th class="px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for mg in movies_genres[:100] %}
+                            <tr>
+                                <td class="px-4 py-2">{{ mg.id }}</td>
+                                <td class="px-4 py-2">{{ mg.movie_id }}</td>
+                                <td class="px-4 py-2">{{ mg.genre_id }}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteResource('/movies/movies-genres/{{ mg.id }}')"
+                                        class="text-red-400 text-xs">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB CONTENT: COMMENTS -->
+    <div id="tab-comments" class="tab-content hidden space-y-8">
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
+            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Comments</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-white/70">
+                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                        <tr>
+                            <th class="px-4 py-3">ID</th>
+                            <th class="px-4 py-3">User ID</th>
+                            <th class="px-4 py-3">Movie ID</th>
+                            <th class="px-4 py-3">Body</th>
+                            <th class="px-4 py-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        {% for c in comments[:100] %}
+                        <tr>
+                            <td class="px-4 py-3">{{ c.id }}</td>
+                            <td class="px-4 py-3">{{ c.user_id }}</td>
+                            <td class="px-4 py-3">{{ c.movie_id }}</td>
+                            <td class="px-4 py-3 truncate max-w-xs">{{ c.body }}</td>
+                            <td class="px-4 py-3">
+                                <button onclick="deleteResource('/comments/{{ c.id }}')"
+                                    class="text-red-400 hover:text-red-300">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB CONTENT: PEOPLE -->
+    <div id="tab-people" class="tab-content hidden space-y-8">
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">People Management</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Add Person</h4>
+                    <form onsubmit="handleApiSubmit(event, '/actors/', 'POST')" class="space-y-4">
+                        <input name="name" placeholder="Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <textarea name="biography" placeholder="Biography"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
+                        <input name="photo_url" placeholder="Photo URL"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input name="birth_date" type="date" placeholder="Birth Date"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button class="btn-primary w-full py-2 rounded-xl">Create Person</button>
+                    </form>
+                    <br>
+                    <h4 class="text-lg font-semibold text-white mb-4">Update Person</h4>
+                    <form onsubmit="handleUpdatePerson(event)" class="space-y-4 pt-4 border-t border-white/10">
+                        <input name="id" type="number" placeholder="Person ID for Update"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="name" placeholder="Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Person</button>
+                    </form>
+                </div>
+                <div
+                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-white/70">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                            <tr>
+                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2">Name</th>
+                                <th class="px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for p in actors[:100] %}
+                            <tr>
+                                <td class="px-4 py-2">{{ p.id }}</td>
+                                <td class="px-4 py-2">{{ p.name }}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteResource('/actors/{{ p.id }}')"
+                                        class="text-red-400 text-xs">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB CONTENT: GAME STATISTIC -->
+    <div id="tab-stats" class="tab-content hidden space-y-8">
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Game Statistics</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Statistic</h4>
+                    <form onsubmit="handleApiSubmit(event, '/statistic/', 'POST')" class="space-y-4">
+                        <input name="movie_id" type="number" placeholder="Movie ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="budget" type="number" step="0.01" placeholder="Budget"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="revenue" type="number" step="0.01" placeholder="Revenue"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <input name="vote_avg" type="number" step="0.1" placeholder="Vote Avg"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button class="btn-primary w-full py-2 rounded-xl">Save</button>
+                    </form>
+                    <br>
+                    <h4 class="text-lg font-semibold text-white mb-4">Update Statistic</h4>
+                    <form onsubmit="handleUpdateStatistic(event)" class="space-y-4 pt-4 border-t border-white/10">
+                        <input name="movie_id" type="number" placeholder="Movie ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="budget" type="number" step="0.01" placeholder="Budget"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update</button>
+                    </form>
+                </div>
+                <div
+                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-white/70">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                            <tr>
+                                <th class="px-4 py-2">Movie ID</th>
+                                <th class="px-4 py-2">Budget</th>
+                                <th class="px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for s in statistics[:100] %}
+                            <tr>
+                                <td class="px-4 py-2">{{ s.movie_id }}</td>
+                                <td class="px-4 py-2">{{ s.budget }}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteResource('/statistic/{{ s.movie_id }}')"
+                                        class="text-red-400 text-xs">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB CONTENT: FAVORITES -->
+    <div id="tab-favorites" class="tab-content hidden space-y-8">
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Favorites Management</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Add Favorite</h4>
+                    <form onsubmit="handleApiSubmit(event, '/movies/favorites', 'POST')" class="space-y-4">
+                        <input name="user_id" type="number" placeholder="User ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="movie_id" type="number" placeholder="Movie ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button class="btn-primary w-full py-2 rounded-xl">Add Favorite</button>
+                    </form>
+                </div>
+                <div
+                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-white/70">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                            <tr>
+                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2">User ID</th>
+                                <th class="px-4 py-2">Movie ID</th>
+                                <th class="px-4 py-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for fav in favorites[:100] %}
+                            <tr>
+                                <td class="px-4 py-2">{{ fav.id }}</td>
+                                <td class="px-4 py-2">{{ fav.user_id }}</td>
+                                <td class="px-4 py-2">{{ fav.movie_id }}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteResource('/movies/favorites/{{ fav.id }}')"
+                                        class="text-red-400 text-xs">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
 
 </section>
 
+<script>
+    // Tab switching logic
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("bg-white/10", "text-white");
+            tablinks[i].classList.add("text-white/60");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("bg-white/10", "text-white");
+        evt.currentTarget.classList.remove("text-white/60");
+    }
+    document.getElementById("defaultOpen").click();
 
- <!-- ===== Movies CRUD ===== -->
-    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
-        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movies Management</h2>
-        <div class="grid lg:grid-cols-2 gap-8">
+    // Generic form submit handler for simple key-value APIs (JSON)
+    async function handleApiSubmit(event, url, method) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const jsonData = {};
 
-            <!-- Create Movie Form -->
-            <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                <h4 class="text-lg font-semibold text-white mb-4">Create New Movie</h4>
-                <form action="{{ url_for('movies.create_movie') }}" method="post" class="space-y-4">
-                    <input name="title" placeholder="Title"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
-                    <input name="release_date" type="date"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                    <textarea name="overview" placeholder="Overview"
-                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
-                    <button class="btn-primary w-full py-2 rounded-xl">Create Movie</button>
-                </form>
-            </div>
+        formData.forEach((value, key) => {
+            if (value !== "") {
+                // Try integer/float conversion if possible, else string
+                if (!isNaN(value) && value.trim() !== "") {
+                    jsonData[key] = parseFloat(value);
+                } else {
+                    jsonData[key] = value;
+                }
+            }
+        });
 
-            <!-- Movies Table -->
-            <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
-                <h4 class="text-lg font-semibold text-white mb-4">Movies List</h4>
-                <table class="w-full text-left text-sm text-white/70 border-collapse">
-                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                        <tr>
-                            <th class="px-4 py-2">ID</th>
-                            <th class="px-4 py-2">Title</th>
-                            <th class="px-4 py-2">Release Date</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        {% for movie in movies %}
-                        <tr class="hover:bg-white/10 transition">
-                            <td class="px-4 py-2 font-mono text-white/50">{{ movie.id }}</td>
-                            <td class="px-4 py-2">{{ movie.title }}</td>
-                            <td class="px-4 py-2">{{ movie.release_date }}</td>
-                            <td class="px-4 py-2 flex gap-2">
-                                <form action="{{ url_for('movies.update_movie', id=movie.id) }}" method="post">
-                                    <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                            <path d="M12.854.146a.5.5 0 0 1 .11.638l-.057.07-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10a.5.5 0 0 1 .707 0z"/>
-                                        </svg>
-                                        Edit
-                                    </button>
-                                </form>
-                                <form action="{{ url_for('movies.delete_movie', id=movie.id) }}" method="post" onsubmit="return confirm('Delete this movie?');">
-                                    <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                            <path d="M2.5 1a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1H15a.5.5 0 0 1 0 1h-1.5v12a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V2H1a.5.5 0 0 1 0-1h1.5z"/>
-                                        </svg>
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        // Special handling for IDs that must be INT (force int if looks like int)
+        // Note: Python APIs are often strict about types (int vs float vs str)
+        // Some inputs like "runtime" might be better as int.
 
-        </div>
-    </section>
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            });
 
-    <!-- ===== Genres CRUD ===== -->
-    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
-        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Genres Management</h2>
-        <div class="grid lg:grid-cols-2 gap-8">
+            if (response.ok) {
+                alert('Success!');
+                location.reload();
+            } else {
+                const result = await response.json();
+                alert('Error: ' + (result.error || result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Request failed: ' + error);
+        }
+    }
 
-            <!-- Create Genre Form -->
-            <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                <h4 class="text-lg font-semibold text-white mb-4">Create New Genre</h4>
-                <form action="{{ url_for('movies.create_genre') }}" method="post" class="space-y-4">
-                    <input name="genre_name" placeholder="Genre Name" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
-                    <button class="btn-primary w-full py-2 rounded-xl">Create Genre</button>
-                </form>
-            </div>
+    // Specific update handlers to append ID to URL
+    async function handleUpdateMovie(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const id = formData.get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/movies/' + id, 'PUT');
+    }
 
-            <!-- Genres Table -->
-            <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
-                <h4 class="text-lg font-semibold text-white mb-4">Genres List</h4>
-                <table class="w-full text-left text-sm text-white/70 border-collapse">
-                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                        <tr>
-                            <th class="px-4 py-2">ID</th>
-                            <th class="px-4 py-2">Genre Name</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        {% for genre in genres %}
-                        <tr class="hover:bg-white/10 transition">
-                            <td class="px-4 py-2 font-mono text-white/50">{{ genre.id }}</td>
-                            <td class="px-4 py-2">{{ genre.genre_name }}</td>
-                            <td class="px-4 py-2 flex gap-2">
-                                <form action="{{ url_for('movies.update_genre', id=genre.id) }}" method="post">
-                                    <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
-                                        Edit
-                                    </button>
-                                </form>
-                                <form action="{{ url_for('movies.delete_genre', id=genre.id) }}" method="post" onsubmit="return confirm('Delete this genre?');">
-                                    <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    async function handleUpdatePerson(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const id = formData.get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/actors/' + id, 'PUT');
+    }
 
-        </div>
-    </section>
+    async function handleUpdateStatistic(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const movie_id = formData.get('movie_id');
+        if (!movie_id) return alert("Movie ID required");
+        handleApiSubmit(event, '/statistic/' + movie_id, 'PUT');
+    }
 
-    <!-- ===== Movie-Genre CRUD ===== -->
-    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
-        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movie-Genre Relations</h2>
-        <div class="grid lg:grid-cols-2 gap-8">
+    // Generic Delete
+    async function deleteResource(url) {
+        if (!confirm('Are you sure?')) return;
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                location.reload();
+            } else {
+                const result = await response.json();
+                alert('Error: ' + (result.error || result.message));
+            }
+        } catch (error) {
+            alert('Delete failed: ' + error);
+        }
+    }
+</script>
 
-            <!-- Create Relation Form -->
-            <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                <h4 class="text-lg font-semibold text-white mb-4">Add Movie-Genre Relation</h4>
-                <form action="{{ url_for('movies.create_movies_genres') }}" method="post" class="space-y-4">
-                    <input name="movie_id" type="number" placeholder="Movie ID" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
-                    <input name="genre_id" type="number" placeholder="Genre ID" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
-                    <button class="btn-primary w-full py-2 rounded-xl">Add Relation</button>
-                </form>
-            </div>
-
-            <!-- Relations Table -->
-            <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
-                <h4 class="text-lg font-semibold text-white mb-4">Relations List</h4>
-                <table class="w-full text-left text-sm text-white/70 border-collapse">
-                    <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                        <tr>
-                            <th class="px-4 py-2">ID</th>
-                            <th class="px-4 py-2">Movie ID</th>
-                            <th class="px-4 py-2">Genre ID</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        {% for mg in movies_genres %}
-                        <tr class="hover:bg-white/10 transition">
-                            <td class="px-4 py-2 font-mono text-white/50">{{ mg.id }}</td>
-                            <td class="px-4 py-2">{{ mg.movie_id }}</td>
-                            <td class="px-4 py-2">{{ mg.genre_id }}</td>
-                            <td class="px-4 py-2 flex gap-2">
-                                <form action="{{ url_for('movies.update_movies_genres', id=mg.id) }}" method="post">
-                                    <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
-                                        Edit
-                                    </button>
-                                </form>
-                                <form action="{{ url_for('movies.delete_movies_genres', id=mg.id) }}" method="post" onsubmit="return confirm('Delete this relation?');">
-                                    <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ===== Favorites CRUD ===== -->
-    <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
-        <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Favorites Management</h2>
-        <div class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5">
-            <h4 class="text-lg font-semibold text-white mb-4">Favorites List</h4>
-            <table class="w-full text-left text-sm text-white/70 border-collapse">
-                <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                    <tr>
-                        <th class="px-4 py-2">ID</th>
-                        <th class="px-4 py-2">User ID</th>
-                        <th class="px-4 py-2">Movie ID</th>
-                        <th class="px-4 py-2">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                    {% for fav in favorites %}
-                    <tr class="hover:bg-white/10 transition">
-                        <td class="px-4 py-2 font-mono text-white/50">{{ fav.id }}</td>
-                        <td class="px-4 py-2">{{ fav.user_id }}</td>
-                        <td class="px-4 py-2">{{ fav.movie_id }}</td>
-                        <td class="px-4 py-2 flex gap-2">
-                            <form action="{{ url_for('movies.update_favorite', id=fav.id) }}" method="post">
-                                <button class="flex items-center gap-1 px-2 py-1 bg-blue-600/70 text-white rounded-lg text-xs">
-                                    Edit
-                                </button>
-                            </form>
-                            <form action="{{ url_for('movies.delete_favorite', id=fav.id) }}" method="post" onsubmit="return confirm('Delete this favorite?');">
-                                <button class="flex items-center gap-1 px-2 py-1 bg-red-600/70 text-white rounded-lg text-xs">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-</section>
 {% endblock %}
