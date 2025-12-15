@@ -4,7 +4,8 @@ from src.services.list_service import (
     add_movie_to_list_db,
     remove_movie_from_list_db,
     get_list_details_db,
-    delete_list_db
+    delete_list_db,
+    is_movie_in_list_db
 )
 
 lists_bp = Blueprint('lists', __name__, url_prefix='/lists')
@@ -30,6 +31,39 @@ def view_list(list_id):
         movies=list_data['movies'],
         is_owner=is_owner
     )
+
+@lists_bp.route('/toggle', methods=['POST'])
+@login_required
+def toggle_list_item():
+    """Toggle a movie in a list - add if not present, remove if present"""
+    try:
+        list_id = int(request.form.get('list_id'))
+        movie_id = int(request.form.get('movie_id'))
+    except (ValueError, TypeError):
+        flash('Invalid request parameters.', 'error')
+        return redirect(url_for('home.home'))
+    
+    # Verify ownership
+    list_details, _ = get_list_details_db(list_id)
+    if not list_details or list_details['list_info']['user_id'] != int(current_user.id):
+        flash('Permission denied.', 'error')
+        return redirect(url_for('home.home'))
+
+    # Check if movie is in list and toggle
+    if is_movie_in_list_db(list_id, movie_id):
+        _, err = remove_movie_from_list_db(list_id, movie_id)
+        if err:
+            flash(f'Error removing movie: {err}', 'error')
+        else:
+            flash('Movie removed from list.', 'success')
+    else:
+        _, err = add_movie_to_list_db(list_id, movie_id)
+        if err:
+            flash(f'Error adding movie: {err}', 'error')
+        else:
+            flash('Movie added to list.', 'success')
+        
+    return redirect(url_for('movies.movies_details_page', movie_id=movie_id))
 
 @lists_bp.route('/add', methods=['POST'])
 @login_required

@@ -96,6 +96,16 @@ def remove_movie_from_list_db(list_id: int, movie_id: int):
         return None, str(e)
 
 
+def is_movie_in_list_db(list_id: int, movie_id: int) -> bool:
+    """Check if a movie is already in a list"""
+    try:
+        query = "SELECT 1 FROM list_items WHERE list_id = %s AND movie_id = %s"
+        result = execute_query(query, (list_id, movie_id), fetch=True)
+        return bool(result)
+    except Exception:
+        return False
+
+
 def get_list_details_db(list_id: int):
     """
     [JOIN QUERY]

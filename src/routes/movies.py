@@ -77,9 +77,18 @@ def movies_details_page(movie_id):
 
     user_lists = []
     if current_user.is_authenticated:
+        from src.services.list_service import get_list_details_db
         lists_data, list_err = get_lists_by_user_db(current_uid)
         if not list_err and lists_data:
-            user_lists = lists_data
+            # Fetch full details including movies for each list
+            for lst in lists_data:
+                list_details, _ = get_list_details_db(lst['id'])
+                if list_details:
+                    user_lists.append({
+                        'id': lst['id'],
+                        'list_name': lst['list_name'],
+                        'movies': list_details.get('movies', [])
+                    })
 
     movie_detail["user_lists"] = user_lists
     movie_detail["similar_movies"] = similar_movies_list

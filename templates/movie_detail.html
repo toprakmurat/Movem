@@ -9,19 +9,18 @@
   <section class="relative overflow-hidden rounded-[40px] border border-white/10 bg-slate-900 shadow-2xl">
     {% if banner_file %}
     <div class="absolute inset-0 z-0">
-        <img src="{{ url_for('static', filename='img/' ~ banner_file) }}"
-             alt="{{ title }} banner"
-             class="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent"></div>
+      <img src="{{ url_for('static', filename='img/' ~ banner_file) }}" alt="{{ title }} banner"
+        class="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent"></div>
     </div>
     {% endif %}
 
     <div class="relative z-10 grid gap-8 p-8 lg:grid-cols-[2fr,3fr]">
       <div class="relative group">
-        <img src="{{ url_for('static', filename='img/' ~ (poster_file or 'placeholder_poster.svg')) }}" 
-             alt="{{ title }} poster" 
-             class="w-full rounded-3xl object-cover shadow-lg shadow-black/50 transition duration-300 group-hover:scale-[1.02]" />
+        <img src="{{ url_for('static', filename='img/' ~ (poster_file or 'placeholder_poster.svg')) }}"
+          alt="{{ title }} poster"
+          class="w-full rounded-3xl object-cover shadow-lg shadow-black/50 transition duration-300 group-hover:scale-[1.02]" />
       </div>
 
       <div class="flex flex-col justify-center space-y-6">
@@ -46,7 +45,10 @@
 
         <div class="flex flex-wrap items-center gap-4 text-sm text-slate-300">
           <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
             {{ release_date }}
           </span>
           <span class="h-1 w-1 rounded-full bg-slate-500"></span>
@@ -60,17 +62,18 @@
         </div>
 
         <div class="flex flex-wrap gap-4 pt-2 items-center">
-          <form method="post" 
-                action="{% if current_user.is_authenticated %}{{ url_for('movies.toggle_favorite', movie_id=id) }}{% else %}{{ url_for('auth.login') }}{% endif %}"
-                {% if not current_user.is_authenticated %}
-                title="Login to add to favorites" 
-                {% endif %}
-                class="inline-block"> <button class="btn-primary flex items-center gap-2 transition-transform active:scale-95" type="submit">
+          <form method="post"
+            action="{% if current_user.is_authenticated %}{{ url_for('movies.toggle_favorite', movie_id=id) }}{% else %}{{ url_for('auth.login') }}{% endif %}"
+            {% if not current_user.is_authenticated %} title="Login to add to favorites" {% endif %}
+            class="inline-block"> <button
+              class="btn-primary flex items-center gap-2 transition-transform active:scale-95" type="submit">
               {% if is_favorite %}
-                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                </svg>
-                <span>Remove Favorite</span>
+              <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                  clip-rule="evenodd" />
+              </svg>
+              <span>Remove Favorite</span>
               {% else %}
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -83,59 +86,66 @@
           </form>
 
           {% if current_user.is_authenticated and user_lists %}
-        <div class="relative group/dropdown">
+          <div class="relative group/dropdown">
             <button class="btn-secondary flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>Add to List</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Add to List</span>
             </button>
-            <div
-                class="absolute top-full left-0 w-56 shadow-xl opacity-0 invisible 
+            <div class="absolute top-full left-0 w-56 shadow-xl opacity-0 invisible 
                       group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition z-50
                       
-                      p-0 pt-2 rounded-xl" > 
-                <div class="rounded-xl border border-white/10 bg-black/90 p-2">
+                      p-0 pt-2 rounded-xl">
+              <div class="rounded-xl border border-white/10 bg-black/90 p-2">
                 {% for list in user_lists %}
 
-                    {% set is_in_list = id in list.movies|map(attribute='id')|list %}
+                {% set is_in_list = id in list.movies|map(attribute='id')|list %}
 
-                    {% if is_in_list %}
-                    <div class="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-green-400 bg-green-900/40 opacity-75 cursor-default">
-                      Added to {{ list.list_name }}
-                    </div>
-                    {% else %}
-                    <form action="{{ url_for('lists.add_to_list') }}" method="post" class="w-full">
-                        <input type="hidden" name="list_id" value="{{ list.id }}">
-                        <input type="hidden" name="movie_id" value="{{ id }}">
-                        <button type="submit"
-                            class="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-white hover:bg-white/10 transition">
-                            {{ list.list_name }}
-                        </button>
-                    </form>
-                    {% endif %}
+                <form action="{{ url_for('lists.toggle_list_item') }}" method="post" class="w-full">
+                  <input type="hidden" name="list_id" value="{{ list.id }}">
+                  <input type="hidden" name="movie_id" value="{{ id }}">
+                  {% if is_in_list %}
+                  <button type="submit"
+                    class="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-green-400 bg-green-900/30 hover:bg-green-900/50 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd" />
+                    </svg>
+                    {{ list.list_name }}
+                  </button>
+                  {% else %}
+                  <button type="submit"
+                    class="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-white hover:bg-white/10 transition">
+                    {{ list.list_name }}
+                  </button>
+                  {% endif %}
+                </form>
 
-                    {% endfor %}
-                </div>
+                {% endfor %}
+              </div>
             </div>
-        </div>
-        {% endif %}
+          </div>
+          {% endif %}
 
           <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary">Back to Catalog</a>
         </div>
 
         <div class="mt-4 inline-block rounded-2xl border border-white/10 bg-black/40 px-5 py-3 backdrop-blur-md">
-            <p class="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">Where to watch</p>
-            <div class="flex items-center gap-3">
-              {% if platform_name %}
-                {% if platform_logo %}
-                  <img src="{{ url_for('static', filename='img/platforms/' ~ platform_logo) }}" alt="{{ platform_name }}" class="h-10 w-10 rounded-lg object-cover shadow-md">
-                {% endif %}
-                <span class="text-sm font-medium text-white">{{ platform_name }}</span>
-              {% else %}
-                <span class="text-xs text-white/60 italic">No streaming info available.</span>
-              {% endif %}
-            </div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-2">Where to watch</p>
+          <div class="flex items-center gap-3">
+            {% if platform_name %}
+            {% if platform_logo %}
+            <img src="{{ url_for('static', filename='img/platforms/' ~ platform_logo) }}" alt="{{ platform_name }}"
+              class="h-10 w-10 rounded-lg object-cover shadow-md">
+            {% endif %}
+            <span class="text-sm font-medium text-white">{{ platform_name }}</span>
+            {% else %}
+            <span class="text-xs text-white/60 italic">No streaming info available.</span>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
@@ -155,7 +165,8 @@
         </div>
         <div class="rounded-2xl border border-white/5 bg-white/5 p-4 text-center">
           <p class="text-xs uppercase tracking-[0.4em] text-white/40">Rating</p>
-          <p class="mt-1 text-2xl font-bold text-brand-400">{{ vote_avg | default('—') }}<span class="text-sm text-white/40">/10</span></p>
+          <p class="mt-1 text-2xl font-bold text-brand-400">{{ vote_avg | default('—') }}<span
+              class="text-sm text-white/40">/10</span></p>
         </div>
       </div>
     </div>
@@ -174,44 +185,42 @@
     </div>
   </section>
 
-{# --- CAST --- #}
+  {# --- CAST --- #}
   <section class="mt-10">
     <div class="mb-6 flex items-center justify-between">
       <h3 class="text-xl font-semibold uppercase tracking-[0.3em] text-white">Cast & Crew</h3>
-      <a href="{{ url_for('movie_cast.movie_cast_page', movie_id=id) }}" class="text-xs uppercase tracking-[0.2em] text-brand-400 hover:text-white transition">View Full Cast</a>
+      <a href="{{ url_for('movie_cast.movie_cast_page', movie_id=id) }}"
+        class="text-xs uppercase tracking-[0.2em] text-brand-400 hover:text-white transition">View Full Cast</a>
     </div>
-    
-    <div class="mt-4 rail-scroll pb-4"> 
+
+    <div class="mt-4 rail-scroll pb-4">
       {% for member in cast %}
-      
-      <a href="{{ url_for('actors.person_detail', person_id=member.id) }}" 
-         class="rail-card group min-w-[170px] w-[170px] relative block transition-transform duration-300 hover:scale-105"
-         style="text-decoration: none; overflow: hidden; border-radius: 0.75rem;">
-        
+
+      <a href="{{ url_for('actors.person_detail', person_id=member.id) }}"
+        class="rail-card group min-w-[170px] w-[170px] relative block transition-transform duration-300 hover:scale-105"
+        style="text-decoration: none; overflow: hidden; border-radius: 0.75rem;">
+
         {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
-        
+
         <div class="relative w-full aspect-[2/3] bg-slate-800">
-          <img
-            src="{{ url_for('static', filename='img/people/' ~ member.id ~ '.jpg') }}"
-            onerror="this.onerror=null;this.src='{{ placeholder }}'"
-            alt="{{ member.name }} portrait"
-            loading="lazy"
+          <img src="{{ url_for('static', filename='img/people/' ~ member.id ~ '.jpg') }}"
+            onerror="this.onerror=null;this.src='{{ placeholder }}'" alt="{{ member.name }} portrait" loading="lazy"
             class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"
-            style="display: block;" 
-          />
+            style="display: block;" />
         </div>
 
-        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none z-10"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none z-10">
+        </div>
 
         <div class="absolute bottom-0 left-0 right-0 p-3 text-left z-20">
-          
-          <p class="text-sm font-bold truncate drop-shadow-md" 
-             style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+
+          <p class="text-sm font-bold truncate drop-shadow-md"
+            style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
             {{ member.name }}
           </p>
-          
-          <p class="text-xs truncate font-medium mt-0.5" 
-             style="color: #e2e8f0 !important; opacity: 1;">
+
+          <p class="text-xs truncate font-medium mt-0.5" style="color: #e2e8f0 !important; opacity: 1;">
             {{ member.character or 'Unknown Role' }}
           </p>
 
@@ -223,72 +232,74 @@
     </div>
   </section>
 
-{# --- SIMILAR MOVIES --- #}
+  {# --- SIMILAR MOVIES --- #}
   {% if similar_movies %}
   <section class="mt-10">
     <div class="mb-6 flex items-center justify-between">
       <h3 class="text-xl font-semibold uppercase tracking-[0.3em] text-white">You Might Also Like</h3>
     </div>
-    
-    <div class="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"> 
+
+    <div class="mt-4 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {% for sim_movie in similar_movies %}
-      
-      <a href="{{ url_for('movies.movies_details_page', movie_id=sim_movie.id) }}" 
-         class="group relative block w-full transition-transform duration-300 hover:scale-105"
-         style="text-decoration: none; overflow: hidden; border-radius: 0.75rem;">
-        
+
+      <a href="{{ url_for('movies.movies_details_page', movie_id=sim_movie.id) }}"
+        class="group relative block w-full transition-transform duration-300 hover:scale-105"
+        style="text-decoration: none; overflow: hidden; border-radius: 0.75rem;">
+
         {% set placeholder = url_for('static', filename='img/placeholder_poster.svg') %}
-        
+
         <div class="relative w-full aspect-[2/3] bg-slate-800">
-          <img
-            src="{{ url_for('static', filename='img/' ~ (sim_movie.poster_file or 'placeholder_poster.svg')) }}"
-            onerror="this.onerror=null;this.src='{{ placeholder }}'"
-            alt="{{ sim_movie.title }}"
-            loading="lazy"
+          <img src="{{ url_for('static', filename='img/' ~ (sim_movie.poster_file or 'placeholder_poster.svg')) }}"
+            onerror="this.onerror=null;this.src='{{ placeholder }}'" alt="{{ sim_movie.title }}" loading="lazy"
             class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"
-            style="display: block;" 
-          />
-          
-          
+            style="display: block;" />
+
+
           {% if sim_movie.match_score %}
           <div class="absolute top-2 left-2 z-30 flex items-center justify-center rounded-lg overflow-hidden shadow-md">
-              <div class="flex items-center justify-center bg-green-600/90 px-2 py-1 backdrop-blur-sm">
-                <span class="text-[10px] font-bold text-white uppercase tracking-wider">
-                  {{ sim_movie.match_score }}% Match
-                </span>
-              </div>
+            <div class="flex items-center justify-center bg-green-600/90 px-2 py-1 backdrop-blur-sm">
+              <span class="text-[10px] font-bold text-white uppercase tracking-wider">
+                {{ sim_movie.match_score }}% Match
+              </span>
+            </div>
           </div>
           {% endif %}
-          
+
           {% if sim_movie.release_date %}
-          <div class="absolute top-2 right-2 z-30 flex items-center gap-1 rounded bg-black/60 px-2 py-1 backdrop-blur-md">
+          <div
+            class="absolute top-2 right-2 z-30 flex items-center gap-1 rounded bg-black/60 px-2 py-1 backdrop-blur-md">
             <span class="text-xs font-bold text-white">{{ sim_movie.release_date.year }}</span>
           </div>
           {% endif %}
         </div>
 
-        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none z-10"></div>
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none z-10">
+        </div>
 
         <div class="absolute bottom-0 left-0 right-0 p-4 text-left z-20">
-          
-          <p class="text-base font-bold truncate drop-shadow-md leading-tight" 
-             style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+
+          <p class="text-base font-bold truncate drop-shadow-md leading-tight"
+            style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
             {{ sim_movie.title }}
           </p>
-          
-          <div class="flex flex-col gap-1 mt-1.5">
-              
-              {% if sim_movie.vote_avg %}
-              <p class="text-xs uppercase tracking-wider font-medium text-yellow-400 flex items-center gap-1" 
-                 style="opacity: 0.9;">
-                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  {{ sim_movie.vote_avg }}
-              </p>
-              {% endif %}
 
-              <p class="text-[11px] truncate font-light text-white/70">
-                {{ sim_movie.genres }}
-              </p>
+          <div class="flex flex-col gap-1 mt-1.5">
+
+            {% if sim_movie.vote_avg %}
+            <p class="text-xs uppercase tracking-wider font-medium text-yellow-400 flex items-center gap-1"
+              style="opacity: 0.9;">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              {{ sim_movie.vote_avg }}
+            </p>
+            {% endif %}
+
+            <p class="text-[11px] truncate font-light text-white/70">
+              {{ sim_movie.genres }}
+            </p>
           </div>
 
         </div>
@@ -297,8 +308,8 @@
     </div>
   </section>
   {% endif %}
-{# -------------------- COMMUNITY REVIEWS -------------------- #}
-<section class="mt-8 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
+  {# -------------------- COMMUNITY REVIEWS -------------------- #}
+  <section class="mt-8 rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
 
     <div class="mb-6 flex items-center justify-between">
       <h3 class="flex items-center gap-3 text-xl font-semibold uppercase tracking-widest text-white">
@@ -419,33 +430,33 @@
       {% endfor %}
     </div>
 
-  {# --- VIEW ALL BAR --- #}
-  {% if (total_reviews_count is defined and total_reviews_count > 3) or reviews|length > 3 %}
+    {# --- VIEW ALL BAR --- #}
+    {% if (total_reviews_count is defined and total_reviews_count > 3) or reviews|length > 3 %}
     <a href="{{ url_for('movies.get_movie_reviews_page', movie_id=id) }}"
-       class="group mt-4 flex w-full items-center justify-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] py-3 text-sm font-medium text-white/60 transition-all hover:border-white/20 hover:bg-white/5 hover:text-white">
-        <span>View all {{ total_reviews_count if total_reviews_count is defined else reviews|length }} reviews</span>
-        <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+      class="group mt-4 flex w-full items-center justify-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] py-3 text-sm font-medium text-white/60 transition-all hover:border-white/20 hover:bg-white/5 hover:text-white">
+      <span>View all {{ total_reviews_count if total_reviews_count is defined else reviews|length }} reviews</span>
+      <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      </svg>
     </a>
     {% endif %}
 
-  {# --- ADD REVIEW FORM --- #}
-  <form id="addReviewForm" method="post" action="{{ url_for('comments.create_comment_route') }}" class="mt-8 border-t border-white/10 pt-6">
-    <input type="hidden" name="movie_id" value="{{ id }}">
-    <input type="hidden" name="user_id" value="{{ current_user.id if current_user.is_authenticated else '' }}">
-    <div class="mb-4 flex items-center justify-between">
-      <label class="text-xs font-bold uppercase tracking-widest text-white/40">Leave a Review</label>
-      <label class="flex cursor-pointer items-center gap-2 rounded-lg p-1 transition-colors hover:bg-white/5">
-        <input type="checkbox" name="has_spoiler" id="has_spoiler" class="peer sr-only">
-        <div class="h-4 w-4 rounded border border-white/30 bg-transparent transition-colors peer-checked:border-brand-500 peer-checked:bg-brand-500"></div>
-        <span class="text-xs font-medium uppercase tracking-wider text-white/60 peer-checked:text-white">Contains Spoilers</span>
-      </label>
-    </div>
-    <div class="flex gap-3">
-      <div class="relative w-20">
-          <input class="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-3 text-center font-bold text-white placeholder-white/20 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
-                 type="number" name="rating" min="1" max="10" step="1" required placeholder="10"
-                 oninvalid="handleInvalidRating(this)" oninput="this.setCustomValidity('')">
-          <span class="absolute right-1 top-1 text-[10px] text-white/20">/10</span>
+    {# --- ADD REVIEW FORM --- #}
+    <form id="addReviewForm" method="post" action="{{ url_for('comments.create_comment_route') }}"
+      class="mt-8 border-t border-white/10 pt-6">
+      <input type="hidden" name="movie_id" value="{{ id }}">
+      <input type="hidden" name="user_id" value="{{ current_user.id if current_user.is_authenticated else '' }}">
+      <div class="mb-4 flex items-center justify-between">
+        <label class="text-xs font-bold uppercase tracking-widest text-white/40">Leave a Review</label>
+        <label class="flex cursor-pointer items-center gap-2 rounded-lg p-1 transition-colors hover:bg-white/5">
+          <input type="checkbox" name="has_spoiler" id="has_spoiler" class="peer sr-only">
+          <div
+            class="h-4 w-4 rounded border border-white/30 bg-transparent transition-colors peer-checked:border-brand-500 peer-checked:bg-brand-500">
+          </div>
+          <span class="text-xs font-medium uppercase tracking-wider text-white/60 peer-checked:text-white">Contains
+            Spoilers</span>
+        </label>
       </div>
       <div class="flex gap-3">
         <div class="relative w-20">
@@ -455,17 +466,25 @@
             oninvalid="handleInvalidRating(this)" oninput="this.setCustomValidity('')">
           <span class="absolute right-1 top-1 text-[10px] text-white/20">/10</span>
         </div>
-        <input
-          class="flex-1 rounded-xl border border-white/10 bg-black/50 px-4 py-3 text-white placeholder-white/20 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-          type="text" name="body" placeholder="Share your opinion on the movie...">
-        <button
-          class="flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-black transition-transform hover:scale-105 active:scale-95">
-          Post <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
-        </button>
-      </div>
+        <div class="flex gap-3">
+          <div class="relative w-20">
+            <input
+              class="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-3 text-center font-bold text-white placeholder-white/20 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              type="number" name="rating" min="1" max="10" step="1" required placeholder="10"
+              oninvalid="handleInvalidRating(this)" oninput="this.setCustomValidity('')">
+            <span class="absolute right-1 top-1 text-[10px] text-white/20">/10</span>
+          </div>
+          <input
+            class="flex-1 rounded-xl border border-white/10 bg-black/50 px-4 py-3 text-white placeholder-white/20 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            type="text" name="body" placeholder="Share your opinion on the movie...">
+          <button
+            class="flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-black transition-transform hover:scale-105 active:scale-95">
+            Post <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </div>
     </form>
   </section>
 
@@ -638,33 +657,33 @@
 
   const addReviewForm = document.getElementById('addReviewForm');
   if (addReviewForm) {
-      addReviewForm.addEventListener('submit', async function(e) {
-          if (!this.checkValidity()) { return; }
-          e.preventDefault(); 
-          const formData = new FormData(this);
-          const data = {
-              movie_id: formData.get('id'),
-              user_id: formData.get('user_id'),
-              rating: parseInt(formData.get('rating')),
-              body: formData.get('body'),
-              has_spoiler: document.getElementById('has_spoiler').checked
-          };
-          try {
-              const response = await fetch(this.action, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(data)
-              });
-              if (response.ok) {
-                  location.reload(); 
-              } else {
-                  const result = await response.json();
-                  alert(result.error || "Failed to post review");
-              }
-          } catch (error) {
-              console.error("Error:", error);
-          }
-      });
+    addReviewForm.addEventListener('submit', async function (e) {
+      if (!this.checkValidity()) { return; }
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = {
+        movie_id: formData.get('id'),
+        user_id: formData.get('user_id'),
+        rating: parseInt(formData.get('rating')),
+        body: formData.get('body'),
+        has_spoiler: document.getElementById('has_spoiler').checked
+      };
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          location.reload();
+        } else {
+          const result = await response.json();
+          alert(result.error || "Failed to post review");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    });
   }
 </script>
 {% endblock %}
