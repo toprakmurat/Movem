@@ -17,63 +17,71 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
         offset = (page - 1) * per_page
         
         where_clauses = ["1=1"] 
-        params = []
+        where_params = []
+        order_params = []
+        order_parts = []
         
         joins = ["LEFT JOIN statistic s ON m.id = s.movie_id"]
         
         if genre_id:
             joins.append("JOIN movies_genres mg ON m.id = mg.movie_id")
             where_clauses.append("mg.genre_id = %s")
-            params.append(genre_id)
+            where_params.append(genre_id)
 
         join_sql = " ".join(joins)
 
         if search:
-            where_clauses.append("(m.title ILIKE %s OR m.overview ILIKE %s)")
             keyword = f"%{search}%"
-            params.extend([keyword, keyword])
+            where_clauses.append("(m.title ILIKE %s OR m.overview ILIKE %s)")
+            where_params.extend([keyword, keyword])
 
-        # rating filter
+            order_parts.append("""
+                CASE
+                    WHEN m.title ILIKE %s THEN 1
+                    WHEN m.overview ILIKE %s THEN 2
+                    ELSE 3
+                END
+            """)
+            order_params.extend([keyword, keyword])
+
         if rating_min > 0 or rating_max < 10:
             where_clauses.append("s.vote_avg >= %s")
-            params.append(rating_min)
+            where_params.append(rating_min)
             where_clauses.append("s.vote_avg <= %s")
-            params.append(rating_max)
+            where_params.append(rating_max)
         
-        # runtime filter
         if runtime_min > 0 or runtime_max < 300:
             where_clauses.append("s.runtime >= %s")
-            params.append(runtime_min)
+            where_params.append(runtime_min)
             where_clauses.append("s.runtime <= %s")
-            params.append(runtime_max)
+            where_params.append(runtime_max)
 
         where_sql = "WHERE " + " AND ".join(where_clauses)
 
-        # handle sorting
-        if sort_by == "rating_desc" or sort_by == "rating":
-            order_sql = "ORDER BY s.vote_avg DESC"
+        if sort_by in ("rating_desc", "rating"):
+            order_parts.append("s.vote_avg DESC")
         elif sort_by == "rating_asc":
-            order_sql = "ORDER BY s.vote_avg ASC"
-        elif sort_by == "release_desc" or sort_by == "release":
-            order_sql = "ORDER BY m.release_date DESC"
+            order_parts.append("s.vote_avg ASC")
+        elif sort_by in ("release_desc", "release"):
+            order_parts.append("m.release_date DESC")
         elif sort_by == "release_asc":
-            order_sql = "ORDER BY m.release_date ASC"
+            order_parts.append("m.release_date ASC")
         else:
-            order_sql = "ORDER BY m.title ASC"
+            order_parts.append("m.title ASC")
 
-        # count query (total items for pagination)
+        order_sql = "ORDER BY " + ", ".join(order_parts)
+
         count_sql = f"""
             SELECT COUNT(DISTINCT m.id) as count
             FROM movies m
             {join_sql}
             {where_sql}
         """
-        total_result = execute_query(count_sql, tuple(params), fetch=True)
+        total_result = execute_query(count_sql, tuple(where_params), fetch=True)
         total_count = total_result[0]['count'] if total_result else 0
 
-        # data query (actual movies)
         data_sql = f"""
-            SELECT DISTINCT m.*, m.poster_file as poster_path, 
+            SELECT m.*, m.poster_file as poster_path, 
                             s.vote_avg as rating, s.vote_count, s.runtime
             FROM movies m
             {join_sql}
@@ -82,8 +90,7 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
             LIMIT %s OFFSET %s
         """
         
-        # create a new parameter tuple that includes the Limit and Offset
-        data_params = tuple(params + [per_page, offset])
+        data_params = tuple(where_params + order_params +[per_page, offset])
         
         movies = execute_query(data_sql, data_params, fetch=True) or []
 

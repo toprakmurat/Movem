@@ -11,9 +11,15 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
-      <form method="get" action="{{ url_for('movies.movies_page') }}" class="flex items-center">
+      <form method="get" action="{{ url_for('movies.movies_page') }}" class="relative flex items-center">
         <input type="text" name="search" placeholder="Search movies..." value="{{ request.args.get('search', '') }}"
-          class="form-field w-64 h-[48px] px-4 py-3" />
+          class="form-field w-64 h-[48px] px-4 py-3 pr-10" />
+        <button type="button" id="clearSearch"
+          class="absolute right-3 text-slate-400 hover:text-white {% if not request.args.get('search') %}hidden{% endif %}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
         {% if request.args.get('genre') %}<input type="hidden" name="genre" value="{{ request.args.get('genre') }}">{%
         endif %}
         {% if request.args.get('sort') %}<input type="hidden" name="sort" value="{{ request.args.get('sort') }}">{%
@@ -52,6 +58,7 @@
       <div class="flex flex-col gap-2">
         <label class="text-xs font-bold text-slate-400 uppercase">Sort By</label>
         <select name="sort" class="form-field w-48">
+          <option value="">Default</option>
           <option value="rating_desc" {% if request.args.get('sort')=='rating_desc' %}selected{% endif %}>Highest Rated
           </option>
           <option value="rating_asc" {% if request.args.get('sort')=='rating_asc' %}selected{% endif %}>Lowest Rated
@@ -180,13 +187,13 @@
       </div>
 
       <div class="flex items-center gap-3 ml-auto">
-        <a class="btn-secondary" href="{{ url_for('movies.movies_page', search=request.args.get('search')) }}">Clear</a>
+        <button type="button" id="clearFilters" class="btn-secondary">Clear</button>
         <button type="submit" class="btn-primary">Apply Filters</button>
       </div>
     </form>
   </div>
 
-  <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  <div id="movies-grid" class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     {% for movie in movies.items %}
     {% include 'partials/movie_card.html' %}
     {% else %}
@@ -196,7 +203,7 @@
     {% endfor %}
   </div>
 
-  <div class="mt-8 flex items-center justify-between text-sm text-slate-400">
+  <div id="pagination-container" class="mt-8 flex items-center justify-between text-sm text-slate-400">
     <span>Showing {{ movies.start_index() }} – {{ movies.end_index() }} of {{ movies.total }} movies</span>
     <div class="flex gap-3">
       {% if movies.has_prev %}
@@ -283,6 +290,172 @@
   document.addEventListener('DOMContentLoaded', () => {
     initSlider('rating-min', 'rating-max', 'rating-track-active', 'rating-val', 0, 10, 0.5);
     initSlider('runtime-min', 'runtime-max', 'runtime-track-active', 'runtime-val', 0, 300, 10);
+
+
+    const searchInput = document.querySelector('input[name="search"]');
+    const moviesGrid = document.getElementById('movies-grid');
+    const paginationContainer = document.getElementById('pagination-container');
+    let searchTimeout = null;
+
+
+    function getFilterParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      const genreSelect = document.querySelector('select[name="genre"]');
+      const sortSelect = document.querySelector('select[name="sort"]');
+      const ratingMin = document.getElementById('rating-min');
+      const ratingMax = document.getElementById('rating-max');
+      const runtimeMin = document.getElementById('runtime-min');
+      const runtimeMax = document.getElementById('runtime-max');
+
+      if (genreSelect) params.set('genre', genreSelect.value);
+      if (sortSelect) params.set('sort', sortSelect.value);
+      if (ratingMin) params.set('rating_min', ratingMin.value);
+      if (ratingMax) params.set('rating_max', ratingMax.value);
+      if (runtimeMin) params.set('runtime_min', runtimeMin.value);
+      if (runtimeMax) params.set('runtime_max', runtimeMax.value);
+
+      return params;
+    }
+
+    function updateUrl(params) {
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.pushState({}, '', newUrl);
+    }
+
+    async function fetchMovies() {
+      const params = getFilterParams();
+      params.set('search', searchInput.value);
+      params.set('ajax', '1');
+      params.set('page', '1');
+
+      try {
+        const response = await fetch(`{{ url_for('movies.movies_page') }}?${params.toString()}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const data = await response.json();
+
+        if (data.html.trim() === '') {
+          moviesGrid.innerHTML = `
+                    <p class="text-slate-400 col-span-full text-center py-10">
+                      No movies found for your filters. Try adjusting your search.
+                    </p>
+                 `;
+        } else {
+          moviesGrid.innerHTML = data.html;
+        }
+
+
+        updatePagination(data.pagination);
+
+        params.delete('ajax');
+        updateUrl(params);
+
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      }
+    }
+
+    function updatePagination(pagination) {
+      if (!pagination) return;
+
+      let html = `<span>Showing ${pagination.start_index} – ${pagination.end_index} of ${pagination.total} movies</span>
+                    <div class="flex gap-3">`;
+
+      const params = getFilterParams();
+      params.set('search', searchInput.value);
+
+      const getPageUrl = (pageNum) => {
+        const p = new URLSearchParams(params);
+        p.set('page', pageNum);
+        return `{{ url_for('movies.movies_page') }}?${p.toString()}`;
+      };
+
+      if (pagination.has_prev) {
+        html += `<a href="${getPageUrl(pagination.prev_num)}" class="btn-secondary">Previous</a>`;
+      }
+
+      if (pagination.has_next) {
+        html += `<a href="${getPageUrl(pagination.next_num)}" class="btn-primary">Next</a>`;
+      }
+
+      html += `</div>`;
+      paginationContainer.innerHTML = html;
+    }
+
+    if (searchInput) {
+      const filterSearchInput = document.querySelector('#filterPanel input[name="search"]');
+      const clearBtn = document.getElementById('clearSearch');
+
+      function toggleClearBtn() {
+        if (searchInput.value.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+
+      searchInput.addEventListener('input', (e) => {
+        toggleClearBtn();
+        if (filterSearchInput) {
+          filterSearchInput.value = e.target.value;
+        }
+
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          fetchMovies();
+        }, 300);
+      });
+
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          fetchMovies();
+        }
+      });
+
+      function resetFilters() {
+        const genreSelect = document.querySelector('select[name="genre"]');
+        const sortSelect = document.querySelector('select[name="sort"]');
+        if (genreSelect) genreSelect.value = "";
+        if (sortSelect) sortSelect.value = "";
+
+        const rMin = document.getElementById('rating-min');
+        const rMax = document.getElementById('rating-max');
+        const runMin = document.getElementById('runtime-min');
+        const runMax = document.getElementById('runtime-max');
+
+        if (rMin) rMin.value = 0;
+        if (rMax) rMax.value = 10;
+        if (runMin) runMin.value = 0;
+        if (runMax) runMax.value = 300;
+
+        if (rMin) rMin.dispatchEvent(new Event('input'));
+        if (runMin) runMin.dispatchEvent(new Event('input'));
+      }
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          toggleClearBtn();
+          if (filterSearchInput) filterSearchInput.value = '';
+
+          resetFilters();
+
+          fetchMovies();
+        });
+      }
+
+      const clearFiltersBtn = document.getElementById('clearFilters');
+      if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+          resetFilters();
+          fetchMovies();
+        });
+      }
+
+      toggleClearBtn();
+    }
   });
 </script>
 {% endblock %}

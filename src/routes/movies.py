@@ -27,6 +27,8 @@ def movies_page():
     rating_max = request.args.get("rating_max", default=10, type=float)
     runtime_min = request.args.get("runtime_min", default=0, type=int)
     runtime_max = request.args.get("runtime_max", default=300, type=int)
+    
+    is_ajax = request.args.get('ajax', type=int) == 1
 
     # Paginated movies
     
@@ -42,7 +44,29 @@ def movies_page():
         runtime_max=runtime_max
     )
     if err_movies:
+        if is_ajax:
+             return jsonify({'error': str(err_movies)}), 500
         return f"Error fetching movies: {err_movies}", 500
+
+    # If AJAX, render the movie cards partial and return JSON
+    if is_ajax:
+        movies_html = []
+        for movie in pagination.items:
+            movies_html.append(render_template('partials/movie_card.html', movie=movie))
+        
+        return jsonify({
+            'html': ''.join(movies_html),
+            'pagination': {
+                'total': pagination.total,
+                'start_index': pagination.start_index(),
+                'end_index': pagination.end_index(),
+                'has_prev': pagination.has_prev,
+                'has_next': pagination.has_next,
+                'prev_num': pagination.prev_num,
+                'next_num': pagination.next_num,
+                'page': page
+            }
+        })
 
     # Genres
     genres, err_genres = get_genres_db()
