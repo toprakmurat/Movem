@@ -130,7 +130,7 @@
           </div>
           {% endif %}
 
-          <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary">Back to Catalog</a>
+          <a href="{{ url_for('movies.movies_page') }}" id="back-button" class="btn-secondary">Go Back</a>
         </div>
 
         <div class="mt-4 inline-block rounded-2xl border border-white/10 bg-black/40 px-5 py-3 backdrop-blur-md">
@@ -685,5 +685,20 @@
       }
     });
   }
+
+  // Dynamic Back Button Logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const backBtn = document.getElementById('back-button');
+    if (!backBtn) return;
+
+    // Check if there is a referrer and it comes from the same site
+    if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+      backBtn.textContent = 'Go Back';
+      backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        history.back();
+      });
+    }
+  });
 </script>
 {% endblock %}

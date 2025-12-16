@@ -1,0 +1,1024 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-[#0f1115] text-gray-300 font-sans selection:bg-blue-500/30">
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+
+        <!-- Header -->
+        <header
+            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 border-b border-gray-800 pb-6">
+            <div>
+                <h1
+                    class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 tracking-tight">
+                    API Playground
+                </h1>
+                <p class="text-gray-500 text-sm mt-1">Test CRUD operations directly against the MoveM database</p>
+            </div>
+            <div
+                class="flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700/50 backdrop-blur-sm">
+                <div
+                    class="w-2 h-2 rounded-full {{ 'bg-green-500 shadow-[0_0_10px_#22c55e]' if current_user.is_authenticated else 'bg-red-500' }}">
+                </div>
+                <span class="text-sm font-medium">
+                    {{ current_user.username if current_user.is_authenticated else 'Guest Mode' }}
+                    {% if current_user.is_authenticated %}
+                    <span class="text-xs text-gray-500 ml-1">#{{ current_user.id }}</span>
+                    {% endif %}
+                </span>
+            </div>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <nav
+            class="flex overflow-x-auto gap-2 mb-8 bg-gray-900/50 p-1.5 rounded-xl border border-gray-800 backdrop-blur sticky top-4 z-40 shadow-xl">
+            <button onclick="switchTab('movies')" id="tab-movies"
+                class="tab-btn group relative flex-1 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800/80 outline-none focus:ring-2 focus:ring-blue-500/20">
+                <span class="relative z-10 group-hover:text-blue-400">Movies</span>
+            </button>
+            <button onclick="switchTab('genres')" id="tab-genres"
+                class="tab-btn group relative flex-1 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800/80 outline-none focus:ring-2 focus:ring-green-500/20">
+                <span class="relative z-10 group-hover:text-green-400">Genres</span>
+            </button>
+            <button onclick="switchTab('movies_genres')" id="tab-movies_genres"
+                class="tab-btn group relative flex-1 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800/80 outline-none focus:ring-2 focus:ring-yellow-500/20">
+                <span class="relative z-10 group-hover:text-yellow-400">Movies Genres</span>
+            </button>
+            <button onclick="switchTab('favorites')" id="tab-favorites"
+                class="tab-btn group relative flex-1 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-800/80 outline-none focus:ring-2 focus:ring-purple-500/20">
+                <span class="relative z-10 group-hover:text-purple-400">Favorites</span>
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="relative min-h-[600px]">
+
+            <!-- --- MOVIES TAB --- -->
+            <section id="section-movies" class="tab-content transition-all duration-300 opacity-100 translate-y-0">
+
+                <!-- Schema Table -->
+                <div class="mb-8 rounded-2xl border border-gray-800 bg-gray-900/40 backdrop-blur overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-gray-900/60">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M3 14h18m-9-4v8m-7 5h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h2 class="font-semibold text-gray-200">Table Schema: <span
+                                    class="text-blue-400 font-mono">movies</span></h2>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-900/80 text-gray-400 uppercase tracking-wider text-xs">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold">Column</th>
+                                    <th class="px-6 py-3 font-semibold">Type</th>
+                                    <th class="px-6 py-3 font-semibold">Nullable</th>
+                                    <th class="px-6 py-3 font-semibold">Default</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800 text-gray-300">
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-blue-300">id <span
+                                            class="text-xs text-gray-500 ml-1">PK</span></td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                    <td class="px-6 py-3"><span class="badge-no">NO</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">title</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">VARCHAR(100)</td>
+                                    <td class="px-6 py-3"><span class="badge-no">NO</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">overview</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">TEXT</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">tagline</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">VARCHAR(256)</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">release_date</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">DATE</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">poster_file</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">VARCHAR(100)</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">banner_file</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">VARCHAR(100)</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">platform_id</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 text-gray-500">-</td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/30 transition-colors">
+                                    <td class="px-6 py-3 font-mono text-white">created_at</td>
+                                    <td class="px-6 py-3 font-mono text-purple-300">TIMESTAMP</td>
+                                    <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                    <td class="px-6 py-3 font-mono text-gray-400">CURRENT_TIMESTAMP</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative py-8">
+                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div class="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <span
+                            class="bg-[#0f1115] px-2 text-sm text-gray-500 uppercase tracking-widest font-semibold">Operations</span>
+                    </div>
+                </div>
+
+                <!-- Operations Stack (Vertical) -->
+                <div class="flex flex-col gap-12">
+
+                    <!-- GET -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Read</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Fetch Movies</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400 font-mono">GET
+                                    /movies</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex flex-wrap gap-3 mb-4 items-center">
+                                    <button onclick="getMovies()" class="ui-btn-primary flex-none">
+                                        Fetch All
+                                    </button>
+                                    <div class="relative flex-1 min-w-[200px]">
+                                        <input type="text" id="m-search" placeholder="Search title..."
+                                            class="ui-input pl-9">
+                                        <svg class="w-4 h-4 absolute left-3 top-3 text-gray-500" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <!-- Result Box -->
+                                <div class="ui-code-preview">
+                                    <pre id="movies-result">Waiting for request...</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- CREATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Create</h3>
+                        </div>
+                        <div class="ui-card group w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Create Movie</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 font-mono">POST
+                                    /movies</span>
+                            </div>
+                            <div class="p-6">
+                                <form onsubmit="createMovie(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="col-span-1 space-y-1">
+                                        <label class="ui-label">ID (PK)</label>
+                                        <input type="number" id="m-id" placeholder="e.g. 5001" class="ui-input"
+                                            required>
+                                    </div>
+                                    <div class="col-span-1 space-y-1">
+                                        <label class="ui-label">Title</label>
+                                        <input type="text" id="m-title" placeholder="Movie Title" class="ui-input"
+                                            required>
+                                    </div>
+                                    <div class="col-span-1 md:col-span-2 space-y-1">
+                                        <label class="ui-label">Tagline & Release</label>
+                                        <div class="flex gap-2">
+                                            <input type="text" id="m-tagline" placeholder="Tagline"
+                                                class="ui-input flex-[2]">
+                                            <input type="date" id="m-release" class="ui-input flex-1">
+                                        </div>
+                                    </div>
+                                    <input type="number" id="m-platform" placeholder="Platform ID" class="ui-input"
+                                        style="display:none">
+                                    <input type="text" id="m-poster" value="img/placeholder_poster.svg"
+                                        style="display:none">
+
+                                    <button type="submit" class="ui-btn-success md:col-span-2 mt-2 w-full md:w-auto">
+                                        Create New Movie
+                                    </button>
+                                </form>
+                                <div id="create-movie-result-container" class="hidden mt-4">
+                                    <div class="ui-code-preview h-32">
+                                        <pre id="create-movie-result"></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- UPDATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Update</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Update Title</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 font-mono">PUT
+                                    /movies/:id</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-3">
+                                    <input type="number" id="mu-id" placeholder="Movie ID" class="ui-input-sm">
+                                    <input type="text" id="mu-title" placeholder="New Title" class="ui-input-sm">
+                                    <button onclick="updateMovie()"
+                                        class="ui-btn-warning w-full text-xs py-2">Update</button>
+                                </div>
+                                <pre id="update-movie-result" class="ui-result-sm hidden"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- DELETE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Delete</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Delete Movie</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400 font-mono">DELETE
+                                    /movies/:id</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-3">
+                                    <input type="number" id="md-id" placeholder="Movie ID" class="ui-input-sm">
+                                    <button onclick="deleteMovie()"
+                                        class="ui-btn-danger w-full text-xs py-2 mt-auto">Delete</button>
+                                </div>
+                                <pre id="delete-movie-result" class="ui-result-sm hidden"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Spacer -->
+                <div class="h-12"></div>
+            </section>
+
+            <!-- --- GENRES TAB --- -->
+            <section id="section-genres" class="tab-content hidden transition-opacity duration-300">
+                <!-- Schema Table -->
+                <div class="mb-8 rounded-2xl border border-gray-800 bg-gray-900/40 backdrop-blur overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-800 flex items-center gap-3 bg-gray-900/60">
+                        <div class="p-2 bg-green-500/10 rounded-lg text-green-400">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                        </div>
+                        <h2 class="font-semibold text-gray-200">Table Schema: <span
+                                class="text-green-400 font-mono">genres</span></h2>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-900/80 text-gray-400 uppercase tracking-wider text-xs">
+                            <tr>
+                                <th class="px-6 py-3">Column</th>
+                                <th class="px-6 py-3">Type</th>
+                                <th class="px-6 py-3">Nullable</th>
+                                <th class="px-6 py-3">Constraint</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-gray-300">
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-blue-300">id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                <td class="px-6 py-3"><span class="badge-no">NO</span></td>
+                                <td class="px-6 py-3 text-yellow-500 text-xs">PRIMARY KEY</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-white">genre_name</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">VARCHAR(50)</td>
+                                <td class="px-6 py-3"><span class="badge-no">NO</span></td>
+                                <td class="px-6 py-3 text-yellow-500 text-xs">UNIQUE</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative py-8">
+                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div class="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <span
+                            class="bg-[#0f1115] px-2 text-sm text-gray-500 uppercase tracking-widest font-semibold">Operations</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-12">
+                    <!-- GET -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Read</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Genres List</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 font-mono">GET
+                                    /movies/genres</span>
+                            </div>
+                            <div class="p-6">
+                                <button onclick="getGenres()" class="ui-btn-primary w-full md:w-auto mb-4">Fetch All
+                                    Genres</button>
+                                <div class="ui-code-preview">
+                                    <pre id="genres-result">Ready...</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- CREATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Create</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Create Genre</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 font-mono">POST
+                                    /movies/genres</span>
+                            </div>
+                            <div class="p-6">
+                                <form onsubmit="createGenre(event)" class="flex flex-col md:flex-row gap-3">
+                                    <input type="number" id="g-id" placeholder="ID" class="ui-input md:w-24">
+                                    <input type="text" id="g-name" placeholder="Name" class="ui-input flex-1">
+                                    <button class="ui-btn-success md:w-32">Create</button>
+                                </form>
+                                <pre id="create-genre-result" class="ui-result-sm hidden mt-3"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- UPDATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Update</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Update Genre</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 font-mono">PUT
+                                    /movies/genres</span>
+                            </div>
+                            <div class="p-6">
+                                <input type="number" id="gu-id" placeholder="ID" class="ui-input-sm mb-2">
+                                <input type="text" id="gu-name" placeholder="Name" class="ui-input-sm mb-2">
+                                <button onclick="updateGenre()" class="ui-btn-warning w-full text-xs">Save</button>
+                                <pre id="update-genre-result" class="hidden mt-2 text-[10px]"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- DELETE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Delete</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Delete Genre</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400 font-mono">DELETE
+                                    /movies/genres</span>
+                            </div>
+                            <div class="p-6">
+                                <input type="number" id="gd-id" placeholder="ID" class="ui-input-sm mb-2">
+                                <button onclick="deleteGenre()"
+                                    class="ui-btn-danger w-full text-xs mt-auto">Delete</button>
+                                <pre id="delete-genre-result" class="hidden mt-2 text-[10px]"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Spacer -->
+                    <div class="h-12"></div>
+            </section>
+
+            <!-- --- MOVIES GENRES TAB --- -->
+            <section id="section-movies_genres" class="tab-content hidden transition-opacity duration-300">
+                <div class="mb-8 rounded-2xl border border-gray-800 bg-gray-900/40 backdrop-blur overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-800 flex items-center gap-3 bg-gray-900/60">
+                        <div class="p-2 bg-yellow-500/10 rounded-lg text-yellow-400">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                        </div>
+                        <h2 class="font-semibold text-gray-200">Table Schema: <span
+                                class="text-yellow-400 font-mono">movies_genres</span></h2>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-900/80 text-gray-400 uppercase tracking-wider text-xs">
+                            <tr>
+                                <th class="px-6 py-3">Column</th>
+                                <th class="px-6 py-3">Type</th>
+                                <th class="px-6 py-3">Nullable</th>
+                                <th class="px-6 py-3">Default</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-gray-300">
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-blue-300">id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">SERIAL (INT)</td>
+                                <td class="px-6 py-3"><span class="badge-no">NO</span></td>
+                                <td class="px-6 py-3 text-gray-400">Auto Increment</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-white">movie_id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                <td class="px-6 py-3 text-gray-500">FK -> movies</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-white">genre_id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                <td class="px-6 py-3 text-gray-500">FK -> genres</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative py-8">
+                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div class="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <span
+                            class="bg-[#0f1115] px-2 text-sm text-gray-500 uppercase tracking-widest font-semibold">Operations</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-12">
+                    <!-- GET -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Read</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Relations List</h3>
+                            </div>
+                            <div class="p-6">
+                                <button onclick="getMoviesGenres()" class="ui-btn-primary w-full md:w-auto mb-4">Fetch
+                                    All
+                                    Relations</button>
+                                <div class="ui-code-preview">
+                                    <pre id="mg-result">Ready...</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- CREATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Link</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="p-6">
+                                <h3 class="text-base font-semibold text-gray-200 mb-4">Link Movie to Genre</h3>
+                                <form onsubmit="createMovieGenre(event)" class="flex flex-col md:flex-row gap-3">
+                                    <input type="number" id="mg-mid" placeholder="Movie ID" class="ui-input flex-1">
+                                    <input type="number" id="mg-gid" placeholder="Genre ID" class="ui-input flex-1">
+                                    <button class="ui-btn-success md:w-32">Link</button>
+                                </form>
+                                <pre id="create-mg-result" class="ui-result-sm hidden mt-3"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- UPDATE -->
+                    <!-- UPDATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Update</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Update Link</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 font-mono">PUT
+                                    /movies/genres</span>
+                            </div>
+                            <div class="p-6">
+                                <input type="number" id="mgu-id" placeholder="ID" class="ui-input-sm mb-2">
+                                <div class="flex gap-1 mb-2">
+                                    <input type="number" id="mgu-mid" placeholder="M-ID" class="ui-input-sm">
+                                    <input type="number" id="mgu-gid" placeholder="G-ID" class="ui-input-sm">
+                                </div>
+                                <button onclick="updateMovieGenre()"
+                                    class="ui-btn-warning w-full text-xs">Update</button>
+                                <pre id="update-mg-result" class="hidden mt-2 text-[10px]"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- DELETE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Delete</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Unlink</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400 font-mono">DELETE
+                                    /movies/genres</span>
+                            </div>
+                            <div class="p-6">
+                                <input type="number" id="mgd-id" placeholder="Relation ID" class="ui-input-sm mb-2">
+                                <button onclick="deleteMovieGenre()"
+                                    class="ui-btn-danger w-full text-xs mt-auto">Delete</button>
+                                <pre id="delete-mg-result" class="hidden mt-2 text-[10px]"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Spacer -->
+                <div class="h-12"></div>
+            </section>
+
+            <!-- --- FAVORITES TAB --- -->
+            <section id="section-favorites" class="tab-content hidden transition-opacity duration-300">
+                <div class="mb-8 rounded-2xl border border-gray-800 bg-gray-900/40 backdrop-blur overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-800 flex items-center gap-3 bg-gray-900/60">
+                        <div class="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="font-semibold text-gray-200">Table Schema: <span
+                                class="text-purple-400 font-mono">favorites</span></h2>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-900/80 text-gray-400 uppercase tracking-wider text-xs">
+                            <tr>
+                                <th class="px-6 py-3">Column</th>
+                                <th class="px-6 py-3">Type</th>
+                                <th class="px-6 py-3">Nullable</th>
+                                <th class="px-6 py-3">Default</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800 text-gray-300">
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-blue-300">id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">SERIAL (INT)</td>
+                                <td class="px-6 py-3"><span class="badge-no">NO</span></td>
+                                <td class="px-6 py-3 text-gray-400">Auto Increment</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-white">user_id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                <td class="px-6 py-3 text-gray-500">FK -> users</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-white">movie_id</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">INTEGER</td>
+                                <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                <td class="px-6 py-3 text-gray-500">FK -> movies</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3 font-mono text-white">created_at</td>
+                                <td class="px-6 py-3 font-mono text-purple-300">TIMESTAMP</td>
+                                <td class="px-6 py-3"><span class="badge-yes">YES</span></td>
+                                <td class="px-6 py-3 font-mono text-gray-400">CURRENT_TIMESTAMP</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Divider -->
+                <div class="relative py-8">
+                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div class="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div class="relative flex justify-center">
+                        <span
+                            class="bg-[#0f1115] px-2 text-sm text-gray-500 uppercase tracking-widest font-semibold">Operations</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-12">
+                    <!-- GET -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Read</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Favorites</h3>
+                            </div>
+                            <div class="p-6">
+                                <button onclick="getFavorites()" class="ui-btn-primary w-full md:w-auto mb-4">Get
+                                    All</button>
+                                <div class="ui-code-preview">
+                                    <pre id="favorites-result"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- CREATE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Create</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Manual Create</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 font-mono">POST
+                                    /favorites</span>
+                            </div>
+                            <div class="p-6">
+                                <form onsubmit="createFavorite(event)" class="flex gap-3">
+                                    <input type="number" id="f-uid" placeholder="UID" class="ui-input w-24" required
+                                        value="{{ current_user.id }}">
+                                    <input type="number" id="f-mid" placeholder="Movie ID" class="ui-input flex-1"
+                                        required>
+                                    <button class="ui-btn-success">Add</button>
+                                </form>
+                                <pre id="create-favorite-result" class="ui-result-sm hidden mt-3"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- TOGGLE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Toggle</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Toggle Favorite</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 font-mono">POST
+                                    /movies/:id/favorite</span>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex gap-2">
+                                    <input type="number" id="ft-mid" placeholder="Movie ID" class="ui-input flex-1">
+                                    <button onclick="toggleFavorite()" class="ui-btn-primary w-28">Toggle</button>
+                                </div>
+                                <pre id="toggle-favorite-result" class="ui-result-sm hidden mt-3"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-800 border-dashed"></div>
+
+                    <!-- DELETE -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Delete</h3>
+                        </div>
+                        <div class="ui-card w-full">
+                            <div class="ui-card-header">
+                                <h3 class="text-lg font-semibold text-gray-200">Delete Favorite</h3>
+                                <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400 font-mono">DELETE
+                                    /favorites/:id</span>
+                            </div>
+                            <div class="p-4 flex gap-3 items-center">
+                                <div class="flex-1">
+                                    <label class="text-xs text-red-400 font-medium uppercase">Delete By ID</label>
+                                    <input type="number" id="fd-id" placeholder="ID" class="ui-input-sm mt-1">
+                                </div>
+                                <button onclick="deleteFavorite()" class="ui-btn-danger h-10 px-6 mt-4">Delete</button>
+                            </div>
+                            <pre id="delete-favorite-result"
+                                class="hidden p-2 text-[10px] bg-red-900/10 text-red-300 mx-4 mb-4 rounded"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Spacer -->
+                <div class="h-12"></div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<style>
+    /* COMPONENT STYLES MATCHING ADMIN DASHBOARD */
+    .tab-btn.active {
+        @apply bg-white/10 text-white shadow-none border-0;
+    }
+
+    .tab-btn {
+        @apply text-white/60 hover:text-white hover:bg-white/5 transition-all;
+    }
+
+    .ui-card {
+        @apply bg-black/60 border border-white/10 rounded-3xl overflow-hidden backdrop-blur-sm flex flex-col h-full;
+    }
+
+    .ui-card-header {
+        @apply px-6 py-4 border-b border-white/10 bg-white/5 flex justify-between items-center;
+    }
+
+    .ui-input {
+        @apply bg-white/5 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:bg-white/10 focus:border-white/20 transition-all placeholder-white/30 w-full;
+    }
+
+    .ui-input-sm {
+        @apply bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:bg-white/10 focus:border-white/20 w-full transition-colors placeholder-white/30;
+    }
+
+    .ui-label {
+        @apply text-xs font-semibold text-white/50 uppercase tracking-wide ml-1 mb-1 block;
+    }
+
+    .ui-btn-primary {
+        @apply bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-5 rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-[0.98] text-sm;
+    }
+
+    .ui-btn-success {
+        @apply bg-green-600 hover:bg-green-500 text-white font-medium py-2.5 px-5 rounded-xl shadow-lg shadow-green-900/20 transition-all active:scale-[0.98] text-sm;
+    }
+
+    .ui-btn-warning {
+        @apply bg-yellow-600/90 hover:bg-yellow-500 text-white font-medium py-2 px-4 rounded-xl transition-colors text-xs uppercase tracking-wide shadow-md;
+    }
+
+    .ui-btn-danger {
+        @apply bg-red-600/90 hover:bg-red-500 text-white font-medium py-2 px-4 rounded-xl transition-colors text-xs uppercase tracking-wide shadow-md;
+    }
+
+    .ui-code-preview {
+        @apply bg-black/50 rounded-2xl border border-white/5 p-4 font-mono text-xs text-white/70 overflow-auto w-full max-w-full;
+        max-height: 400px;
+    }
+
+    .ui-result-sm {
+        @apply bg-black/50 rounded-2xl p-3 font-mono text-[11px] text-white/70 overflow-x-auto border border-white/5 mt-3 w-full max-w-full;
+        max-height: 150px;
+    }
+
+    .badge-yes {
+        @apply px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 inline-block;
+    }
+
+    .badge-no {
+        @apply px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 inline-block;
+    }
+
+    /* Custom Scrollbar for code blocks */
+    .ui-code-preview::-webkit-scrollbar,
+    .ui-result-sm::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .ui-code-preview::-webkit-scrollbar-track,
+    .ui-result-sm::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .ui-code-preview::-webkit-scrollbar-thumb,
+    .ui-result-sm::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+
+    .ui-code-preview::-webkit-scrollbar-thumb:hover,
+    .ui-result-sm::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+
+<script>
+    // TABS LOGIC
+    function switchTab(tabId) {
+        // Hide all
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden', 'opacity-0', 'translate-y-4');
+        });
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+        // Show target
+        const target = document.getElementById('section-' + tabId);
+        target.classList.remove('hidden');
+
+        // Small delay for fade animation
+        setTimeout(() => {
+            target.classList.remove('opacity-0', 'translate-y-4');
+        }, 10);
+
+        document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    // API UTILS
+    async function apiCall(url, method, body = null, resultId) {
+        const resEl = document.getElementById(resultId);
+        if (resEl.parentElement.classList.contains('hidden')) {
+            resEl.parentElement.classList.remove('hidden');
+        }
+        resEl.classList.remove('hidden');
+
+        resEl.innerHTML = '<span class="text-gray-500 animate-pulse">Requesting...</span>';
+
+        const options = {
+            method: method,
+            headers: { 'Content-Type': 'application/json' }
+        };
+        if (body) options.body = JSON.stringify(body);
+
+        try {
+            const response = await fetch(url, options);
+            const text = await response.text();
+            let data;
+            try { data = JSON.parse(text); } catch { data = text; }
+
+            const isError = !response.ok;
+            const colorClass = isError ? 'text-red-400' : 'text-blue-300';
+
+            resEl.className = `${isError ? 'text-red-400' : ''}`;
+            resEl.innerText = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+
+        } catch (error) {
+            resEl.innerText = 'Network Error: ' + error;
+            resEl.className = 'text-red-500 font-bold';
+        }
+    }
+
+    // --- FUNCTION BINDINGS ---
+    // Movies
+    const getMovies = () => {
+        const s = document.getElementById('m-search').value;
+        let url = '/movies?ajax=1';
+        if (s) url += '&search=' + encodeURIComponent(s);
+        apiCall(url, 'GET', null, 'movies-result');
+    };
+
+    const createMovie = (e) => {
+        e.preventDefault();
+        const d = {
+            id: document.getElementById('m-id').value,
+            title: document.getElementById('m-title').value,
+            tagline: document.getElementById('m-tagline').value,
+            release_date: document.getElementById('m-release').value,
+            poster_file: document.getElementById('m-poster').value,
+            platform_id: document.getElementById('m-platform').value || null
+        };
+        document.getElementById('create-movie-result-container').classList.remove('hidden');
+        apiCall('/movies/', 'POST', d, 'create-movie-result');
+    };
+
+    const updateMovie = () => {
+        const id = document.getElementById('mu-id').value;
+        const title = document.getElementById('mu-title').value;
+        if (!id) return alert('ID Required');
+        apiCall('/movies/' + id, 'PUT', { title }, 'update-movie-result');
+    }
+
+    const deleteMovie = () => {
+        const id = document.getElementById('md-id').value;
+        apiCall('/movies/' + id, 'DELETE', null, 'delete-movie-result');
+    }
+
+    // Genres
+    const getGenres = () => apiCall('/movies/genres', 'GET', null, 'genres-result');
+    const createGenre = (e) => {
+        e.preventDefault();
+        const d = {
+            id: document.getElementById('g-id').value,
+            genre_name: document.getElementById('g-name').value
+        };
+        apiCall('/movies/genre', 'POST', d, 'create-genre-result');
+    };
+    const updateGenre = () => {
+        const id = document.getElementById('gu-id').value;
+        const name = document.getElementById('gu-name').value;
+        if (!id) return alert('ID Required');
+        apiCall('/movies/genre/' + id, 'PUT', { genre_name: name }, 'update-genre-result');
+    };
+    const deleteGenre = () => {
+        const id = document.getElementById('gd-id').value;
+        apiCall('/movies/genre/' + id, 'DELETE', null, 'delete-genre-result');
+    }
+
+    // Movies Genres
+    const getMoviesGenres = () => apiCall('/movies/movies-genres', 'GET', null, 'mg-result');
+    const createMovieGenre = (e) => {
+        e.preventDefault();
+        const d = { movie_id: document.getElementById('mg-mid').value, genre_id: document.getElementById('mg-gid').value };
+        apiCall('/movies/movies-genres', 'POST', d, 'create-mg-result');
+    };
+    const updateMovieGenre = () => {
+        const id = document.getElementById('mgu-id').value;
+        const mid = document.getElementById('mgu-mid').value;
+        const gid = document.getElementById('mgu-gid').value;
+        const d = {};
+        if (mid) d.movie_id = mid;
+        if (gid) d.genre_id = gid;
+        apiCall('/movies/movies-genres/' + id, 'PUT', d, 'update-mg-result');
+    };
+    const deleteMovieGenre = () => {
+        const id = document.getElementById('mgd-id').value;
+        apiCall('/movies/movies-genres/' + id, 'DELETE', null, 'delete-mg-result');
+    }
+
+    // Favorites
+    const getFavorites = () => apiCall('/movies/favorites', 'GET', null, 'favorites-result');
+    const createFavorite = (e) => {
+        e.preventDefault();
+        const d = { user_id: document.getElementById('f-uid').value, movie_id: document.getElementById('f-mid').value };
+        apiCall('/movies/favorites', 'POST', d, 'create-favorite-result');
+    }
+    const toggleFavorite = () => {
+        const mid = document.getElementById('ft-mid').value;
+        apiCall('/movies/' + mid + '/favorite', 'POST', null, 'toggle-favorite-result');
+    }
+    const deleteFavorite = () => {
+        const id = document.getElementById('fd-id').value;
+        apiCall('/movies/favorites/' + id, 'DELETE', null, 'delete-favorite-result');
+    }
+
+    // Initialize
+    switchTab('movies');
+</script>
+{% endblock %}

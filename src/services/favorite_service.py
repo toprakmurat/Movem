@@ -1,5 +1,7 @@
 from src.config.database import execute_query
+from src.utils.pagination_utils import Pagination
 
+######################### CRUD FOR FAVORITES ##########################
 def get_favorites_db():
     """Get all favorites"""
     try:
@@ -8,21 +10,6 @@ def get_favorites_db():
             fetch=True
         )
         return favorites, None
-    except Exception as e:
-        return None, str(e)
-
-
-def get_favorite_by_id_db(id: int):
-    """Get favorite by id"""
-    try:
-        fav = execute_query(
-            "SELECT * FROM favorites WHERE id = %s",
-            (id,),
-            fetch=True
-        )
-        if fav:
-            return fav[0], None
-        return None, None
     except Exception as e:
         return None, str(e)
 
@@ -107,6 +94,41 @@ def delete_favorite_db(id: int):
         return None, str(e)
     
 
+#########################  COMPLEX ONES ##########################
+
+def get_favorites_paginated_db(page: int = 1, per_page: int = 20):
+    try:
+        offset = (page - 1) * per_page
+        
+        count_res = execute_query("SELECT COUNT(*) as count FROM favorites", fetch=True)
+        total = count_res[0]['count'] if count_res else 0
+
+        favorites = execute_query(
+            "SELECT * FROM favorites ORDER BY id LIMIT %s OFFSET %s",
+            (per_page, offset),
+            fetch=True
+        ) or []
+
+        return Pagination(items=favorites, page=page, per_page=per_page, total_count=total), None
+    except Exception as e:
+        return None, str(e)
+
+
+def get_favorite_by_id_db(id: int):
+    """Get favorite by id"""
+    try:
+        fav = execute_query(
+            "SELECT * FROM favorites WHERE id = %s",
+            (id,),
+            fetch=True
+        )
+        if fav:
+            return fav[0], None
+        return None, None
+    except Exception as e:
+        return None, str(e)
+
+
 def is_movie_favorite_for_user(user_id: int, movie_id: int) -> bool:
     """Return True if the movie is in the given user's favorites"""
     try:
@@ -168,3 +190,44 @@ def get_favorite_movies_detailed_for_user_db(user_id: int):
         return None, str(e)
 
 
+
+def toggle_favorite_db(user_id: int, movie_id: int):
+    """
+    Toggle favorite
+    """
+
+    try:
+        favorites, err = get_favorites_db()
+        if err:
+            return None, err
+
+        existing = None
+        for fav in favorites:
+            if fav["user_id"] == user_id and fav["movie_id"] == movie_id:
+                existing = fav
+                break
+
+        if existing:
+            deleted, err = delete_favorite_db(existing["id"])
+            if err:
+                return None, err
+            return {
+                "action": "removed",
+                "favorite": deleted
+            }, None
+
+        new_fav, err = create_favorite_db({
+            "user_id": user_id,
+            "movie_id": movie_id
+        })
+        if err:
+            return None, err
+
+        return {
+            "action": "added",
+            "favorite": new_fav
+        }, None
+
+
+    except Exception as e:
+        return None, str(e)

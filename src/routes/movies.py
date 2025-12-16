@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, render_template, redirect, url_for
 from src.config.database import execute_query
 from src.services.movie_service import *
+from src.services.genres_service import *
 from src.services.favorite_service import *
 from flask_login import current_user
 from src.services.comments_service import get_comments_for_movie
@@ -29,9 +30,9 @@ def movies_page():
     runtime_max = request.args.get("runtime_max", default=300, type=int)
     
     is_ajax = request.args.get('ajax', type=int) == 1
+    fmt = request.args.get('format', type=str)
 
-    # Paginated movies
-    
+    # Paginated movies  
     pagination, err_movies = get_movies_paginated_db(
         page=page, 
         per_page=per_page, 
@@ -48,8 +49,18 @@ def movies_page():
              return jsonify({'error': str(err_movies)}), 500
         return f"Error fetching movies: {err_movies}", 500
 
-    # If AJAX, render the movie cards partial and return JSON
     if is_ajax:
+        if fmt == 'json':
+            return jsonify({
+                'items': [dict(m) for m in pagination.items],
+                'pagination': {
+                    'total': pagination.total,
+                    'page': pagination.page,
+                    'per_page': pagination.per_page,
+                    'pages': pagination.pages
+                }
+            })
+
         movies_html = []
         for movie in pagination.items:
             movies_html.append(render_template('partials/movie_card.html', movie=movie))
@@ -183,7 +194,24 @@ def delete_movie(id):
 ######## genres
 @movies_bp.route("/genres", methods=["GET"])
 def get_all_genres():
-    """Get all genres"""
+    """Get all genres with optional pagination"""
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", default=20, type=int)
+
+    if page:
+        paginated, err = get_genres_paginated_db(page, per_page)
+        if err:
+            return jsonify({"error": err}), 500
+        return jsonify({
+            'items': [dict(g) for g in paginated.items],
+            'pagination': {
+                'total': paginated.total,
+                'page': paginated.page,
+                'per_page': paginated.per_page,
+                'pages': paginated.pages
+            }
+        }), 200
+    
     genres, err = get_genres_db()
     if err:
         return jsonify({"error": err}), 500
@@ -253,7 +281,23 @@ def get_movies_by_genre(genre_id):
 ######## movies_genres
 @movies_bp.route('/movies-genres', methods=['GET'])
 def get_movies_genres():
-    """Get all movie-genre relations"""
+    """Get all movie-genre relations with optional pagination"""
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", default=20, type=int)
+
+    if page:
+        paginated, err = get_movies_genres_paginated_db(page, per_page)
+        if err:
+            return jsonify({"error": err}), 500
+        return jsonify({
+            'items': [dict(mg) for mg in paginated.items],
+            'pagination': {
+                'total': paginated.total,
+                'page': paginated.page,
+                'per_page': paginated.per_page,
+                'pages': paginated.pages
+            }
+        }), 200
 
     movies_genres, err = get_movies_genres_db()
     if err:
@@ -313,6 +357,23 @@ def delete_movies_genres(id):
 #########favorites
 @movies_bp.route("/favorites", methods=["GET"])
 def get_favorites():
+    page = request.args.get("page", type=int)
+    per_page = request.args.get("per_page", default=20, type=int)
+
+    if page:
+        paginated, err = get_favorites_paginated_db(page, per_page)
+        if err:
+            return jsonify({"error": err}), 500
+        return jsonify({
+            'items': [dict(f) for f in paginated.items],
+            'pagination': {
+                'total': paginated.total,
+                'page': paginated.page,
+                'per_page': paginated.per_page,
+                'pages': paginated.pages
+            }
+        }), 200
+
     favorites, err = get_favorites_db()
     if err:
         return jsonify({"error": err}), 500

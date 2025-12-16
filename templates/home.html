@@ -177,11 +177,17 @@
 <section class="space-y-6 mb-12 mx-auto max-w-6xl">
   <div class="flex items-center justify-between">
     <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Collections spotlight</h2>
+    <div class="flex gap-3">
+      <button class="btn-icon" type="button" data-rail-nav data-direction="prev"
+        data-rail-target="collections">&larr;</button>
+      <button class="btn-icon" type="button" data-rail-nav data-direction="next"
+        data-rail-target="collections">&rarr;</button>
+    </div>
   </div>
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="rail-scroll" data-rail="collections">
     {% for collection in featured_collections %}
     <a href="{{ url_for('lists.view_list', list_id=collection.id) }}"
-      class="group rounded-3xl border border-white/10 bg-gradient-to-br from-black via-black/70 to-brand-800/40 p-6 transition hover:border-white/40">
+      class="w-[85vw] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] shrink-0 group rounded-3xl border border-white/10 bg-gradient-to-br from-black via-black/70 to-brand-800/40 p-6 transition hover:border-white/40">
       <p class="text-xs uppercase tracking-[0.4em] text-white/60">Curated by {{ collection.curator }}</p>
       <h3 class="mt-2 text-2xl font-display tracking-widest text-white">{{ collection.title }}</h3>
       <p class="mt-4 text-sm text-white/70">{{ collection.count }} curated titles</p>
@@ -213,7 +219,7 @@
   <div class="rail-scroll" data-rail="curated">
     {% for option in discovery_options %}
     <a href="{{ url_for('statistic.cinemetrics_page', metric_type=option.link_param) }}"
-      class="w-80 shrink-0 group relative flex h-80 flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-slate-900 transition-all duration-500 hover:scale-[1.02] hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-900/20">
+      class="w-[85vw] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] shrink-0 group relative flex h-80 flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-slate-900 transition-all duration-500 hover:scale-[1.02] hover:border-brand-500/50 hover:shadow-2xl hover:shadow-brand-900/20">
       <img src="{{ option.image }}" alt="{{ option.title }}"
         class="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-40" />
       <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
@@ -240,10 +246,10 @@
 </section>
 
 {# -------------------- GENRE SPOTLIGHT (HORIZONTAL RAILS) -------------------- #}
-{% for genre_name in genres %}
+{% for genre in genres %}
 {% set match = namespace(found=false) %}
 {% for movie in home_movies %}
-{% if genre_name in movie.genre_list %}
+{% if genre.genre_name in movie.genre_list %}
 {% set match.found = true %}
 {% endif %}
 {% endfor %}
@@ -251,17 +257,21 @@
 {% if match.found %}
 <section class="mb-12 mx-auto max-w-6xl">
   <div class="mb-3 flex items-center justify-between">
-    <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">{{ genre_name }} Movies</h2>
-    <div class="flex gap-3">
-      <button class="btn-icon" type="button" data-rail-nav data-direction="prev"
-        data-rail-target="genre-{{ loop.index }}">&larr;</button>
-      <button class="btn-icon" type="button" data-rail-nav data-direction="next"
-        data-rail-target="genre-{{ loop.index }}">&rarr;</button>
+    <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">{{ genre.genre_name }} Movies</h2>
+    <div class="flex items-center gap-4">
+      <a href="{{ url_for('movies.movies_page', genre=genre.genre_id) }}"
+        class="text-sm uppercase tracking-[0.4em] text-white/70 hover:text-white transition">See all</a>
+      <div class="flex gap-3">
+        <button class="btn-icon" type="button" data-rail-nav data-direction="prev"
+          data-rail-target="genre-{{ loop.index }}">&larr;</button>
+        <button class="btn-icon" type="button" data-rail-nav data-direction="next"
+          data-rail-target="genre-{{ loop.index }}">&rarr;</button>
+      </div>
     </div>
   </div>
 
   <div class="rail-scroll" data-rail="genre-{{ loop.index }}">
-    {% for movie in home_movies if genre_name in movie.genre_list %}
+    {% for movie in home_movies if genre.genre_name in movie.genre_list %}
     {% include 'partials/movie_card.html' %}
     {% endfor %}
   </div>

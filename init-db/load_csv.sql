@@ -48,3 +48,7 @@ SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 SELECT setval('user_lists_id_seq', (SELECT MAX(id) FROM user_lists));
 
 SELECT setval('list_items_id_seq', (SELECT MAX(id) FROM list_items));
+
+SELECT setval('favorites_id_seq', (SELECT MAX(id) FROM favorites));
+
+SELECT setval('movies_genres_id_seq', (SELECT MAX(id) FROM movies_genres));

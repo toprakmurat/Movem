@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, render_template, url_for
 from src.services.movie_service import *
+from src.services.genres_service import *
 from src.services.users_service import *
 from src.routes.actors import *
 from src.services.list_service import get_public_admin_lists_db
@@ -67,7 +68,6 @@ def home():
     best_movies, _ = get_best_movies_detailed_db(8)
     featured_movies, _ = get_random_movies_detailed_db(8)
     genres_available, _ = get_top_genres_db(10)
-    genres_available = [g['genre_name'] for g in genres_available]
 
     featured_people, _ = get_featured_people_db(4)
     if not featured_people:
@@ -98,3 +98,7 @@ def home():
         "discovery_options": discovery_options
     }
     return render_template("home.html", **data)
+
+@home_bp.route('/test')
+def test_page():
+    return render_template("test.html")

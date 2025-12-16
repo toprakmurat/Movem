@@ -22,19 +22,57 @@
     <div class="rounded-[40px] border border-white/10 bg-gradient-to-r from-black via-black/80 to-purple-800/40 p-10">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-4xl font-display text-white mb-2">Admin Dashboard</h1>
-                <p class="text-white/60">Manage users, movies, people, and system data.</p>
+                <h1 class="text-3xl font-bold text-white tracking-tight">Admin Dashboard</h1>
             </div>
             <div class="space-x-4">
                 <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-sm">
                     Total Users: {{ users|length if users else 0 }}
                 </span>
                 <span class="px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-sm">
-                    Total Movies: {{ movies|length if movies else 0 }}
+                    Total Movies: {{ movies.total if movies else 0 }}
                 </span>
             </div>
         </div>
     </div>
+
+    {% macro render_pagination(pagination, endpoint, tab_id, page_param) %}
+    {% if pagination and pagination.pages > 1 %}
+    <div
+        class="flex justify-between items-center mt-4 px-2 py-3 bg-black/40 rounded-xl border border-white/5 backdrop-blur-sm">
+        <div>
+            {% if pagination.has_prev %}
+            <a href="{{ url_for(endpoint, **dict(request.args, **{page_param: pagination.prev_num})) }}{{ tab_id }}"
+                class="flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-200 rounded-lg text-xs font-medium transition border border-blue-500/20">
+                <span>← Previous</span>
+            </a>
+            {% else %}
+            <span
+                class="flex items-center gap-1 px-3 py-1.5 bg-white/5 text-white/30 rounded-lg text-xs font-medium border border-white/5 cursor-not-allowed">
+                <span>← Previous</span>
+            </span>
+            {% endif %}
+        </div>
+
+        <div class="text-xs font-mono text-white/50">
+            Page <span class="text-white font-bold">{{ pagination.page }}</span> of {{ pagination.pages }}
+        </div>
+
+        <div>
+            {% if pagination.has_next %}
+            <a href="{{ url_for(endpoint, **dict(request.args, **{page_param: pagination.next_num})) }}{{ tab_id }}"
+                class="flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-200 rounded-lg text-xs font-medium transition border border-blue-500/20">
+                <span>Next →</span>
+            </a>
+            {% else %}
+            <span
+                class="flex items-center gap-1 px-3 py-1.5 bg-white/5 text-white/30 rounded-lg text-xs font-medium border border-white/5 cursor-not-allowed">
+                <span>Next →</span>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endmacro %}
 
     <!-- TABS NAVIGATION -->
     <div class="flex flex-wrap gap-4 border-b border-white/10 pb-4">
@@ -43,6 +81,11 @@
             id="defaultOpen">Users</button>
         <button onclick="openTab(event, 'tab-movies')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Movies</button>
+        <button onclick="openTab(event, 'tab-genres')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Genres</button>
+        <button onclick="openTab(event, 'tab-movie-genres')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Movie
+            Genres</button>
         <button onclick="openTab(event, 'tab-comments')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Comments</button>
         <button onclick="openTab(event, 'tab-people')"
@@ -304,12 +347,89 @@
         <!-- Movies Management -->
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movies Management</h2>
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: MOVIES</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK (Manual Input)</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">title</td>
+                                <td class="px-2 py-1">varchar(100)</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">overview</td>
+                                <td class="px-2 py-1">text</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">tagline</td>
+                                <td class="px-2 py-1">varchar(256)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">release_date</td>
+                                <td class="px-2 py-1">date</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">poster_file</td>
+                                <td class="px-2 py-1">varchar(100)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">banner_file</td>
+                                <td class="px-2 py-1">varchar(100)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">platform_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">created_at</td>
+                                <td class="px-2 py-1">timestamp</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Create Movie Form -->
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Create Movie</h4>
                     <form onsubmit="handleApiSubmit(event, '/movies/', 'POST')" class="space-y-4">
-                        <input name="title" placeholder="Title"
+                        <input name="id" type="number" placeholder="Movie ID (Required - Manual Input)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="title" placeholder="Title (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <input name="release_date" type="date"
@@ -317,142 +437,311 @@
                         <textarea name="overview" placeholder="Overview"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
                         <div class="grid grid-cols-2 gap-2">
-                            <input name="runtime" type="number" placeholder="Runtime (min)"
+                            <input name="poster_file" placeholder="Poster Path"
                                 class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                            <input name="vote_avg" step="0.1" type="number" placeholder="Vote Avg"
+                            <input name="banner_file" placeholder="Banner Path"
                                 class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                         </div>
-                        <input name="poster_file" placeholder="Poster Path"
+                        <input name="tagline" placeholder="Tagline"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                         <button class="btn-primary w-full py-2 rounded-xl">Create Movie</button>
                     </form>
                     <br>
                     <h4 class="text-lg font-semibold text-white mb-4">Update Movie</h4>
                     <form onsubmit="handleUpdateMovie(event)" class="space-y-4 pt-4 border-t border-white/10">
-                        <input name="id" type="number" placeholder="ID to Update"
+                        <input name="id" type="number" placeholder="ID to Update (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <input name="title" placeholder="Title"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                         <input name="release_date" type="date"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <textarea name="overview" placeholder="Overview"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="poster_file" placeholder="Poster Path"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="banner_file" placeholder="Banner Path"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <input name="tagline" placeholder="Tagline"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="platform_id" type="number" placeholder="Platform ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="created_at" type="datetime-local" placeholder="Created At"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
                         <button
                             class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
                             Movie</button>
                     </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Movie by
+                        ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/movies', loadMovies)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Movie</button>
+                    </form>
                 </div>
                 <!-- Movies Table -->
-                <div
-                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
-                    <h4 class="text-lg font-semibold text-white mb-4">Movies List</h4>
-                    <table class="w-full text-left text-sm text-white/70 border-collapse">
-                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                <!-- Movies Table -->
+                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[600px]">
+                        <h4
+                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
+                            Movies List</h4>
+                        <table class="w-full text-left text-sm text-white/70 border-collapse">
+                            <thead
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                <tr>
+                                    <th class="px-4 py-3 text-blue-300">id</th>
+                                    <th class="px-4 py-3 text-blue-300">title</th>
+                                    <th class="px-4 py-3 text-blue-300">release_date</th>
+                                    <th class="px-4 py-3 text-blue-300">platform_id</th>
+                                    <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="movies-table-body" class="divide-y divide-white/5">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="movies-pagination"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB CONTENT: GENRES -->
+    <div id="tab-genres" class="tab-content hidden space-y-8">
+        <!-- Genre Management -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Genres Management</h2>
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: GENRES</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
                             <tr>
-                                <th class="px-4 py-2">ID</th>
-                                <th class="px-4 py-2">Title</th>
-                                <th class="px-4 py-2">Actions</th>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-white/5">
-                            {% for movie in movies[:100] %}
-                            <tr class="hover:bg-white/10 transition">
-                                <td class="px-4 py-2 font-mono text-white/50">{{ movie.id }}</td>
-                                <td class="px-4 py-2">{{ movie.title }}</td>
-                                <td class="px-4 py-2">
-                                    <button onclick="deleteResource('/movies/{{ movie.id }}')"
-                                        class="text-red-400 hover:text-red-300 text-xs">Delete</button>
-                                </td>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK (Manual Input)</td>
                             </tr>
-                            {% endfor %}
+                            <tr>
+                                <td class="px-2 py-1 font-mono">genre_name</td>
+                                <td class="px-2 py-1">varchar(50)</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </section>
 
-        <!-- Genre Management -->
-        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
-            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Genres Management</h2>
+            <!-- Get Genre By ID -->
+            <form onsubmit="handleGetGenreById(event)"
+                class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10">
+                <input name="id" type="number" placeholder="Get Genre by ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
+                    required>
+                <button
+                    class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm transition">Go</button>
+            </form>
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Create Genre</h4>
                     <form onsubmit="handleApiSubmit(event, '/movies/genre', 'POST')" class="space-y-4">
-                        <input name="id" type="number" placeholder="Genre ID"
+                        <input name="id" type="number" placeholder="Genre ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <input name="genre_name" placeholder="Genre Name"
+                        <input name="genre_name" placeholder="Genre Name (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <button class="btn-primary w-full py-2 rounded-xl">Create Genre</button>
                     </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Genre
+                    </h4>
+                    <form onsubmit="handleUpdateGenre(event)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Update (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="genre_name" placeholder="New Genre Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Genre</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Genre by
+                        ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/movies/genre', loadGenres)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Genre</button>
+                    </form>
                 </div>
-                <div
-                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[300px] overflow-y-auto">
-                    <table class="w-full text-left text-sm text-white/70">
-                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[500px]">
+                        <h4
+                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
+                            Genres List</h4>
+                        <table class="w-full text-left text-sm text-white/70">
+                            <thead
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                <tr>
+                                    <th class="px-4 py-3 text-blue-300">id</th>
+                                    <th class="px-4 py-3 text-blue-300">genre_name</th>
+                                    <th class="px-4 py-3 text-blue-300 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="genres-table-body" class="divide-y divide-white/5">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="genres-pagination"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB CONTENT: MOVIE GENRES -->
+    <div id="tab-movie-genres" class="tab-content hidden space-y-8">
+        <!-- Movie-Genre Relations -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movie-Genre Relations</h2>
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: MOVIES_GENRES</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
                             <tr>
-                                <th class="px-4 py-2">ID</th>
-                                <th class="px-4 py-2">Name</th>
-                                <th class="px-4 py-2">Action</th>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-white/5">
-                            {% for g in genres[:100] %}
+                        <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-4 py-2">{{ g.id }}</td>
-                                <td class="px-4 py-2">{{ g.genre_name }}</td>
-                                <td class="px-4 py-2">
-                                    <button onclick="deleteResource('/movies/genre/{{ g.id }}')"
-                                        class="text-red-400 text-xs">Delete</button>
-                                </td>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK (Serial)</td>
                             </tr>
-                            {% endfor %}
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">genre_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </section>
 
-        <!-- Movie-Genre Relations -->
-        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
-            <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Movie-Genre Relations</h2>
+            <!-- Get MG By ID -->
+            <form onsubmit="handleGetMovieGenreById(event)"
+                class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10">
+                <input name="id" type="number" placeholder="Get Relation by ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
+                    required>
+                <button
+                    class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm transition">Go</button>
+            </form>
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Relation</h4>
                     <form onsubmit="handleApiSubmit(event, '/movies/movies-genres', 'POST')" class="space-y-4">
-                        <input name="movie_id" type="number" placeholder="Movie ID"
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <input name="genre_id" type="number" placeholder="Genre ID"
+                        <input name="genre_id" type="number" placeholder="Genre ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <button class="btn-primary w-full py-2 rounded-xl">Link Genre</button>
                     </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Relation
+                    </h4>
+                    <form onsubmit="handleUpdateMovieGenre(event)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Update (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="movie_id" type="number" placeholder="New Movie ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="genre_id" type="number" placeholder="New Genre ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Relation</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Relation
+                        by ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/movies/movies-genres', loadMovieGenres)"
+                        class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Relation</button>
+                    </form>
                 </div>
-                <div
-                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[300px] overflow-y-auto">
-                    <table class="w-full text-left text-sm text-white/70">
-                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                            <tr>
-                                <th class="px-4 py-2">ID</th>
-                                <th class="px-4 py-2">Movie ID</th>
-                                <th class="px-4 py-2">Genre ID</th>
-                                <th class="px-4 py-2">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            {% for mg in movies_genres[:100] %}
-                            <tr>
-                                <td class="px-4 py-2">{{ mg.id }}</td>
-                                <td class="px-4 py-2">{{ mg.movie_id }}</td>
-                                <td class="px-4 py-2">{{ mg.genre_id }}</td>
-                                <td class="px-4 py-2">
-                                    <button onclick="deleteResource('/movies/movies-genres/{{ mg.id }}')"
-                                        class="text-red-400 text-xs">Delete</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[500px]">
+                        <h4
+                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
+                            Relations List</h4>
+                        <table class="w-full text-left text-sm text-white/70">
+                            <thead
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                <tr>
+                                    <th class="px-4 py-3 text-blue-300">id</th>
+                                    <th class="px-4 py-3 text-blue-300">movie_id</th>
+                                    <th class="px-4 py-3 text-blue-300">genre_id</th>
+                                    <th class="px-4 py-3 text-blue-300 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="movies-genres-table-body" class="divide-y divide-white/5">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="movies-genres-pagination"></div>
                 </div>
             </div>
         </section>
@@ -462,6 +751,50 @@
     <div id="tab-comments" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Comments</h2>
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: COMMENTS</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">user_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">body</td>
+                                <td class="px-2 py-1">text</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-white/70">
                     <thead class="uppercase tracking-wider text-xs border-b border-white/10">
@@ -496,11 +829,50 @@
     <div id="tab-people" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">People Management</h2>
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: PEOPLE</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">name</td>
+                                <td class="px-2 py-1">varchar(255)</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">description</td>
+                                <td class="px-2 py-1">text</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Add Person</h4>
                     <form onsubmit="handleApiSubmit(event, '/actors/', 'POST')" class="space-y-4">
-                        <input name="name" placeholder="Name"
+                        <input name="name" placeholder="Name (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <textarea name="biography" placeholder="Biography"
@@ -514,7 +886,7 @@
                     <br>
                     <h4 class="text-lg font-semibold text-white mb-4">Update Person</h4>
                     <form onsubmit="handleUpdatePerson(event)" class="space-y-4 pt-4 border-t border-white/10">
-                        <input name="id" type="number" placeholder="Person ID for Update"
+                        <input name="id" type="number" placeholder="Person ID for Update (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <input name="name" placeholder="Name"
@@ -556,17 +928,85 @@
     <div id="tab-stats" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Game Statistics</h2>
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: STATISTIC</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">revenue</td>
+                                <td class="px-2 py-1">bigint</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">runtime</td>
+                                <td class="px-2 py-1">numeric</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">vote_avg</td>
+                                <td class="px-2 py-1">numeric(4,1)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">vote_count</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">budget</td>
+                                <td class="px-2 py-1">bigint</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Create Statistic</h4>
                     <form onsubmit="handleApiSubmit(event, '/statistic/', 'POST')" class="space-y-4">
-                        <input name="movie_id" type="number" placeholder="Movie ID"
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <div class="grid grid-cols-2 gap-2">
+                            <input name="runtime" type="number" step="0.1" placeholder="Runtime"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                             <input name="budget" type="number" step="0.01" placeholder="Budget"
                                 class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
                             <input name="revenue" type="number" step="0.01" placeholder="Revenue"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="vote_count" type="number" placeholder="Vote Count"
                                 class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                         </div>
                         <input name="vote_avg" type="number" step="0.1" placeholder="Vote Avg"
@@ -576,13 +1016,26 @@
                     <br>
                     <h4 class="text-lg font-semibold text-white mb-4">Update Statistic</h4>
                     <form onsubmit="handleUpdateStatistic(event)" class="space-y-4 pt-4 border-t border-white/10">
-                        <input name="movie_id" type="number" placeholder="Movie ID"
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <input name="budget" type="number" step="0.01" placeholder="Budget"
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="budget" type="number" step="0.01" placeholder="Budget"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="revenue" type="number" step="0.01" placeholder="Revenue"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="runtime" type="number" step="0.1" placeholder="Runtime"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="vote_avg" type="number" step="0.1" placeholder="Vote Avg"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <input name="vote_count" type="number" placeholder="Vote Count"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                         <button
-                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update</button>
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                        </button>
                     </form>
                 </div>
                 <div
@@ -599,7 +1052,8 @@
                             {% for s in statistics[:100] %}
                             <tr>
                                 <td class="px-4 py-2">{{ s.movie_id }}</td>
-                                <td class="px-4 py-2">{{ s.budget }}</td>
+                                <td class="px-4 py-2">{{ s.runtime }}</td>
+                                <td class="px-4 py-2">{{ s.vote_avg }}</td>
                                 <td class="px-4 py-2">
                                     <button onclick="deleteResource('/statistic/{{ s.movie_id }}')"
                                         class="text-red-400 text-xs">Delete</button>
@@ -617,46 +1071,115 @@
     <div id="tab-favorites" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Favorites Management</h2>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                    <h4 class="text-lg font-semibold text-white mb-4">Add Favorite</h4>
-                    <form onsubmit="handleApiSubmit(event, '/movies/favorites', 'POST')" class="space-y-4">
-                        <input name="user_id" type="number" placeholder="User ID"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
-                            required>
-                        <input name="movie_id" type="number" placeholder="Movie ID"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
-                            required>
-                        <button class="btn-primary w-full py-2 rounded-xl">Add Favorite</button>
-                    </form>
-                </div>
-                <div
-                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
-                    <table class="w-full text-left text-sm text-white/70">
-                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
+
+            <!-- TABLE DEFINITION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: FAVORITES</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
                             <tr>
-                                <th class="px-4 py-2">ID</th>
-                                <th class="px-4 py-2">User ID</th>
-                                <th class="px-4 py-2">Movie ID</th>
-                                <th class="px-4 py-2">Action</th>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-white/5">
-                            {% for fav in favorites[:100] %}
+                        <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-4 py-2">{{ fav.id }}</td>
-                                <td class="px-4 py-2">{{ fav.user_id }}</td>
-                                <td class="px-4 py-2">{{ fav.movie_id }}</td>
-                                <td class="px-4 py-2">
-                                    <button onclick="deleteResource('/movies/favorites/{{ fav.id }}')"
-                                        class="text-red-400 text-xs">Delete</button>
-                                </td>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK (Serial)</td>
                             </tr>
-                            {% endfor %}
+                            <tr>
+                                <td class="px-2 py-1 font-mono">user_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">created_at</td>
+                                <td class="px-2 py-1">timestamp</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Add Favorite</h4>
+                    <form onsubmit="handleApiSubmit(event, '/movies/favorites', 'POST')" class="space-y-4">
+                        <input name="user_id" type="number" placeholder="User ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button class="btn-primary w-full py-2 rounded-xl">Add Favorite</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Favorite
+                    </h4>
+                    <form onsubmit="handleUpdateFavorite(event)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Update (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="user_id" type="number" placeholder="New User ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="movie_id" type="number" placeholder="New Movie ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Favorite</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Favorite
+                        by ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/movies/favorites', loadFavorites)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Favorite</button>
+                    </form>
+
+                </div>
+                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[500px]">
+                        <h4
+                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
+                            Favorites List</h4>
+                        <table class="w-full text-left text-sm text-white/70">
+                            <thead
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                <tr>
+                                    <th class="px-4 py-3 text-blue-300">id</th>
+                                    <th class="px-4 py-3 text-blue-300">user_id</th>
+                                    <th class="px-4 py-3 text-blue-300">movie_id</th>
+                                    <th class="px-4 py-3 text-blue-300">created_at</th>
+                                    <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="favorites-table-body" class="divide-y divide-white/5">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                        <div id="favorites-pagination"></div>
+                    </div>
+                </div>
         </section>
     </div>
 
@@ -676,20 +1199,158 @@
             tablinks[i].classList.add("text-white/60");
         }
         document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.classList.add("bg-white/10", "text-white");
-        evt.currentTarget.classList.remove("text-white/60");
+
+        if (evt && evt.currentTarget) {
+            evt.currentTarget.classList.add("bg-white/10", "text-white");
+            evt.currentTarget.classList.remove("text-white/60");
+        } else {
+            const btn = document.querySelector(`button[onclick="openTab(event, '${tabName}')"]`);
+            if (btn) {
+                btn.classList.add("bg-white/10", "text-white");
+                btn.classList.remove("text-white/60");
+            }
+        }
+
+        localStorage.setItem('activeTab', tabName);
+
+        // Load data for the tab
+        if (tabName === 'tab-movies') loadMovies();
+        if (tabName === 'tab-genres') loadGenres();
+        if (tabName === 'tab-movie-genres') loadMovieGenres();
+        if (tabName === 'tab-favorites') loadFavorites();
     }
-    document.getElementById("defaultOpen").click();
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const hash = window.location.hash.replace('#', '');
+        const storedTab = localStorage.getItem('activeTab');
+
+        if (hash && document.getElementById(hash)) {
+            openTab(null, hash);
+        } else if (storedTab && document.getElementById(storedTab)) {
+            openTab(null, storedTab);
+        } else {
+            document.getElementById("defaultOpen").click();
+        }
+    });
+
+    // --- DATA LOADING & PAGINATION ---
+
+    async function fetchData(url, containerId, paginationId, renderRowFn) {
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.error) throw new Error(data.error);
+
+            const tbody = document.getElementById(containerId);
+            tbody.innerHTML = '';
+
+            if (data.items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="px-4 py-3 text-center text-white/40">No records found</td></tr>';
+            } else {
+                data.items.forEach(item => {
+                    tbody.innerHTML += renderRowFn(item);
+                });
+            }
+
+            renderPaginationControl(paginationId, data.pagination, url.split('?')[0]);
+        } catch (e) {
+            console.error(e);
+            alert("Error loading data: " + e.message);
+        }
+    }
+
+    function renderPaginationControl(containerId, pagination, baseUrl) {
+        const container = document.getElementById(containerId);
+        if (!pagination || pagination.pages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const prevDisabled = pagination.page === 1 ? 'pointer-events-none opacity-50' : '';
+        const nextDisabled = pagination.page === pagination.pages ? 'pointer-events-none opacity-50' : '';
+
+        container.innerHTML = `
+            <div class="flex justify-between items-center mt-4 px-2 py-3 bg-black/40 rounded-xl border border-white/5 backdrop-blur-sm">
+                <button onclick="changePage('${baseUrl}', ${pagination.page - 1})" class="${prevDisabled} flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-200 rounded-lg text-xs font-medium transition border border-blue-500/20">
+                    <span>← Previous</span>
+                </button>
+                <div class="text-xs font-mono text-white/50">
+                    Page <span class="text-white font-bold">${pagination.page}</span> of ${pagination.pages}
+                </div>
+                <button onclick="changePage('${baseUrl}', ${pagination.page + 1})" class="${nextDisabled} flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-200 rounded-lg text-xs font-medium transition border border-blue-500/20">
+                    <span>Next →</span>
+                </button>
+            </div>
+        `;
+    }
+
+    // Global variable to track active loads
+    window.loadMovies = (page = 1) => fetchData(`/movies/?format=json&ajax=1&page=${page}&per_page=100`, 'movies-table-body', 'movies-pagination', (m) => `
+        <tr class="hover:bg-blue-500/10 transition duration-150 group">
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${m.id}</td>
+            <td class="px-4 py-2 group-hover:text-white font-medium">${m.title}</td>
+            <td class="px-4 py-2 text-white/60">${m.release_date || '-'}</td>
+            <td class="px-4 py-2 text-white/60">${m.platform_id || '-'}</td>
+            <td class="px-4 py-2 text-right">
+                <button onclick="deleteResource('/movies/${m.id}', loadMovies)"
+                    class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
+            </td>
+        </tr>
+    `);
+
+    window.loadGenres = (page = 1) => fetchData(`/movies/genres?page=${page}&per_page=100`, 'genres-table-body', 'genres-pagination', (g) => `
+        <tr class="hover:bg-blue-500/10 transition duration-150 group">
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${g.id}</td>
+            <td class="px-4 py-2 group-hover:text-white">${g.genre_name}</td>
+            <td class="px-4 py-2 text-right">
+                <button onclick="deleteResource('/movies/genre/${g.id}', loadGenres)"
+                    class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
+            </td>
+        </tr>
+    `);
+
+    window.loadMovieGenres = (page = 1) => fetchData(`/movies/movies-genres?page=${page}&per_page=100`, 'movies-genres-table-body', 'movies-genres-pagination', (mg) => `
+        <tr class="hover:bg-blue-500/10 transition duration-150 group">
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${mg.id}</td>
+            <td class="px-4 py-2">${mg.movie_id}</td>
+            <td class="px-4 py-2">${mg.genre_id}</td>
+            <td class="px-4 py-2 text-right">
+                <button onclick="deleteResource('/movies/movies-genres/${mg.id}', loadMovieGenres)"
+                    class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
+            </td>
+        </tr>
+    `);
+
+    window.loadFavorites = (page = 1) => fetchData(`/movies/favorites?page=${page}&per_page=100`, 'favorites-table-body', 'favorites-pagination', (f) => `
+        <tr class="hover:bg-blue-500/10 transition duration-150 group">
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${f.id}</td>
+            <td class="px-4 py-2">${f.user_id}</td>
+            <td class="px-4 py-2">${f.movie_id}</td>
+            <td class="px-4 py-2 text-white/60 text-xs">${f.created_at || '-'}</td>
+            <td class="px-4 py-2 text-right">
+                <button onclick="deleteResource('/movies/favorites/${f.id}', loadFavorites)"
+                    class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
+            </td>
+        </tr>
+    `);
+
+    // Helper to switch pages
+    window.changePage = (baseUrl, page) => {
+        if (baseUrl.includes('/movies/genres')) loadGenres(page);
+        else if (baseUrl.includes('/movies/movies-genres')) loadMovieGenres(page);
+        else if (baseUrl.includes('/movies/favorites')) loadFavorites(page);
+        else if (baseUrl.includes('/movies/')) loadMovies(page);
+    };
 
     // Generic form submit handler for simple key-value APIs (JSON)
-    async function handleApiSubmit(event, url, method) {
+    async function handleApiSubmit(event, url, method, successCallback) {
         event.preventDefault();
         const formData = new FormData(event.target);
         const jsonData = {};
 
         formData.forEach((value, key) => {
             if (value !== "") {
-                // Try integer/float conversion if possible, else string
                 if (!isNaN(value) && value.trim() !== "") {
                     jsonData[key] = parseFloat(value);
                 } else {
@@ -698,22 +1359,25 @@
             }
         });
 
-        // Special handling for IDs that must be INT (force int if looks like int)
-        // Note: Python APIs are often strict about types (int vs float vs str)
-        // Some inputs like "runtime" might be better as int.
-
         try {
             const response = await fetch(url, {
                 method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(jsonData)
             });
 
             if (response.ok) {
+                // Determine which loader to call based on the URL or explicitly passed callback
+                // Simple heuristic based on URL
+                if (url.includes('/movies/genre')) loadGenres();
+                else if (url.includes('/movies/movies-genres')) loadMovieGenres();
+                else if (url.includes('/movies/favorites')) loadFavorites();
+                else if (url.includes('/movies/')) loadMovies();
+                else if (url.includes('/statistic/')) location.reload(); // Stats still reload
+                else if (url.includes('/actors/')) location.reload();    // Actors still reload
+
                 alert('Success!');
-                location.reload();
+                event.target.reset(); // Clear form
             } else {
                 const result = await response.json();
                 alert('Error: ' + (result.error || result.message || 'Unknown error'));
@@ -723,40 +1387,101 @@
         }
     }
 
-    // Specific update handlers to append ID to URL
+    // Specific update handlers
+    // For these, we just wrap handleApiSubmit passing the constructed URL
     async function handleUpdateMovie(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const id = formData.get('id');
+        const id = new FormData(event.target).get('id');
         if (!id) return alert("ID required");
         handleApiSubmit(event, '/movies/' + id, 'PUT');
     }
 
     async function handleUpdatePerson(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const id = formData.get('id');
+        const id = new FormData(event.target).get('id');
         if (!id) return alert("ID required");
         handleApiSubmit(event, '/actors/' + id, 'PUT');
     }
 
     async function handleUpdateStatistic(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const movie_id = formData.get('movie_id');
+        const movie_id = new FormData(event.target).get('movie_id');
         if (!movie_id) return alert("Movie ID required");
         handleApiSubmit(event, '/statistic/' + movie_id, 'PUT');
     }
 
+    async function handleUpdateGenre(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/movies/genre/' + id, 'PUT');
+    }
+
+    async function handleUpdateMovieGenre(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/movies/movies-genres/' + id, 'PUT');
+    }
+
+    async function handleUpdateFavorite(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/movies/favorites/' + id, 'PUT');
+    }
+
+    // Get By ID Handlers
+    async function handleGetGenreById(event) {
+        event.preventDefault();
+        const id = new FormData(event.target).get('id');
+        try {
+            const res = await fetch('/movies/genre/' + id);
+            const data = await res.json();
+            alert(JSON.stringify(data, null, 2));
+        } catch (e) { alert(e); }
+    }
+
+    async function handleGetMovieGenreById(event) {
+        event.preventDefault();
+        const id = new FormData(event.target).get('id');
+        try {
+            const res = await fetch('/movies/movies-genres/' + id);
+            const data = await res.json();
+            alert(JSON.stringify(data, null, 2));
+        } catch (e) { alert(e); }
+    }
+
+    // Generic Delete via Form (Delete by ID)
+    async function handleDeleteById(event, urlPrefix, reloadFn) {
+        event.preventDefault();
+        if (!confirm('Are you sure you want to delete this item?')) return;
+        const formData = new FormData(event.target);
+        const id = formData.get('id');
+        if (!id) return alert("ID required");
+
+        // Remove trailing slash if present to avoid double slashes
+        const cleanPrefix = urlPrefix.endsWith('/') ? urlPrefix.slice(0, -1) : urlPrefix;
+        const url = `${cleanPrefix}/${id}`;
+
+        try {
+            const response = await fetch(url, { method: 'DELETE' });
+            if (response.ok) {
+                alert('Deleted successfully');
+                if (reloadFn) reloadFn();
+                else location.reload();
+                event.target.reset();
+            } else {
+                const result = await response.json();
+                alert('Error: ' + (result.error || result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Delete failed: ' + error);
+        }
+    }
+
     // Generic Delete
-    async function deleteResource(url) {
+    async function deleteResource(url, refreshCallback) {
         if (!confirm('Are you sure?')) return;
         try {
-            const response = await fetch(url, {
-                method: 'DELETE'
-            });
+            const response = await fetch(url, { method: 'DELETE' });
             if (response.ok) {
-                location.reload();
+                if (refreshCallback) refreshCallback();
+                else location.reload(); // Fallback
             } else {
                 const result = await response.json();
                 alert('Error: ' + (result.error || result.message));

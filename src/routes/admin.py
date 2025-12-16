@@ -25,8 +25,10 @@ from src.services.list_service import (
     get_list_details_db
 )
 
-from src.services.movie_service import (
-    get_movies_db,
+from src.services.movie_service import get_movies_paginated_db, get_movies_db
+from src.services.genres_service import (
+    get_genres_paginated_db,
+    get_movies_genres_paginated_db,
     get_genres_db,
     get_movies_genres_db
 )
@@ -37,7 +39,7 @@ from src.services.actors_service import get_actors_paginated_db
 
 from src.services.statistic_service import get_statistics_db
 
-from src.services.favorite_service import get_favorites_db
+from src.services.favorite_service import get_favorites_paginated_db, get_favorites_db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -54,15 +56,24 @@ def dashboard():
     users, _ = get_users_db()
     active_curators, _ = get_most_active_curators_db()
     
-    # Fetch data for all admin dashboard tabs
-    movies, _ = get_movies_db()
-    genres, _ = get_genres_db()
-    movies_genres, _ = get_movies_genres_db()
+    # Pagination Parameters
+    movies_page = request.args.get('movies_page', 1, type=int)
+    genres_page = request.args.get('genres_page', 1, type=int)
+    mg_page = request.args.get('mg_page', 1, type=int)
+    fav_page = request.args.get('fav_page', 1, type=int)
+    per_page = 100
+
+    # Fetch paginated data
+    movies_paginated, _ = get_movies_paginated_db(page=movies_page, per_page=per_page)
+    genres_paginated, _ = get_genres_paginated_db(page=genres_page, per_page=per_page)
+    movies_genres_paginated, _ = get_movies_genres_paginated_db(page=mg_page, per_page=per_page)
+    favorites_paginated, _ = get_favorites_paginated_db(page=fav_page, per_page=per_page)
+
+    # Others (non-paginated or pre-limited)
     comments, _ = get_all_comments()
     actors_result, _ = get_actors_paginated_db(page=1, per_page=1000)
     actors = actors_result['actors'] if actors_result else []
     statistics, _ = get_statistics_db()
-    favorites, _ = get_favorites_db()
     
     # Placeholders for search results
     selected_user = None
@@ -76,8 +87,8 @@ def dashboard():
         uid = int(request.args.get('view_user_id'))
         selected_user, _ = get_user_by_id_db(uid)
         if selected_user:
-             genre_stats, _ = get_user_favorite_genre_stats_db(uid)
-             actor_stats = get_user_favorite_actor_stats_db(uid)
+            genre_stats, _ = get_user_favorite_genre_stats_db(uid)
+            actor_stats = get_user_favorite_actor_stats_db(uid)
 
     if request.args.get('view_list_id'):
         lid = int(request.args.get('view_list_id'))
@@ -91,13 +102,13 @@ def dashboard():
         selected_list=selected_list,
         genre_stats=genre_stats,
         actor_stats=actor_stats,
-        movies=movies,
-        genres=genres,
-        movies_genres=movies_genres,
+        movies=movies_paginated,
+        genres=genres_paginated,
+        movies_genres=movies_genres_paginated,
         comments=comments,
         actors=actors,
         statistics=statistics,
-        favorites=favorites,
+        favorites=favorites_paginated,
     )
 
 # --- USER MANAGEMENT ROUTES ---
