@@ -36,4 +36,15 @@
 -- movie_question
 \copy movie_question(id, question_type, movie1_id, movie2_id) FROM '/docker-entrypoint-initdb.d/csv/db_movie_question.csv' DELIMITER ',' CSV HEADER
 
+-- user_lists
+\copy user_lists(id, user_id, list_name, is_public, created_at) FROM '/docker-entrypoint-initdb.d/csv/db_user_lists.csv' DELIMITER ',' CSV HEADER
+
+-- list_items
+\copy list_items(id, list_id, movie_id, added_at) FROM '/docker-entrypoint-initdb.d/csv/db_list_items.csv' DELIMITER ',' CSV HEADER
+
+
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+
+SELECT setval('user_lists_id_seq', (SELECT MAX(id) FROM user_lists));
+
+SELECT setval('list_items_id_seq', (SELECT MAX(id) FROM list_items));
