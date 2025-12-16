@@ -98,7 +98,3 @@ def home():
         "discovery_options": discovery_options
     }
     return render_template("home.html", **data)
-
-@home_bp.route('/test')
-def test_page():
-    return render_template("test.html")
