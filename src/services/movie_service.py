@@ -13,7 +13,7 @@ def get_movies_db():
     try:
         movies = execute_query(
             """
-            SELECT id, title, overview, tagline, release_date, poster_file, banner_file, platform_id 
+            SELECT *
             FROM movies
             ORDER BY title
             """,
@@ -29,7 +29,7 @@ def get_movie_by_id_db(id: int):
     try:
         movies = execute_query(
             """
-            SELECT id, title, overview, tagline, release_date, poster_file, banner_file, platform_id 
+            SELECT *
             FROM movies
             WHERE id = %s
             """,

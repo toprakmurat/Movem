@@ -421,11 +421,22 @@
                 </div>
             </div>
 
+            <!-- Get Movie By ID -->
+            <form onsubmit="handleGetMovieById(event)"
+                class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10 mb-6">
+                <input name="id" type="number" placeholder="Get Movie by ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
+                    required>
+                <button
+                    class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm transition">Go</button>
+            </form>
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Create Movie Form -->
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Create Movie</h4>
-                    <form onsubmit="handleApiSubmit(event, '/movies/', 'POST')" class="space-y-4">
+                    <form onsubmit="handleApiSubmitMultipart(event, '/movies/', 'POST')" class="space-y-4"
+                        enctype="multipart/form-data">
                         <input name="id" type="number" placeholder="Movie ID (Required - Manual Input)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
@@ -437,18 +448,30 @@
                         <textarea name="overview" placeholder="Overview"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
                         <div class="grid grid-cols-2 gap-2">
-                            <input name="poster_file" placeholder="Poster Path"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                            <input name="banner_file" placeholder="Banner Path"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <!-- File inputs -->
+                            <div class="space-y-1">
+                                <label class="text-xs text-white/50 ml-1">Poster File</label>
+                                <input name="poster_file" type="file" accept="image/*"
+                                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full text-xs file:bg-transparent file:text-blue-300 file:border-0 file:mr-2">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs text-white/50 ml-1">Banner File</label>
+                                <input name="banner_file" type="file" accept="image/*"
+                                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full text-xs file:bg-transparent file:text-blue-300 file:border-0 file:mr-2">
+                            </div>
                         </div>
                         <input name="tagline" placeholder="Tagline"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input name="platform_id" type="number" placeholder="Platform ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
                         <button class="btn-primary w-full py-2 rounded-xl">Create Movie</button>
                     </form>
-                    <br>
+                </div>
+
+                <!-- Update and Delete Movie Forms (Right Side) -->
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Update Movie</h4>
-                    <form onsubmit="handleUpdateMovie(event)" class="space-y-4 pt-4 border-t border-white/10">
+                    <form onsubmit="handleUpdateMovieMultipart(event)" class="space-y-4" enctype="multipart/form-data">
                         <input name="id" type="number" placeholder="ID to Update (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
@@ -459,10 +482,16 @@
                         <textarea name="overview" placeholder="Overview"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
                         <div class="grid grid-cols-2 gap-2">
-                            <input name="poster_file" placeholder="Poster Path"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                            <input name="banner_file" placeholder="Banner Path"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <div class="space-y-1">
+                                <label class="text-xs text-white/50 ml-1">Poster File (Optional)</label>
+                                <input name="poster_file" type="file" accept="image/*"
+                                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full text-xs file:bg-transparent file:text-blue-300 file:border-0 file:mr-2">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs text-white/50 ml-1">Banner File (Optional)</label>
+                                <input name="banner_file" type="file" accept="image/*"
+                                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full text-xs file:bg-transparent file:text-blue-300 file:border-0 file:mr-2">
+                            </div>
                         </div>
                         <input name="tagline" placeholder="Tagline"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
@@ -488,31 +517,39 @@
                             Movie</button>
                     </form>
                 </div>
-                <!-- Movies Table -->
-                <!-- Movies Table -->
-                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
-                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[600px]">
-                        <h4
-                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
-                            Movies List</h4>
-                        <table class="w-full text-left text-sm text-white/70 border-collapse">
-                            <thead
-                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
-                                <tr>
-                                    <th class="px-4 py-3 text-blue-300">id</th>
-                                    <th class="px-4 py-3 text-blue-300">title</th>
-                                    <th class="px-4 py-3 text-blue-300">release_date</th>
-                                    <th class="px-4 py-3 text-blue-300">platform_id</th>
-                                    <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="movies-table-body" class="divide-y divide-white/5">
-                                <!-- JS Populated -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="movies-pagination"></div>
+            </div>
+
+            <!-- Movies Table (Full Width Bottom) -->
+            <div class="mt-8 overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                <h4
+                    class="text-lg font-semibold text-white p-4 border-b border-white/10 bg-black/80 backdrop-blur w-full block">
+                    Movies List
+                </h4>
+                <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[600px]">
+                    <table class="w-full text-left text-sm text-white/70 border-collapse">
+                        <thead
+                            class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-0 bg-black/90 backdrop-blur z-20 shadow-lg">
+                            <tr>
+                                <th class="px-4 py-3 text-blue-300">id</th>
+                                <th
+                                    class="px-4 py-3 text-blue-300 sticky left-0 z-30 bg-black/90 border-r border-white/10">
+                                    title</th>
+                                <th class="px-4 py-3 text-blue-300">overview</th>
+                                <th class="px-4 py-3 text-blue-300">tagline</th>
+                                <th class="px-4 py-3 text-blue-300">release_date</th>
+                                <th class="px-4 py-3 text-blue-300">poster</th>
+                                <th class="px-4 py-3 text-blue-300">banner</th>
+                                <th class="px-4 py-3 text-blue-300">platform_id</th>
+                                <th class="px-4 py-3 text-blue-300">created_at</th>
+                                <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movies-table-body" class="divide-y divide-white/5">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
                 </div>
+                <div id="movies-pagination"></div>
             </div>
         </section>
     </div>
@@ -728,7 +765,7 @@
                             Relations List</h4>
                         <table class="w-full text-left text-sm text-white/70">
                             <thead
-                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-20 shadow-lg">
                                 <tr>
                                     <th class="px-4 py-3 text-blue-300">id</th>
                                     <th class="px-4 py-3 text-blue-300">movie_id</th>
@@ -1115,6 +1152,18 @@
                 </div>
             </div>
 
+
+
+            <!-- Get Favorite By ID -->
+            <form onsubmit="handleGetFavoriteById(event)"
+                class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10 mb-6">
+                <input name="id" type="number" placeholder="Get Favorite by ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
+                    required>
+                <button
+                    class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm transition">Go</button>
+            </form>
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Add Favorite</h4>
@@ -1164,10 +1213,12 @@
                             Favorites List</h4>
                         <table class="w-full text-left text-sm text-white/70">
                             <thead
-                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-20 shadow-lg">
                                 <tr>
                                     <th class="px-4 py-3 text-blue-300">id</th>
-                                    <th class="px-4 py-3 text-blue-300">user_id</th>
+                                    <th
+                                        class="px-4 py-3 text-blue-300 sticky left-0 z-30 bg-black/90 border-r border-white/10">
+                                        user_id</th>
                                     <th class="px-4 py-3 text-blue-300">movie_id</th>
                                     <th class="px-4 py-3 text-blue-300">created_at</th>
                                     <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
@@ -1289,9 +1340,18 @@
     window.loadMovies = (page = 1) => fetchData(`/movies/?format=json&ajax=1&page=${page}&per_page=100`, 'movies-table-body', 'movies-pagination', (m) => `
         <tr class="hover:bg-blue-500/10 transition duration-150 group">
             <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${m.id}</td>
-            <td class="px-4 py-2 group-hover:text-white font-medium">${m.title}</td>
-            <td class="px-4 py-2 text-white/60">${m.release_date || '-'}</td>
+            <td class="px-4 py-2 group-hover:text-white font-medium sticky left-0 z-10 bg-[#0a0a0a] border-r border-white/5">${m.title}</td>
+             <td class="px-4 py-2 text-white/60">
+                <div class="max-w-[200px] max-h-[100px] overflow-y-auto custom-scrollbar text-xs">
+                    ${m.overview || '-'}
+                </div>
+            </td>
+            <td class="px-4 py-2 text-white/60 text-xs">${m.tagline || '-'}</td>
+            <td class="px-4 py-2 text-white/60 whitespace-nowrap">${m.release_date || '-'}</td>
+            <td class="px-4 py-2 text-white/60 text-xs truncate max-w-[100px]" title="${m.poster_file || ''}">${m.poster_file || '-'}</td>
+            <td class="px-4 py-2 text-white/60 text-xs truncate max-w-[100px]" title="${m.banner_file || ''}">${m.banner_file || '-'}</td>
             <td class="px-4 py-2 text-white/60">${m.platform_id || '-'}</td>
+            <td class="px-4 py-2 text-white/60 text-xs whitespace-nowrap">${m.created_at || '-'}</td>
             <td class="px-4 py-2 text-right">
                 <button onclick="deleteResource('/movies/${m.id}', loadMovies)"
                     class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
@@ -1376,8 +1436,41 @@
                 else if (url.includes('/statistic/')) location.reload(); // Stats still reload
                 else if (url.includes('/actors/')) location.reload();    // Actors still reload
 
-                alert('Success!');
+
+
+                const resData = await response.json().catch(() => ({}));
+                if (method === 'POST' && resData && resData.id) {
+                    alert('Success! Created ID: ' + resData.id);
+                } else {
+                    alert('Success!');
+                }
                 event.target.reset(); // Clear form
+            } else {
+                const result = await response.json();
+                alert('Error: ' + (result.error || result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Request failed: ' + error);
+        }
+    }
+
+    // Handler for multipart/form-data (Files)
+    async function handleApiSubmitMultipart(event, url, method, successCallback) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        // Do not set Content-Type header, let browser set boundary
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                body: formData
+            });
+
+            if (response.ok) {
+                if (url.includes('/movies/')) loadMovies();
+
+                alert('Success!');
+                event.target.reset();
             } else {
                 const result = await response.json();
                 alert('Error: ' + (result.error || result.message || 'Unknown error'));
@@ -1407,6 +1500,12 @@
         handleApiSubmit(event, '/statistic/' + movie_id, 'PUT');
     }
 
+    async function handleUpdateMovieMultipart(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmitMultipart(event, '/movies/' + id, 'PUT');
+    }
+
     async function handleUpdateGenre(event) {
         const id = new FormData(event.target).get('id');
         if (!id) return alert("ID required");
@@ -1426,6 +1525,26 @@
     }
 
     // Get By ID Handlers
+    async function handleGetMovieById(event) {
+        event.preventDefault();
+        const id = new FormData(event.target).get('id');
+        try {
+            const res = await fetch('/movies/' + id + '?format=json');
+            const data = await res.json();
+            alert(JSON.stringify(data, null, 2));
+        } catch (e) { alert(e); }
+    }
+
+    async function handleGetFavoriteById(event) {
+        event.preventDefault();
+        const id = new FormData(event.target).get('id');
+        try {
+            const res = await fetch('/movies/favorites/' + id);
+            const data = await res.json();
+            alert(JSON.stringify(data, null, 2));
+        } catch (e) { alert(e); }
+    }
+
     async function handleGetGenreById(event) {
         event.preventDefault();
         const id = new FormData(event.target).get('id');

@@ -6,9 +6,9 @@ from src.services.favorite_service import *
 from flask_login import current_user
 from src.services.comments_service import get_comments_for_movie
 from src.services.list_service import get_lists_by_user_db
+from src.utils.file_utils import save_upload_file, delete_file
 
 movies_bp = Blueprint('movies', __name__)
-
 
 ######## movies
 @movies_bp.route('/', methods=['GET'])
@@ -49,17 +49,18 @@ def movies_page():
              return jsonify({'error': str(err_movies)}), 500
         return f"Error fetching movies: {err_movies}", 500
 
+    if fmt == 'json':
+        return jsonify({
+            'items': [dict(m) for m in pagination.items],
+            'pagination': {
+                'total': pagination.total,
+                'page': pagination.page,
+                'per_page': pagination.per_page,
+                'pages': pagination.pages
+            }
+        })
+
     if is_ajax:
-        if fmt == 'json':
-            return jsonify({
-                'items': [dict(m) for m in pagination.items],
-                'pagination': {
-                    'total': pagination.total,
-                    'page': pagination.page,
-                    'per_page': pagination.per_page,
-                    'pages': pagination.pages
-                }
-            })
 
         movies_html = []
         for movie in pagination.items:
@@ -93,6 +94,17 @@ def movies_page():
 @movies_bp.route('/<int:movie_id>', methods=['GET'])
 def movies_details_page(movie_id):
     """ Returns corresponding page for movies """
+    fmt = request.args.get("format", type=str)
+    
+    if fmt == 'json':
+        movie, err = get_movie_by_id_db(movie_id)
+        if err:
+            return jsonify({"error": err}), 500
+        if not movie:
+            return jsonify({"message": "Movie not found"}), 404
+            
+        return jsonify(dict(movie))
+
     current_uid = current_user.id if current_user.is_authenticated else None
     movie_detail, err = get_movie_details_full_db(movie_id, current_uid)
 
@@ -154,11 +166,25 @@ def toggle_favorite(movie_id):
 @movies_bp.route("/", methods=["POST"])
 def create_movie():
     """Get a new movie"""
-    movie_data = request.get_json()
-    if not movie_data:
+    data = {}
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form.to_dict()
+
+    if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    new_movie, err = create_movie_db(movie_data)
+    # File uploads
+    if 'poster_file' in request.files:
+        fn = save_upload_file(request.files['poster_file'])
+        if fn: data['poster_file'] = fn
+        
+    if 'banner_file' in request.files:
+        fn = save_upload_file(request.files['banner_file'])
+        if fn: data['banner_file'] = fn
+
+    new_movie, err = create_movie_db(data)
     if err:
         return jsonify({"error": err}), 500
 
@@ -168,11 +194,25 @@ def create_movie():
 @movies_bp.route("/<int:id>", methods=["PUT"])
 def update_movie(id):
     """Update movie by id"""
-    movie_data = request.get_json()
-    if not movie_data:
+    data = {}
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form.to_dict()
+
+    if not data and not request.files:
         return jsonify({"error": "No data provided"}), 400
 
-    updated_movie, err = update_movie_db(id, movie_data)
+    # File uploads
+    if 'poster_file' in request.files:
+        fn = save_upload_file(request.files['poster_file'])
+        if fn: data['poster_file'] = fn
+
+    if 'banner_file' in request.files:
+        fn = save_upload_file(request.files['banner_file'])
+        if fn: data['banner_file'] = fn
+
+    updated_movie, err = update_movie_db(id, data)
     if err:
         return jsonify({"error": err}), 500
     if not updated_movie:
@@ -184,11 +224,22 @@ def update_movie(id):
 @movies_bp.route("/<int:id>", methods=["DELETE"])
 def delete_movie(id):
     """Delete movie by id"""
+    movie, err = get_movie_by_id_db(id)
+    if err:
+        return jsonify({"error": err}), 500
+    if not movie:
+        return jsonify({"message": "Movie not found"}), 404
+
+    # Delete the movie record
     deleted_movie, err = delete_movie_db(id)
     if err:
         return jsonify({"error": err}), 500
     if not deleted_movie:
         return jsonify({"message": "Movie not found"}), 404
+        
+    delete_file(movie.get('poster_file'))
+    delete_file(movie.get('banner_file'))
+    
     return jsonify(deleted_movie), 200
 
 ######## genres
