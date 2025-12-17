@@ -25,10 +25,13 @@ def get_actors_paginated_db(page: int = 1, per_page: int = 12, search_query: str
             # Get paginated actors with search
             actors = execute_query(
                 """
-                SELECT id, name, biography, birth_date, photo_url, created_at
-                FROM people
-                WHERE name ILIKE %s
-                ORDER BY name
+                SELECT p.id, p.name, p.biography, p.birth_date, p.photo_url, p.created_at,
+                       COUNT(mc.movie_id) as movie_count
+                FROM people p
+                LEFT JOIN movie_cast mc ON p.id = mc.person_id
+                WHERE p.name ILIKE %s
+                GROUP BY p.id, p.name, p.biography, p.birth_date, p.photo_url, p.created_at
+                ORDER BY movie_count DESC, p.name
                 LIMIT %s OFFSET %s
                 """,
                 (f'%{search_query}%', per_page, offset),
@@ -45,9 +48,12 @@ def get_actors_paginated_db(page: int = 1, per_page: int = 12, search_query: str
             # Get paginated actors
             actors = execute_query(
                 """
-                SELECT id, name, biography, birth_date, photo_url, created_at
-                FROM people
-                ORDER BY name
+                SELECT p.id, p.name, p.biography, p.birth_date, p.photo_url, p.created_at,
+                       COUNT(mc.movie_id) as movie_count
+                FROM people p
+                LEFT JOIN movie_cast mc ON p.id = mc.person_id
+                GROUP BY p.id, p.name, p.biography, p.birth_date, p.photo_url, p.created_at
+                ORDER BY movie_count DESC, p.name
                 LIMIT %s OFFSET %s
                 """,
                 (per_page, offset),
