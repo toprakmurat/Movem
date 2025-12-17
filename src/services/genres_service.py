@@ -23,11 +23,9 @@ def get_genres_paginated_db(page: int = 1, per_page: int = 20):
     try:
         offset = (page - 1) * per_page
         
-        # Count
         count_res = execute_query("SELECT COUNT(*) as count FROM genres", fetch=True)
         total = count_res[0]['count'] if count_res else 0
 
-        # Data
         genres = execute_query(
             "SELECT * FROM genres ORDER BY id LIMIT %s OFFSET %s",
             (per_page, offset),

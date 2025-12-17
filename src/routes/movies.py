@@ -7,6 +7,7 @@ from flask_login import current_user
 from src.services.comments_service import get_comments_for_movie
 from src.services.list_service import get_lists_by_user_db
 from src.utils.file_utils import save_upload_file, delete_file
+from src.utils.decorators import admin_required
 
 movies_bp = Blueprint('movies', __name__)
 
@@ -164,6 +165,7 @@ def toggle_favorite(movie_id):
 
 
 @movies_bp.route("/", methods=["POST"])
+@admin_required
 def create_movie():
     """Get a new movie"""
     data = {}
@@ -192,6 +194,7 @@ def create_movie():
 
 
 @movies_bp.route("/<int:id>", methods=["PUT"])
+@admin_required
 def update_movie(id):
     """Update movie by id"""
     data = {}
@@ -222,6 +225,7 @@ def update_movie(id):
 
 
 @movies_bp.route("/<int:id>", methods=["DELETE"])
+@admin_required
 def delete_movie(id):
     """Delete movie by id"""
     movie, err = get_movie_by_id_db(id)
@@ -281,6 +285,7 @@ def get_genre_by_id(id):
 
 
 @movies_bp.route("/genre", methods=["POST"])
+@admin_required
 def create_genre():
     """Create a new genre"""
     genre_data = request.get_json()
@@ -294,6 +299,7 @@ def create_genre():
 
 
 @movies_bp.route("/genre/<int:id>", methods=["PUT"])
+@admin_required
 def update_genre(id):
     """Update genre by id"""
     genre_data = request.get_json()
@@ -309,6 +315,7 @@ def update_genre(id):
 
 
 @movies_bp.route("/genre/<int:id>", methods=["DELETE"])
+@admin_required
 def delete_genre(id):
     """Delete genre by id"""
     deleted_genre, err = delete_genre_db(id)
@@ -366,6 +373,7 @@ def get_movies_genres_by_id(id):
     return jsonify(dict(mg)), 200
 
 @movies_bp.route("/movies-genres", methods=["POST"])
+@admin_required
 def create_movies_genres():
     """Create a movie-genre relation"""
     data = request.get_json()
@@ -379,6 +387,7 @@ def create_movies_genres():
     return jsonify(dict(new_mg)), 201
 
 @movies_bp.route("/movies-genres/<int:id>", methods=["PUT"])
+@admin_required
 def update_movies_genres(id):
     """Update movie-genre relation"""
     data = request.get_json()
@@ -395,6 +404,7 @@ def update_movies_genres(id):
 
 
 @movies_bp.route("/movies-genres/<int:id>", methods=["DELETE"])
+@admin_required
 def delete_movies_genres(id):
     """Delete movie-genre relation"""
     deleted, err = delete_movie_genre_db(id)
@@ -442,6 +452,7 @@ def get_favorite(id):
 
 
 @movies_bp.route("/favorites", methods=["POST"])
+@admin_required
 def create_favorite():
     data = request.get_json()
     if not data or "user_id" not in data or "movie_id" not in data:
@@ -455,6 +466,7 @@ def create_favorite():
 
 
 @movies_bp.route("/favorites/<int:id>", methods=["PUT"])
+@admin_required
 def update_favorite(id):
     data = request.get_json()
     if not data:
@@ -470,6 +482,7 @@ def update_favorite(id):
 
 
 @movies_bp.route("/favorites/<int:id>", methods=["DELETE"])
+@admin_required
 def delete_favorite(id):
     deleted, err = delete_favorite_db(id)
     if err:
