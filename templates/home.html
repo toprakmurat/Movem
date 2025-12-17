@@ -298,9 +298,11 @@
 
       <a href="{{ url_for('auth.public_profile', user_id=reviewer.user_id) }}" class="absolute inset-0 z-10"
         aria-label="View {{ reviewer.username }}'s profile"></a>
+      {% set placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
       <div class="aspect-[1/1] w-full overflow-hidden rounded-t-2xl">
-        <img src="{{ url_for('static', filename='img/' ~ ('placeholder_avatar.svg')) }}"
-          alt="{{ reviewer.username }} avatar"
+        <img
+          src="{{ url_for('static', filename=reviewer.profile_picture) if reviewer.profile_picture else placeholder }}"
+          onerror="this.src='{{ placeholder }}'" alt="{{ reviewer.username }} avatar"
           class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
       </div>
 

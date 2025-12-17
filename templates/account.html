@@ -24,7 +24,10 @@
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-4">
           {% set default_avatar = url_for('static', filename='img/placeholder_avatar.svg') %}
-          <img src="{{ url_for('static', filename=current_user.avatar) }}" onerror="this.src='{{ default_avatar }}';"
+          {% set user_avatar = current_user.avatar if current_user.avatar is defined else
+          current_user.get('profile_picture') %}
+          <img src="{{ url_for('static', filename=user_avatar) if user_avatar else default_avatar }}"
+            onerror="this.src='{{ default_avatar }}';"
             class="h-24 w-24 rounded-3xl object-cover ring-2 ring-white/20 bg-black"
             alt="{{ current_user.first_name }} avatar" />
           <div>
