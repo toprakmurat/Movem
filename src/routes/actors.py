@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, render_template
+from src.utils.decorators import admin_required
 from src.services.actors_service import (
     get_actors_paginated_db,
     get_actor_by_id_db,
@@ -95,6 +96,7 @@ def get_actor_movies(actor_id):
 
 
 @actors_bp.route('/', methods=['POST'])
+@admin_required
 def create_actor():
     """Create a new actor"""
     data = request.get_json()
@@ -110,6 +112,7 @@ def create_actor():
 
 # TODO: Subject to change, might better handle parameters with a helper function
 @actors_bp.route('/<int:actor_id>', methods=['PUT'])
+@admin_required
 def update_actor(actor_id):
     """Update an existing actor"""
     data = request.get_json()
@@ -128,6 +131,7 @@ def update_actor(actor_id):
 
 
 @actors_bp.route('/<int:actor_id>', methods=['DELETE'])
+@admin_required
 def delete_actor(actor_id):
     """Delete an actor"""
     # Delete actor using service

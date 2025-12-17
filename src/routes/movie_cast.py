@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, render_template
+from src.utils.decorators import admin_required
 from src.services.movie_cast_service import (
     get_movie_cast_paginated_db,
     get_movie_cast_by_id_db,
@@ -94,6 +95,7 @@ def get_cast_by_person(person_id):
 
 
 @movie_cast_bp.route('/', methods=['POST'])
+@admin_required
 def create_movie_cast():
     """Create a new movie cast entry - returns JSON only"""
     data = request.get_json()
@@ -109,6 +111,7 @@ def create_movie_cast():
 
 
 @movie_cast_bp.route('/<int:cast_id>', methods=['PUT'])
+@admin_required
 def update_movie_cast(cast_id):
     """Update an existing movie cast entry - returns JSON only"""
     data = request.get_json()
@@ -127,6 +130,7 @@ def update_movie_cast(cast_id):
 
 
 @movie_cast_bp.route('/<int:cast_id>', methods=['DELETE'])
+@admin_required
 def delete_movie_cast(cast_id):
     """Delete a movie cast entry - returns JSON only"""
     # Delete movie cast entry using service
