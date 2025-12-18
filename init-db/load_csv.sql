@@ -52,3 +52,7 @@ SELECT setval('list_items_id_seq', (SELECT MAX(id) FROM list_items));
 SELECT setval('favorites_id_seq', (SELECT MAX(id) FROM favorites));
 
 SELECT setval('movies_genres_id_seq', (SELECT MAX(id) FROM movies_genres));
+
+SELECT setval('movie_question_id_seq', (SELECT MAX(id) FROM movie_question));
+
+SELECT setval('question_types_id_seq', (SELECT MAX(id) FROM question_types));
