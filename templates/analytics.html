@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% block title %}Analytics • MoveM{% endblock %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<section class="mx-auto max-w-7xl animate-fade-in space-y-8">
+
+    {# Header #}
+    <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div>
+            <p class="text-xs uppercase tracking-[0.3em] text-brand-400">Data Insights</p>
+            <h1 class="mt-2 text-4xl font-display font-bold uppercase tracking-wide text-white">Analytics</h1>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="switchTab('trends')" id="tab-btn-trends"
+                class="rounded-full border border-white/10 bg-white/5 px-6 py-2 text-sm font-medium text-white transition hover:bg-white/10 active-tab:bg-brand-600 active-tab:border-brand-500">
+                Movie Trends
+            </button>
+            <button onclick="switchTab('market')" id="tab-btn-market"
+                class="rounded-full border border-white/10 bg-white/5 px-6 py-2 text-sm font-medium text-white transition hover:bg-white/10">
+                Market Overview
+            </button>
+        </div>
+    </div>
+
+    {# Tab: Movie Trends #}
+    <div id="tab-trends" class="space-y-8 tab-content">
+        <div class="grid gap-6 md:grid-cols-2">
+
+            <!-- Genre Radar -->
+            <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">The Genre Landscape</h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="genreChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">Distribution of movies across top genres</p>
+            </div>
+
+            <!-- Rating Distribution (Bell Curve) -->
+            <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">Rating Distribution</h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="ratingChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">How critical are the audiences?</p>
+            </div>
+
+            <!-- Runtime Trend -->
+            <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">Are Movies Getting Longer?</h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="runtimeChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">Average runtime (minutes) over the years</p>
+            </div>
+
+            <!-- Bankable Stars -->
+            <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">Bankable Stars</h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="actorsChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">Top actors by average movie rating (Quality Control)
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    {# Tab: Market Overview #}
+    <div id="tab-market" class="space-y-8 hidden tab-content">
+        <div class="grid gap-6 md:grid-cols-2">
+
+            <!-- Platform Share -->
+            <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">The Streaming Wars</h3>
+                <div class="relative h-64 md:h-80 w-full flex items-center justify-center">
+                    <canvas id="platformChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">Market share by movie count</p>
+            </div>
+
+            <!-- Release Timeline -->
+            <div class="rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">The Golden Eras</h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">Number of releases per year</p>
+            </div>
+
+            <!-- Seasonal Revenue Trends -->
+            <div class="col-span-1 md:col-span-2 rounded-3xl border border-white/10 bg-slate-900/50 p-6 md:p-8">
+                <h3 class="mb-6 text-xl font-semibold text-white">Seasonal Revenue Trends</h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="seasonalChart"></canvas>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-400">Does releasing in specific months matter?</p>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<script>
+    // -- Data from Flask --
+    const platformData = {{ platforms | tojson }};
+    const genreData = {{ genres | tojson }};
+    const timelineData = {{ timeline | tojson }};
+    const runtimeData = {{ runtime_trend | tojson }};
+    const ratingData = {{ rating_dist | tojson }};
+    const seasonalData = {{ seasonal_rev | tojson }};
+    const actorsData = {{ bankable_stars | tojson }};
+
+    // -- Chart Configs --
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#334155';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // 1. Genre Landscape (Radar)
+    new Chart(document.getElementById('genreChart'), {
+        type: 'radar',
+        data: {
+            labels: genreData.map(d => d.genre_name),
+            datasets: [{
+                label: 'Movie Count',
+                data: genreData.map(d => d.total_movies),
+                backgroundColor: 'rgba(239, 68, 68, 0.2)', // Brand Red
+                borderColor: '#ef4444',
+                pointBackgroundColor: '#ef4444',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#ef4444'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: { color: '#e2e8f0', font: { size: 12 } },
+                    ticks: { display: false, backdropColor: 'transparent' }
+                }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // 2. Rating Distribution (Bar)
+    const ratingOrder = ['1-2', '3-4', '5-6', '7-8', '9-10'];
+    const ratingCounts = ratingOrder.map(label => {
+        const found = ratingData.find(d => d.rating_range === label);
+        return found ? found.count : 0;
+    });
+
+    new Chart(document.getElementById('ratingChart'), {
+        type: 'bar',
+        data: {
+            labels: ratingOrder,
+            datasets: [{
+                label: 'Movie Count',
+                data: ratingCounts,
+                backgroundColor: '#3b82f6', // Blue
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+
+    // 3. Runtime Trends (Line)
+    new Chart(document.getElementById('runtimeChart'), {
+        type: 'line',
+        data: {
+            labels: runtimeData.map(d => d.year),
+            datasets: [{
+                label: 'Avg Runtime (min)',
+                data: runtimeData.map(d => d.avg_minutes),
+                borderColor: '#f59e0b', // Amber
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: false } // Focus on the range
+            }
+        }
+    });
+
+    // 4. Bankable Stars (Horizontal Bar)
+    new Chart(document.getElementById('actorsChart'), {
+        type: 'bar',
+        indexAxis: 'y',
+        data: {
+            labels: actorsData.map(d => d.name),
+            datasets: [{
+                label: 'Avg Rating',
+                data: actorsData.map(d => d.rating_average),
+                backgroundColor: '#10b981', // Emerald
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { min: 0, max: 10 },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 5. Platform Share (Doughnut)
+    new Chart(document.getElementById('platformChart'), {
+        type: 'doughnut',
+        data: {
+            labels: platformData.map(d => d.platform_name),
+            datasets: [{
+                data: platformData.map(d => d.movie_count),
+                backgroundColor: [
+                    '#ef4444', // Netflix Red
+                    '#3b82f6', // Disney Blue
+                    '#10b981', // Prime Green
+                    '#f59e0b', // Hulu Orange
+                    '#8b5cf6', // HBO Purple
+                    '#ec4899', // Pink
+                    '#6366f1', // Indigo
+                    '#14b8a6', // Teal
+                    '#f97316', // Orange
+                    '#84cc16', // Lime
+                    '#64748b'  // Others (Gray)
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // 6. Release Timeline (Line/Area)
+    new Chart(document.getElementById('timelineChart'), {
+        type: 'line',
+        data: {
+            labels: timelineData.map(d => d.release_year),
+            datasets: [{
+                label: 'Releases',
+                data: timelineData.map(d => d.movie_count),
+                borderColor: '#3b82f6', // Blue
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.2,
+                fill: true,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // 7. Seasonal Revenue (Line)
+    const monthNames = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    new Chart(document.getElementById('seasonalChart'), {
+        type: 'line',
+        data: {
+            labels: seasonalData.map(d => monthNames[d.month]),
+            datasets: [{
+                label: 'Avg Revenue ($)',
+                data: seasonalData.map(d => d.avg_revenue),
+                borderColor: '#8b5cf6', // Purple
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return '$' + (value / 1000000).toFixed(0) + 'M';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // -- Tab Switching Logic --
+    function switchTab(tabId) {
+        // Hide all
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+        // Show target
+        document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+        // Reset buttons
+        const buttons = ['trends', 'market'];
+        buttons.forEach(id => {
+            const btn = document.getElementById('tab-btn-' + id);
+            if (id === tabId) {
+                btn.classList.add('bg-brand-600', 'border-brand-500');
+                btn.classList.remove('bg-white/5', 'border-white/10');
+            } else {
+                btn.classList.remove('bg-brand-600', 'border-brand-500');
+                btn.classList.add('bg-white/5', 'border-white/10');
+            }
+        });
+
+        // Resize charts just in case 
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 10);
+    }
+
+    // Set Default Tab
+    switchTab('trends');
+</script>
+{% endblock %}

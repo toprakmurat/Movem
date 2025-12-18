@@ -1,168 +1,219 @@
 {% extends 'base.html' %}
 {% block title %}New Game • MoveM{% endblock %}
 {% block content %}
-<section class="mx-auto max-w-3xl space-y-8 py-10">
-  <header class="text-center">
-    <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Setup</p>
-    <h1 class="mt-2 text-4xl font-semibold font-display tracking-wide">Choose Game Modes</h1>
-    <p class="mt-2 text-slate-400">Select one or more categories to include in your game.</p>
-  </header>
+<section class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 py-10">
 
-  <form action="{{ url_for('game.start_game') }}" method="post" class="space-y-10">
-    <!-- Grid of Game Modes -->
-    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+  <!-- Main Game Setup Area (Col Span 3) -->
+  <div class="lg:col-span-3 space-y-8">
+    <header class="text-left">
+      <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Setup</p>
+      <h1 class="mt-2 text-4xl font-semibold font-display tracking-wide">Choose Game Modes</h1>
+      <p class="mt-2 text-slate-400">Select one or more categories to include in your game.</p>
+    </header>
 
-      <!-- Mode 1: Budget -->
-      <label class="cursor-pointer group relative">
-        <input type="checkbox" name="game_types" value="1" class="peer sr-only" checked>
-        <div
-          class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+    <form action="{{ url_for('game.start_game') }}" method="post" class="space-y-10">
+      <!-- Grid of Game Modes -->
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+        <!-- Mode 1: Budget -->
+        <label class="cursor-pointer group relative">
+          <input type="checkbox" name="game_types" value="1" class="peer sr-only" checked>
           <div
-            class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-          </div>
-          <h3 class="font-semibold text-white">Higher Budget</h3>
-          <p class="text-xs text-slate-400 mt-1">Who spent more to make it?</p>
+            class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+            <div
+              class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-white">Higher Budget</h3>
+            <p class="text-xs text-slate-400 mt-1">Who spent more to make it?</p>
 
-          <!-- Checkmark Icon (Visible only when checked) -->
-          <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd" />
-            </svg>
+            <!-- Checkmark Icon (Visible only when checked) -->
+            <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
-        </div>
-      </label>
+        </label>
 
-      <!-- Mode 2: Revenue -->
-      <label class="cursor-pointer group relative">
-        <input type="checkbox" name="game_types" value="2" class="peer sr-only">
-        <div
-          class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+        <!-- Mode 2: Revenue -->
+        <label class="cursor-pointer group relative">
+          <input type="checkbox" name="game_types" value="2" class="peer sr-only">
           <div
-            class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
+            class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+            <div
+              class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-white">Higher Revenue</h3>
+            <p class="text-xs text-slate-400 mt-1">Who made more money?</p>
+            <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
-          <h3 class="font-semibold text-white">Higher Revenue</h3>
-          <p class="text-xs text-slate-400 mt-1">Who made more money?</p>
-          <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd" />
-            </svg>
-          </div>
-        </div>
-      </label>
+        </label>
 
-      <!-- Mode 3: Runtime -->
-      <label class="cursor-pointer group relative">
-        <input type="checkbox" name="game_types" value="3" class="peer sr-only">
-        <div
-          class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+        <!-- Mode 3: Runtime -->
+        <label class="cursor-pointer group relative">
+          <input type="checkbox" name="game_types" value="3" class="peer sr-only">
           <div
-            class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
+            class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+            <div
+              class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-white">Longer Runtime</h3>
+            <p class="text-xs text-slate-400 mt-1">Which movie is longer?</p>
+            <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
-          <h3 class="font-semibold text-white">Longer Runtime</h3>
-          <p class="text-xs text-slate-400 mt-1">Which movie is longer?</p>
-          <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd" />
-            </svg>
-          </div>
-        </div>
-      </label>
+        </label>
 
-      <!-- Mode 4: Rating -->
-      <label class="cursor-pointer group relative">
-        <input type="checkbox" name="game_types" value="4" class="peer sr-only">
-        <div
-          class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+        <!-- Mode 4: Rating -->
+        <label class="cursor-pointer group relative">
+          <input type="checkbox" name="game_types" value="4" class="peer sr-only">
           <div
-            class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-              </polygon>
-            </svg>
+            class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+            <div
+              class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                </polygon>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-white">Higher Rating</h3>
+            <p class="text-xs text-slate-400 mt-1">Critics liked it more.</p>
+            <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
-          <h3 class="font-semibold text-white">Higher Rating</h3>
-          <p class="text-xs text-slate-400 mt-1">Critics liked it more.</p>
-          <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd" />
-            </svg>
-          </div>
-        </div>
-      </label>
+        </label>
 
-      <!-- Mode 5: Votes -->
-      <label class="cursor-pointer group relative">
-        <input type="checkbox" name="game_types" value="5" class="peer sr-only">
-        <div
-          class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+        <!-- Mode 5: Votes -->
+        <label class="cursor-pointer group relative">
+          <input type="checkbox" name="game_types" value="5" class="peer sr-only">
           <div
-            class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
+            class="h-full rounded-2xl border border-slate-700 bg-slate-900/60 p-6 transition-all duration-200 hover:border-brand-400 hover:bg-slate-800 peer-checked:border-brand-500 peer-checked:bg-brand-900/20 peer-checked:ring-1 peer-checked:ring-brand-500">
+            <div
+              class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-brand-300 peer-checked:bg-brand-500 peer-checked:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-white">More Votes</h3>
+            <p class="text-xs text-slate-400 mt-1">Most popular popularity.</p>
+            <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clip-rule="evenodd" />
+              </svg>
+            </div>
           </div>
-          <h3 class="font-semibold text-white">More Votes</h3>
-          <p class="text-xs text-slate-400 mt-1">Most popular popularity.</p>
-          <div class="absolute top-4 right-4 text-brand-500 opacity-0 transition-opacity peer-checked:opacity-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd" />
-            </svg>
-          </div>
-        </div>
-      </label>
+        </label>
 
+      </div>
+
+      <div class="flex justify-start">
+        <button type="submit" class="btn-primary w-full max-w-md text-lg py-4 rounded-xl shadow-xl hover:scale-105">
+          Start Game
+        </button>
+      </div>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="mt-8 space-y-4">
+      {% for category, message in messages %}
+      <div
+        class="p-4 rounded-lg {{ 'bg-green-500/20 text-green-400 border border-green-500/50' if category == 'success' else 'bg-red-500/20 text-red-400 border border-red-500/50' }}">
+        {{ message }}
+      </div>
+      {% endfor %}
     </div>
-
-    <div class="flex justify-center pt-6">
-      <button type="submit" class="btn-primary w-full max-w-md text-lg py-4 rounded-xl shadow-xl hover:scale-105">
-        Start Game
-      </button>
-    </div>
-  </form>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <div class="mt-8 space-y-4">
-    {% for category, message in messages %}
-    <div
-      class="p-4 rounded-lg {{ 'bg-green-500/20 text-green-400 border border-green-500/50' if category == 'success' else 'bg-red-500/20 text-red-400 border border-red-500/50' }}">
-      {{ message }}
-    </div>
-    {% endfor %}
+    {% endif %}
+    {% endwith %}
   </div>
-  {% endif %}
-  {% endwith %}
+
+  <!-- Sidebar: Leaderboard -->
+  <div class="lg:col-span-1 border-l border-white/5 pl-0 lg:pl-8">
+    <div class="sticky top-24">
+      <h2 class="text-xl font-bold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+        Leaderboard
+      </h2>
+
+      {% if leaderboard %}
+      <div class="space-y-4">
+        {% for user in leaderboard %}
+        <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50 border border-white/5">
+          <div class="flex-shrink-0 font-display font-bold text-slate-500 w-6 text-center">
+            #{{ loop.index }}
+          </div>
+          <img
+            src="{{ url_for('static', filename=user.avatar) if user.avatar else url_for('static', filename='img/placeholder_avatar.svg') }}"
+            alt="{{ user.username }}" class="h-10 w-10 rounded-full object-cover border border-white/10">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-white truncate">
+              {{ user.username }}
+            </p>
+            <p class="text-xs text-brand-500 font-bold">
+              {{ user.score }} pts
+            </p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="mt-6 text-center">
+        <a href="{{ url_for('game.leaderboard') }}"
+          class="text-xs text-slate-400 hover:text-white transition-colors uppercase tracking-widest border-b border-dashed border-slate-600 hover:border-white pb-0.5">
+          View Full Board
+        </a>
+      </div>
+      {% else %}
+      <div class="rounded-xl bg-slate-900/50 p-6 text-center border border-white/5">
+        <p class="text-sm text-slate-400">No high scores yet.</p>
+        <p class="text-xs text-slate-500 mt-2">Be the first!</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 
 </section>
 {% endblock %}

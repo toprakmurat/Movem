@@ -91,8 +91,9 @@
         <button onclick="openTab(event, 'tab-people')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">People</button>
         <button onclick="openTab(event, 'tab-stats')"
-            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Game
-            Statistic</button>
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Statistic</button>
+        <button onclick="openTab(event, 'tab-game')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Game</button>
         <button onclick="openTab(event, 'tab-favorites')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Favorites</button>
     </div>
@@ -961,7 +962,7 @@
         </section>
     </div>
 
-    <!-- TAB CONTENT: GAME STATISTIC -->
+    <!-- TAB CONTENT: STATISTIC -->
     <div id="tab-stats" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Game Statistics</h2>
@@ -1051,6 +1052,21 @@
                         <button class="btn-primary w-full py-2 rounded-xl">Save</button>
                     </form>
                     <br>
+                    <h4 class="text-lg font-semibold text-white mb-4">Get Statistic by ID</h4>
+                    <form onsubmit="handleGetStatisticById(event)" class="space-y-4 mb-8 pb-8 border-b border-white/10">
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-green-600/80 hover:bg-green-500 text-white rounded-xl py-2 font-medium transition">Get
+                            Statistic</button>
+                    </form>
+                    <div id="statistic-result" class="mb-8 hidden">
+                        <h5 class="text-sm font-semibold text-blue-300 mb-2">Result:</h5>
+                        <pre
+                            class="bg-black/40 p-4 rounded-xl text-xs font-mono text-white/80 overflow-x-auto border border-white/5"></pre>
+                    </div>
+
                     <h4 class="text-lg font-semibold text-white mb-4">Update Statistic</h4>
                     <form onsubmit="handleUpdateStatistic(event)" class="space-y-4 pt-4 border-t border-white/10">
                         <input name="movie_id" type="number" placeholder="Movie ID (Required)"
@@ -1074,23 +1090,45 @@
                             class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
                         </button>
                     </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete
+                        Statistic by ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/statistic', () => location.reload())" class="space-y-4">
+                        <input name="id" type="number" placeholder="Movie ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Statistic</button>
+                    </form>
+
+
                 </div>
                 <div
                     class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
                     <table class="w-full text-left text-sm text-white/70">
                         <thead class="uppercase tracking-wider text-xs border-b border-white/10">
                             <tr>
+                                <th class="px-4 py-2">ID</th>
                                 <th class="px-4 py-2">Movie ID</th>
                                 <th class="px-4 py-2">Budget</th>
+                                <th class="px-4 py-2">Revenue</th>
+                                <th class="px-4 py-2">Runtime</th>
+                                <th class="px-4 py-2">Vote Avg</th>
+                                <th class="px-4 py-2">Vote Count</th>
                                 <th class="px-4 py-2">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-white/5">
-                            {% for s in statistics[:100] %}
+                            {% for s in statistics.items %}
                             <tr>
+                                <td class="px-4 py-2">{{ s.id }}</td>
                                 <td class="px-4 py-2">{{ s.movie_id }}</td>
+                                <td class="px-4 py-2 font-mono text-xs">{{ s.budget }}</td>
+                                <td class="px-4 py-2 font-mono text-xs">{{ s.revenue }}</td>
                                 <td class="px-4 py-2">{{ s.runtime }}</td>
                                 <td class="px-4 py-2">{{ s.vote_avg }}</td>
+                                <td class="px-4 py-2">{{ s.vote_count }}</td>
                                 <td class="px-4 py-2">
                                     <button onclick="deleteResource('/statistic/{{ s.movie_id }}')"
                                         class="text-red-400 text-xs">Delete</button>
@@ -1099,6 +1137,8 @@
                             {% endfor %}
                         </tbody>
                     </table>
+
+                    {{ render_pagination(statistics, 'admin.dashboard', '#tab-stats', 'stats_page') }}
                 </div>
             </div>
         </section>
@@ -1234,6 +1274,254 @@
         </section>
     </div>
 
+    <!-- TAB CONTENT: GAME -->
+    <div id="tab-game" class="tab-content hidden space-y-8">
+        <!-- MOVIE QUESTIONS SECTION -->
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Game Management</h2>
+
+            <!-- TABLE DEFINITION: MOVIE_QUESTION -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: MOVIE_QUESTION</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">question_type</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie1_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie2_id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">FK</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Manage Movie Questions -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Get Question by ID</h4>
+                    <form onsubmit="handleGetQuestionById(event)" class="space-y-4 mb-8 pb-8 border-b border-white/10">
+                        <input name="id" type="number" placeholder="Question ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-green-600/80 hover:bg-green-500 text-white rounded-xl py-2 font-medium transition">Get
+                            Question</button>
+                    </form>
+                    <div id="question-result" class="mb-8 hidden">
+                        <h5 class="text-sm font-semibold text-blue-300 mb-2">Result:</h5>
+                        <pre
+                            class="bg-black/40 p-4 rounded-xl text-xs font-mono text-white/80 overflow-x-auto border border-white/5"></pre>
+                    </div>
+
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Question</h4>
+                    <form onsubmit="handleApiSubmit(event, '/game/questions', 'POST')" class="space-y-4">
+                        <input name="question_type" type="number" placeholder="Question Type ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="movie1_id" type="number" placeholder="Movie 1 ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                                required>
+                            <input name="movie2_id" type="number" placeholder="Movie 2 ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                                required>
+                        </div>
+                        <button class="btn-primary w-full py-2 rounded-xl">Create Question</button>
+                    </form>
+                    <br>
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Question
+                    </h4>
+                    <form onsubmit="handleUpdateQuestion(event)" class="space-y-4">
+                        <input name="id" type="number" placeholder="Question ID to Update (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="question_type" type="number" placeholder="New Question Type ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="movie1_id" type="number" placeholder="New Movie 1 ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <input name="movie2_id" type="number" placeholder="New Movie 2 ID"
+                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        </div>
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Question</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Question
+                        by ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/game/questions', loadGameQuestions)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Question</button>
+                    </form>
+
+
+                </div>
+
+                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[500px]">
+                        <h4
+                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
+                            Questions List</h4>
+                        <table class="w-full text-left text-sm text-white/70">
+                            <thead
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                <tr>
+                                    <th class="px-4 py-3 text-blue-300">ID</th>
+                                    <th class="px-4 py-3 text-blue-300">Type</th>
+                                    <th class="px-4 py-3 text-blue-300">Movie 1</th>
+                                    <th class="px-4 py-3 text-blue-300">Movie 2</th>
+                                    <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                {% for q in questions.items %}
+                                <tr>
+                                    <td class="px-4 py-3">{{ q.id }}</td>
+                                    <td class="px-4 py-3">{{ q.question_type_name }}</td>
+                                    <td class="px-4 py-3">{{ q.movie1_id }}</td>
+                                    <td class="px-4 py-3">{{ q.movie2_id }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <button onclick="deleteResource('/game/questions/{{ q.id }}')"
+                                            class="text-red-400 hover:text-red-300 text-xs">Delete</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {{ render_pagination(questions, 'admin.dashboard', '#tab-game', 'game_page') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-white/10 my-8"></div>
+
+            <!-- TABLE DEFINITION: QUESTION_TYPES -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: QUESTION_TYPES</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">question_type_name</td>
+                                <td class="px-2 py-1">varchar</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Manage Question Types -->
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Question Type</h4>
+                    <form onsubmit="handleApiSubmit(event, '/game/question-types', 'POST')" class="space-y-4">
+                        <input name="question_type_name" placeholder="Name (e.g. higher_budget)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button class="btn-primary w-full py-2 rounded-xl">Create Type</button>
+                    </form>
+                    <br>
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Question
+                        Type
+                    </h4>
+                    <form onsubmit="handleUpdateQuestionType(event)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Update (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input name="question_type_name" placeholder="New Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
+                            Type</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Type by
+                        ID</h4>
+                    <form onsubmit="handleDeleteById(event, '/game/question-types', loadQuestionTypes)"
+                        class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <button
+                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
+                            Type</button>
+                    </form>
+                </div>
+
+                <div class="overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
+                    <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[500px]">
+                        <h4
+                            class="text-lg font-semibold text-white mb-4 sticky top-0 bg-black/80 backdrop-blur z-20 p-4 border-b border-white/10 w-full block">
+                            Question Types List</h4>
+                        <table class="w-full text-left text-sm text-white/70">
+                            <thead
+                                class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-[60px] bg-black/90 backdrop-blur z-10 shadow-lg">
+                                <tr>
+                                    <th class="px-4 py-3 text-blue-300">ID</th>
+                                    <th class="px-4 py-3 text-blue-300">Name</th>
+                                    <th class="px-4 py-3 text-blue-300 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="question-types-table-body" class="divide-y divide-white/5">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
 </section>
 
 <script>
@@ -1269,6 +1557,9 @@
         if (tabName === 'tab-genres') loadGenres();
         if (tabName === 'tab-movie-genres') loadMovieGenres();
         if (tabName === 'tab-favorites') loadFavorites();
+        if (tabName === 'tab-game') {
+            loadQuestionTypes();
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -1294,6 +1585,10 @@
             if (data.error) throw new Error(data.error);
 
             const tbody = document.getElementById(containerId);
+            if (!tbody) {
+                console.warn(`Container with ID '${containerId}' not found.`);
+                return;
+            }
             tbody.innerHTML = '';
 
             if (data.items.length === 0) {
@@ -1312,7 +1607,10 @@
     }
 
     function renderPaginationControl(containerId, pagination, baseUrl) {
+        if (!containerId) return;
         const container = document.getElementById(containerId);
+        if (!container) return;
+
         if (!pagination || pagination.pages <= 1) {
             container.innerHTML = '';
             return;
@@ -1395,7 +1693,32 @@
         </tr>
     `);
 
+    window.loadGameQuestions = () => fetchData('/game/questions', 'game-questions-table-body', null, (q) => `
+        <tr class="hover:bg-blue-500/10 transition duration-150 group">
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${q.id}</td>
+            <td class="px-4 py-2">${q.question_type_name || q.question_type}</td>
+            <td class="px-4 py-2" title="${q.movie1_title}">${q.movie1_title ? (q.movie1_title.substring(0, 20) + '...') : q.movie1_id}</td>
+            <td class="px-4 py-2" title="${q.movie2_title}">${q.movie2_title ? (q.movie2_title.substring(0, 20) + '...') : q.movie2_id}</td>
+            <td class="px-4 py-2 text-right">
+                <button onclick="deleteResource('/game/questions/${q.id}', loadGameQuestions)"
+                    class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
+            </td>
+        </tr>
+    `);
+
+    window.loadQuestionTypes = () => fetchData('/game/question-types', 'question-types-table-body', null, (t) => `
+        <tr class="hover:bg-blue-500/10 transition duration-150 group">
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${t.id}</td>
+            <td class="px-4 py-2 group-hover:text-white">${t.question_type_name}</td>
+            <td class="px-4 py-2 text-right">
+                <button onclick="deleteResource('/game/question-types/${t.id}', loadQuestionTypes)"
+                    class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
+            </td>
+        </tr>
+    `);
+
     // Helper to switch pages
+
     window.changePage = (baseUrl, page) => {
         if (baseUrl.includes('/movies/genres')) loadGenres(page);
         else if (baseUrl.includes('/movies/movies-genres')) loadMovieGenres(page);
@@ -1433,8 +1756,14 @@
                 else if (url.includes('/movies/movies-genres')) loadMovieGenres();
                 else if (url.includes('/movies/favorites')) loadFavorites();
                 else if (url.includes('/movies/')) loadMovies();
-                else if (url.includes('/statistic/')) location.reload(); // Stats still reload
-                else if (url.includes('/actors/')) location.reload();    // Actors still reload
+                else if (url.includes('/statistic/')) location.reload();
+                else if (url.includes('/actors/')) location.reload();
+                else if (url.includes('/game/questions')) {
+                    if (document.getElementById('game-questions-table-body')) loadGameQuestions();
+                }
+                else if (url.includes('/game/question-types')) {
+                    if (document.getElementById('question-types-table-body')) loadQuestionTypes();
+                }
 
 
 
@@ -1524,6 +1853,18 @@
         handleApiSubmit(event, '/movies/favorites/' + id, 'PUT');
     }
 
+    async function handleUpdateQuestion(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/game/questions/' + id, 'PUT');
+    }
+
+    async function handleUpdateQuestionType(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/game/question-types/' + id, 'PUT');
+    }
+
     // Get By ID Handlers
     async function handleGetMovieById(event) {
         event.preventDefault();
@@ -1563,6 +1904,56 @@
             const data = await res.json();
             alert(JSON.stringify(data, null, 2));
         } catch (e) { alert(e); }
+    }
+
+    async function handleGetStatisticById(event) {
+        event.preventDefault();
+        const id = new FormData(event.target).get('movie_id');
+        const resultContainer = document.getElementById('statistic-result');
+        const pre = resultContainer.querySelector('pre');
+
+        try {
+            const res = await fetch('/statistic/' + id);
+            const data = await res.json();
+
+            resultContainer.classList.remove('hidden');
+            if (res.ok) {
+                pre.textContent = JSON.stringify(data, null, 2);
+            } else {
+                pre.textContent = 'Error: ' + (data.message || data.error);
+            }
+        } catch (e) {
+            resultContainer.classList.remove('hidden');
+            pre.textContent = 'Request failed: ' + e;
+        }
+    }
+
+    async function handleGetQuestionById(event) {
+        event.preventDefault();
+        const id = new FormData(event.target).get('id');
+        const resultContainer = document.getElementById('question-result');
+        const pre = resultContainer.querySelector('pre');
+
+        try {
+            const res = await fetch('/game/questions/' + id);
+            const data = await res.json();
+
+            resultContainer.classList.remove('hidden');
+            if (res.ok) {
+                const filteredData = {
+                    id: data.id,
+                    question_type: data.question_type,
+                    movie1_id: data.movie1_id,
+                    movie2_id: data.movie2_id
+                };
+                pre.textContent = JSON.stringify(filteredData, null, 2);
+            } else {
+                pre.textContent = 'Error: ' + (data.message || data.error);
+            }
+        } catch (e) {
+            resultContainer.classList.remove('hidden');
+            pre.textContent = 'Request failed: ' + e;
+        }
     }
 
     // Generic Delete via Form (Delete by ID)

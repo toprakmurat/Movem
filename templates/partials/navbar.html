@@ -8,17 +8,18 @@
       <a href="{{ url_for('movies.movies_page') }}" class="nav-link">Movies</a>
       <a href="{{ url_for('actors.get_actors') }}" class="nav-link">People</a>
       <a href="{{ url_for('nexus.nexus') }}" class="nav-link">Nexus</a>
-      <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
       <a href="{{ url_for('comments.battleground_page') }}" class="nav-link">Battleground</a>
-      <a href="{{ url_for('game.leaderboard') }}" class="nav-link">Leaderboard</a>   
-      <a href="{{ url_for('auth.account') }}" class="nav-link">Account</a>  
+      <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
+      <a href="{{ url_for('statistic.analytics_page') }}" class="nav-link">Analytics</a>
+      <a href="{{ url_for('auth.account') }}" class="nav-link">Account</a>
       {% if current_user.is_authenticated and current_user.role == 'admin' %}
       <a href="{{ url_for('admin.dashboard') }}" class="nav-link text-purple-400 hover:text-purple-300">Admin</a>
       {% endif %}
     </nav>
     <div class="flex items-center gap-3">
       {% if current_user.is_authenticated %}
-      <div class="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white md:flex">
+      <div
+        class="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white md:flex">
         <span>{{ current_user.first_name or current_user.username }}</span>
       </div>
       <a href="{{ url_for('auth.logout') }}" class="btn-secondary">Logout</a>
@@ -40,9 +41,9 @@
       <a href="{{ url_for('movies.movies_page') }}" class="nav-link">Movies</a>
       <a href="{{ url_for('actors.get_actors') }}" class="nav-link">People</a>
       <a href="{{ url_for('nexus.nexus') }}" class="nav-link">Nexus</a>
-      <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
       <a href="{{ url_for('comments.battleground_page') }}" class="nav-link">Battleground</a>
-      <a href="{{ url_for('game.leaderboard') }}" class="nav-link">Leaderboard</a>
+      <a href="{{ url_for('game.lobby') }}" class="nav-link">Game</a>
+      <a href="{{ url_for('statistic.analytics_page') }}" class="nav-link">Analytics</a>
       <a href="{{ url_for('auth.account') }}" class="nav-link">Account</a>
     </div>
   </div>
