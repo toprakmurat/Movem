@@ -1,10 +1,39 @@
 from src.config.database import execute_query
 
+
+def get_statistics_paginated_db(page=1, per_page=20):
+    """Get all statistics paginated"""
+    try:
+        from src.utils.pagination_utils import Pagination
+        
+        offset = (page - 1) * per_page
+        
+        # count total
+        count_query = "SELECT COUNT(*) as count FROM statistic"
+        count_res = execute_query(count_query, fetch=True)
+        total_count = count_res[0]['count'] if count_res else 0
+        
+        # get data
+        query = """
+            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count, id
+            FROM statistic
+            ORDER BY movie_id
+            LIMIT %s OFFSET %s
+        """
+        stats = execute_query(query, (per_page, offset), fetch=True) or []
+        
+        return Pagination(items=[dict(s) for s in stats],
+                          page=page,
+                          per_page=per_page,
+                          total_count=total_count), None
+    except Exception as e:
+        return None, str(e)
+
 def get_statistics_db():
-    """Get all statistics"""
+    """Get all statistics (Legacy/Non-paginated)"""
     try:
         query = """
-            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count
+            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count, id
             FROM statistic
             ORDER BY movie_id
         """
@@ -226,7 +255,6 @@ def get_cinemetrics_movies_db(metric_type: str, page: int = 1, per_page: int = 8
             
         else:
             # standard simple queries
-            # total count
             count_sql = f"SELECT COUNT(*) as count FROM movies m JOIN statistic s ON m.id = s.movie_id {where_clause}"
             total_res = execute_query(count_sql, tuple(params), fetch=True)
             total_count = total_res[0]['count'] if total_res else 0
@@ -259,5 +287,145 @@ def get_cinemetrics_movies_db(metric_type: str, page: int = 1, per_page: int = 8
                           per_page=per_page,
                           total_count=total_count), None
 
+    except Exception as e:
+        return None, str(e)
+
+def get_platform_share_db():
+    """Get platform market share (Top 10 + Others)"""
+    try:
+        query = """
+            SELECT 
+                p.platform_name, 
+                COUNT(m.id) as movie_count
+            FROM platforms p
+            JOIN movies m ON p.id = m.platform_id
+            GROUP BY p.id, p.platform_name
+            ORDER BY movie_count DESC
+        """
+        all_platforms = execute_query(query, fetch=True)
+        if not all_platforms:
+            return [], None
+            
+        # process for Top 10 + Others
+        if len(all_platforms) > 10:
+            top_10 = all_platforms[:10]
+            others_count = sum(p['movie_count'] for p in all_platforms[10:])
+            result = [dict(p) for p in top_10]
+            result.append({'platform_name': 'Others', 'movie_count': others_count})
+            return result, None
+            
+        return [dict(p) for p in all_platforms], None
+    except Exception as e:
+        return None, str(e)
+
+def get_genre_popularity_db():
+    """Get genre popularity"""
+    try:
+        query = """
+            SELECT 
+                g.genre_name,
+                COUNT(mg.movie_id) as total_movies
+            FROM genres g
+            JOIN movies_genres mg ON g.id = mg.genre_id
+            GROUP BY g.id, g.genre_name
+            ORDER BY total_movies DESC
+            LIMIT 8
+        """
+        return execute_query(query, fetch=True), None
+    except Exception as e:
+        return None, str(e)
+
+def get_release_timeline_db():
+    """Get movies released per year"""
+    try:
+        query = """
+            SELECT 
+                EXTRACT(YEAR FROM release_date) as release_year,
+                COUNT(id) as movie_count
+            FROM movies
+            WHERE release_date IS NOT NULL
+            GROUP BY release_year
+            ORDER BY release_year ASC
+        """
+        return execute_query(query, fetch=True), None
+    except Exception as e:
+        return None, str(e)
+
+def get_runtime_trend_db():
+    """Get average runtime per year"""
+    try:
+        query = """
+            SELECT 
+                EXTRACT(YEAR FROM m.release_date) as year,
+                ROUND(AVG(s.runtime), 0) as avg_minutes
+            FROM movies m
+            JOIN statistic s ON m.id = s.movie_id
+            WHERE m.release_date IS NOT NULL 
+              AND s.runtime > 30 
+            GROUP BY year
+            ORDER BY year ASC
+        """
+        return execute_query(query, fetch=True), None
+    except Exception as e:
+        return None, str(e)
+
+def get_rating_distribution_db():
+    """Get vote average distribution (Bell Curve)"""
+    try:
+        # grouping
+        query = """
+            SELECT 
+                CASE 
+                    WHEN vote_avg < 2 THEN '1-2'
+                    WHEN vote_avg >= 2 AND vote_avg < 4 THEN '3-4'
+                    WHEN vote_avg >= 4 AND vote_avg < 6 THEN '5-6'
+                    WHEN vote_avg >= 6 AND vote_avg < 8 THEN '7-8'
+                    ELSE '9-10'
+                END as rating_range,
+                COUNT(movie_id) as count
+            FROM statistic
+            WHERE vote_avg IS NOT NULL
+            GROUP BY rating_range
+            ORDER BY rating_range
+        """
+        return execute_query(query, fetch=True), None
+    except Exception as e:
+        return None, str(e)
+
+def get_seasonal_revenue_db():
+    """Get average revenue by month"""
+    try:
+        query = """
+            SELECT 
+                EXTRACT(MONTH FROM release_date) as month,
+                AVG(s.revenue) as avg_revenue
+            FROM movies m
+            JOIN statistic s ON m.id = s.movie_id
+            WHERE m.release_date IS NOT NULL AND s.revenue > 0
+            GROUP BY month
+            ORDER BY month ASC
+        """
+        return execute_query(query, fetch=True), None
+    except Exception as e:
+        return None, str(e)
+
+def get_bankable_stars_db():
+    """Get top actors by average movie rating (Quality Control)"""
+    try:
+        query = """
+            SELECT 
+                p.name, 
+                ROUND(AVG(s.vote_avg), 2) as rating_average,
+                COUNT(s.movie_id) as movie_count
+            FROM people p
+            JOIN movie_cast mc ON p.id = mc.person_id
+            JOIN statistic s ON mc.movie_id = s.movie_id
+            WHERE mc.role = 'Actor'
+            GROUP BY p.id, p.name
+            HAVING COUNT(s.movie_id) >= 5 
+            ORDER BY rating_average DESC
+            LIMIT 10
+        """
+        return execute_query(query, fetch=True), None
     except Exception as e:
         return None, str(e)

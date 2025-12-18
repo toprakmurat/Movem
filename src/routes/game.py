@@ -8,7 +8,11 @@ from src.services.game_service import (
     update_question_db,
     delete_question_db,
     get_leaderboard_db,
-    update_user_score_db
+    update_user_score_db,
+    get_question_types_db,
+    create_question_type_db,
+    update_question_type_db,
+    delete_question_type_db
 )
 from flask_login import current_user
 
@@ -16,7 +20,20 @@ game_bp = Blueprint('game', __name__)
 
 @game_bp.route('/')
 def lobby():
-    return render_template('lobby.html')
+    # fetch top 10 for sidebar
+    leaderboard_data, err = get_leaderboard_db(limit=10)
+    
+    # process for template
+    processed_leaderboard = []
+    if leaderboard_data:
+        for user in leaderboard_data:
+            processed_leaderboard.append({
+                'username': user.get('username'),
+                'avatar': user.get('avatar'),
+                'score': user.get('score', 0)
+            })
+
+    return render_template('lobby.html', leaderboard=processed_leaderboard)
 
 @game_bp.route('/leaderboard')
 def leaderboard():
@@ -25,10 +42,6 @@ def leaderboard():
         flash(f"Error loading leaderboard: {err}", "error")
         leaderboard_data = []
     
-    # Process leaderboard data to ensure fields match template expectations
-    # Template uses: score, best_streak, games_played
-    # DB provides: score (from game_score), avatar, username
-    # We will fill missing fields with defaults or available data
     processed_leaderboard = []
     if leaderboard_data:
         for user in leaderboard_data:
@@ -36,8 +49,6 @@ def leaderboard():
                 'username': user.get('username'),
                 'avatar': user.get('avatar'),
                 'score': user.get('score', 0),
-                'best_streak': 0, # Not currently tracked in DB
-                'games_played': 0, # Not currently tracked in DB
                 'country': None
             })
             
@@ -122,7 +133,7 @@ def get_questions():
     questions, err = get_questions_db()
     if err:
         return jsonify({"error": err}), 500
-    return jsonify([dict(q) for q in questions]), 200
+    return jsonify({"items": [dict(q) for q in questions]}), 200
 
 
 @game_bp.route('/questions/<int:id>', methods=['GET'])
@@ -174,3 +185,50 @@ def delete_question(id):
         return jsonify({"message": "Question not found"}), 404
     return jsonify(dict(deleted)), 200
 
+
+@game_bp.route('/question-types', methods=['GET'])
+def get_question_types():
+    """Get all question types"""
+    types, err = get_question_types_db()
+    if err:
+        return jsonify({"error": err}), 500
+    return jsonify({"items": [dict(t) for t in types]}), 200
+
+
+@game_bp.route('/question-types', methods=['POST'])
+def create_question_type():
+    """Create a question type"""
+    data = request.get_json()
+    if not data or 'question_type_name' not in data:
+        return jsonify({"error": "Missing question_type_name"}), 400
+        
+    new_type, err = create_question_type_db(data['question_type_name'])
+    if err:
+        return jsonify({"error": err}), 500
+    return jsonify(dict(new_type)), 201
+
+
+@game_bp.route('/question-types/<int:id>', methods=['PUT'])
+def update_question_type(id):
+    """Update a question type"""
+    data = request.get_json()
+    if not data or 'question_type_name' not in data:
+        return jsonify({"error": "Missing question_type_name"}), 400
+        
+    updated, err = update_question_type_db(id, data['question_type_name'])
+    if err:
+        return jsonify({"error": err}), 500
+    if not updated:
+        return jsonify({"message": "Not found"}), 404
+    return jsonify(dict(updated)), 200
+
+
+@game_bp.route('/question-types/<int:id>', methods=['DELETE'])
+def delete_question_type(id):
+    """Delete a question type"""
+    deleted, err = delete_question_type_db(id)
+    if err:
+        return jsonify({"error": err}), 500
+    if not deleted:
+        return jsonify({"message": "Not found"}), 404
+    return jsonify(dict(deleted)), 200

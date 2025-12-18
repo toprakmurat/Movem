@@ -37,7 +37,9 @@ from src.services.comments_service import get_all_comments
 
 from src.services.actors_service import get_actors_paginated_db
 
-from src.services.statistic_service import get_statistics_db
+from src.services.statistic_service import get_statistics_paginated_db
+
+from src.services.game_service import get_questions_paginated_db
 
 from src.services.favorite_service import get_favorites_paginated_db, get_favorites_db
 
@@ -73,7 +75,13 @@ def dashboard():
     comments, _ = get_all_comments()
     actors_result, _ = get_actors_paginated_db(page=1, per_page=1000)
     actors = actors_result['actors'] if actors_result else []
-    statistics, _ = get_statistics_db()
+    
+    # Paginated Statistics and Game Questions
+    stats_page = request.args.get('stats_page', 1, type=int)
+    game_page = request.args.get('game_page', 1, type=int)
+    
+    statistics_paginated, _ = get_statistics_paginated_db(page=stats_page, per_page=per_page)
+    questions_paginated, _ = get_questions_paginated_db(page=game_page, per_page=per_page)
     
     # Placeholders for search results
     selected_user = None
@@ -107,7 +115,8 @@ def dashboard():
         movies_genres=movies_genres_paginated,
         comments=comments,
         actors=actors,
-        statistics=statistics,
+        statistics=statistics_paginated,
+        questions=questions_paginated,
         favorites=favorites_paginated,
     )
 

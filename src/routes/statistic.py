@@ -5,7 +5,14 @@ from src.services.statistic_service import (
     create_statistic_db,
     update_statistic_db,
     delete_statistic_db,
-    get_cinemetrics_movies_db
+    get_cinemetrics_movies_db,
+    get_platform_share_db,
+    get_genre_popularity_db,
+    get_release_timeline_db,
+    get_runtime_trend_db,
+    get_rating_distribution_db,
+    get_seasonal_revenue_db,
+    get_bankable_stars_db
 )
 
 statistic_bp = Blueprint('statistic', __name__)
@@ -96,3 +103,43 @@ def delete_statistic(movie_id):
     if not deleted:
         return jsonify({"message": "Statistic not found"}), 404
     return jsonify(dict(deleted)), 200
+
+@statistic_bp.route('/analytics', methods=['GET'])
+def analytics_page():
+    """Render the analytics dashboard with chart data"""
+    
+    # platform share
+    platforms, err1 = get_platform_share_db()
+    
+    # genre popularity
+    genres, err2 = get_genre_popularity_db()
+    
+    # release timeline
+    timeline, err3 = get_release_timeline_db()
+    
+    # runtime trend
+    runtime_trend, err4 = get_runtime_trend_db()
+
+    # rating distribution
+    rating_dist, err5 = get_rating_distribution_db()
+
+    # seasonal revenue
+    seasonal_rev, err6 = get_seasonal_revenue_db()
+
+    # bankable stars
+    bankable_stars, err7 = get_bankable_stars_db()
+
+    # error handling
+    if any([err1, err2, err3, err4, err5, err6, err7]):
+        print(f"Analytics Error: {err1} {err2} {err3} {err4} {err5} {err6} {err7}")
+
+    return render_template(
+        'analytics.html',
+        platforms=platforms or [],
+        genres=genres or [],
+        timeline=timeline or [],
+        runtime_trend=runtime_trend or [],
+        rating_dist=rating_dist or [],
+        seasonal_rev=seasonal_rev or [],
+        bankable_stars=bankable_stars or []
+    )

@@ -129,6 +129,47 @@ def check_answer_db(question_id, selected_movie_id):
         return False, None, str(e)
 
 
+
+def get_questions_paginated_db(page=1, per_page=20):
+    """Get all questions paginated"""
+    try:
+        from src.utils.pagination_utils import Pagination
+        
+        offset = (page - 1) * per_page
+        
+        # count total
+        count_query = "SELECT COUNT(*) as count FROM movie_question"
+        count_res = execute_query(count_query, fetch=True)
+        total_count = count_res[0]['count'] if count_res else 0
+        
+        # get data
+        query = """
+            SELECT 
+                mq.id,
+                mq.question_type,
+                qt.question_type_name,
+                mq.movie1_id,
+                m1.title as movie1_title,
+                m1.poster_file as movie1_poster,
+                mq.movie2_id,
+                m2.title as movie2_title,
+                m2.poster_file as movie2_poster
+            FROM movie_question mq
+            JOIN question_types qt ON mq.question_type = qt.id
+            JOIN movies m1 ON mq.movie1_id = m1.id
+            JOIN movies m2 ON mq.movie2_id = m2.id
+            ORDER BY mq.id
+            LIMIT %s OFFSET %s
+        """
+        questions = execute_query(query, (per_page, offset), fetch=True) or []
+        
+        return Pagination(items=[dict(q) for q in questions],
+                          page=page,
+                          per_page=per_page,
+                          total_count=total_count), None
+    except Exception as e:
+        return None, str(e)
+
 def get_questions_db():
     """Get all questions"""
     try:
@@ -276,10 +317,6 @@ def get_leaderboard_db(limit=50):
             LIMIT %s
         """
         leaderboard = execute_query(query, (limit,), fetch=True)
-        # Add rank and other display fields if needed, or handle in template
-        # The template expects: user.score, user.best_streak, user.games_played
-        # Our DB currently only has game_score. 
-        # We can pass what we have.
         return leaderboard, None
     except Exception as e:
         return None, str(e)
@@ -291,7 +328,7 @@ def update_user_score_db(user_id, new_score):
     Only updates if new_score is higher than existing game_score.
     """
     try:
-        # First get current score
+        # first get current score
         query_get = "SELECT game_score FROM users WHERE id = %s"
         current = execute_query(query_get, (user_id,), fetch=True)
         
@@ -313,3 +350,58 @@ def update_user_score_db(user_id, new_score):
         
     except Exception as e:
         return False, str(e)
+
+
+# --- Question Type CRUD ---
+
+def get_question_types_db():
+    """Get all question types"""
+    try:
+        query = "SELECT id, question_type_name FROM question_types ORDER BY id"
+        types = execute_query(query, fetch=True)
+        return types, None
+    except Exception as e:
+        return None, str(e)
+
+
+def create_question_type_db(name):
+    """Create a new question type"""
+    try:
+        query = "INSERT INTO question_types (question_type_name) VALUES (%s) RETURNING id, question_type_name"
+        new_type = execute_query(query, (name,), fetch=True)
+        if new_type:
+            return new_type[0], None
+        return None, "Failed to create question type"
+    except Exception as e:
+        return None, str(e)
+
+
+def update_question_type_db(id, name):
+    """Update a question type"""
+    try:
+        # check existence
+        check_query = "SELECT id FROM question_types WHERE id = %s"
+        exists = execute_query(check_query, (id,), fetch=True)
+        if not exists:
+            return None, "Question type not found"
+
+        query = "UPDATE question_types SET question_type_name = %s WHERE id = %s RETURNING id, question_type_name"
+        updated = execute_query(query, (name, id), fetch=True)
+        if updated:
+            return updated[0], None
+        return None, "Failed to update question type"
+    except Exception as e:
+        return None, str(e)
+
+
+def delete_question_type_db(id):
+    """Delete a question type"""
+    try:
+        query = "DELETE FROM question_types WHERE id = %s RETURNING id"
+        deleted = execute_query(query, (id,), fetch=True)
+        if deleted:
+            return deleted[0], None
+        return None, "Question type not found"
+    except Exception as e:
+        return None, str(e)
+
