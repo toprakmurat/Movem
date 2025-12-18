@@ -185,4 +185,16 @@
         </div>
     </div>
 </div>
+
+{% if searched_movie %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const element = document.getElementById("manual-targeting");
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    });
+</script>
+{% endif %}
+
 {% endblock %}
