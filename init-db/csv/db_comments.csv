@@ -6,7 +6,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 65,285,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-10-11 01:49:20.808954,1,1
 73,206647,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-09-09 01:49:20.809719,14,2
 88,206647,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-03-20 01:49:20.809719,10,10
-5,49026,"Honestly, I wasn't expecting much going in, but I was completely blown away. The cinematography alone is worth the ticket price.",8,2025-10-17 01:49:20.809719,9,0
 5,49026,"I can't recommend this enough. Even if you're not a fan of the genre, give it a shot. You won't regret it.",8,2025-10-12 01:49:20.809719,15,4
 78,49026,This is exactly why I go to the movies. It reminds me of the golden age of cinema where dialogue mattered more than explosions.,8,2025-05-05 01:49:20.809719,14,1
 40,49529,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-09-12 01:49:20.809719,23,0
@@ -89,7 +88,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 4,168259,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-04-22 01:49:20.810928,17,8
 77,168259,"Technically competent filmmaking, but it lacks soul and passion.",7,2025-07-20 01:49:20.810928,0,1
 99,168259,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-07-22 01:49:20.810928,2,2
-70,72190,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",7,2025-02-20 01:49:20.810928,0,0
 70,72190,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-08-12 01:49:20.810928,0,1
 43,127585,This is what cinema is all about. Pure escapism grounded in genuine human emotion.,8,2025-04-19 01:49:20.810928,2,0
 93,127585,"Hands down the best movie of the year. The pacing was tight, the acting was phenomenal, and the direction was visionary.",8,2025-10-19 01:49:20.810928,5,12
@@ -212,7 +210,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 43,27022,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-03-03 01:49:20.812295,0,0
 94,27022,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",6,2025-04-18 01:49:20.812295,9,17
 41,503,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-03-13 01:49:20.812295,8,0
-94,503,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-10-08 01:49:20.812295,15,6
 45,503,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-06-05 01:49:20.812295,2,0
 74,241259,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-11-09 01:49:20.812295,7,3
 84,810,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2024-12-25 01:49:20.812295,16,9
@@ -429,7 +426,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 97,9471,"I enjoyed it while watching, but looking back, the logic falls apart completely.",5,2025-01-04 01:49:20.815606,20,2
 2,9471,"Okay for a streaming night, but I wouldn't pay theater prices for this.",5,2025-06-04 01:49:20.815606,1,0
 12,70981,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-04-19 01:49:20.815606,4,5
-87,70981,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-08-27 01:49:20.815606,7,0
 87,70981,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-02-18 01:49:20.815606,3,19
 99,10996,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",5,2025-12-13 01:49:20.815606,17,6
 81,10996,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",5,2025-08-03 01:49:20.815606,9,4
@@ -475,9 +471,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 15,166424,I've seen better acting in high school plays. Absolutely dreadful performances.,4,2025-05-12 01:49:20.815606,27,2
 39,166424,Every character makes the stupidest decision possible just to move the plot forward. Lazy writing.,4,2025-07-23 01:49:20.815606,18,3
 70,1593,It started off strong but completely lost its way by the third act. Such a shame.,6,2024-12-23 01:49:20.815606,2,17
-70,254128,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-08-04 01:49:20.815606,1,14
-71,254128,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-11-05 01:49:20.815606,0,0
-47,254128,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-03-13 01:49:20.815606,8,12
 82,714,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-05-06 01:49:20.815606,17,9
 20,714,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-12-02 01:49:20.815606,15,2
 37,2024,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",7,2025-09-14 01:49:20.815606,13,4
@@ -734,7 +727,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 11,921,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",7,2025-04-22 01:49:20.820038,0,11
 84,921,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-08-29 01:49:20.820038,5,11
 12,921,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-08-12 01:49:20.820038,0,0
-35,49852,"I enjoyed it while watching, but looking back, the logic falls apart completely.",5,2025-02-17 01:49:20.820038,3,24
 28,49852,"Solid, but forgettable. I probably won't remember the plot by next week.",5,2025-05-26 01:49:20.820038,6,5
 35,49852,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",5,2025-02-22 01:49:20.820038,9,1
 92,4464,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-08-19 01:49:20.820038,3,0
@@ -756,7 +748,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 99,76492,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-10-15 01:49:20.820473,20,6
 12,76492,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-02-06 01:49:20.820473,5,7
 94,4523,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",7,2025-11-07 01:49:20.820473,12,11
-100,4523,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-02-21 01:49:20.820473,22,4
 100,4523,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-11-13 01:49:20.820473,2,6
 57,59961,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-06-02 01:49:20.820473,3,23
 1,10481,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",5,2025-05-09 01:49:20.820473,2,3
@@ -774,7 +765,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 72,157350,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",7,2025-08-08 01:49:20.820473,2,5
 34,853,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-01-23 01:49:20.820473,5,8
 34,10159,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-04-17 01:49:20.820473,0,2
-41,9593,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-09-21 01:49:20.820473,6,9
 41,9593,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-01-31 01:49:20.820473,3,16
 5,1904,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-12-07 01:49:20.820473,10,11
 90,9615,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-01-26 01:49:20.820473,4,22
@@ -789,7 +779,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 91,62764,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-02-21 01:49:20.820473,22,3
 4,22538,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-05-01 01:49:20.820473,25,1
 28,22538,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-04-18 01:49:20.820473,2,4
-24,9341,"Okay for a streaming night, but I wouldn't pay theater prices for this.",5,2024-12-28 01:49:20.820473,4,24
 86,9341,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",5,2025-05-09 01:49:20.820473,3,6
 24,9341,"Solid, but forgettable. I probably won't remember the plot by next week.",5,2025-06-20 01:49:20.820473,9,3
 35,12107,I walked out. I just couldn't take it anymore. The dialogue was physically painful.,5,2025-01-26 01:49:20.820473,0,1
@@ -949,7 +938,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 86,274854,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-10-22 01:49:20.823479,0,3
 97,274854,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-09-28 01:49:20.823479,5,3
 24,8870,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",5,2025-03-25 01:49:20.823479,19,4
-12,9992,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-11-21 01:49:20.823479,18,0
 93,9992,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-04-05 01:49:20.823479,8,2
 12,9992,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-05-12 01:49:20.823479,10,12
 67,36970,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-08-02 01:49:20.823479,8,15
@@ -1116,7 +1104,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 68,16869,I was on the edge of my seat the entire time. The tension building is masterclass level.,8,2025-05-05 01:49:20.825478,5,0
 13,879,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-02-10 01:49:20.825478,0,10
 57,879,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-04-23 01:49:20.825478,0,25
-100,1573,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2025-09-21 01:49:20.825478,2,18
 100,1573,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-09-04 01:49:20.825478,15,14
 61,9257,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-05-17 01:49:20.825478,12,4
 76,1903,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",6,2025-09-18 01:49:20.825478,23,1
@@ -1310,7 +1297,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 65,16577,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-09-29 01:49:20.828586,1,9
 1,16577,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-03-12 01:49:20.828586,4,5
 24,16577,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-07-14 01:49:20.828586,3,20
-89,329,"The chemistry between the leads is undeniable. I laughed, I cried, and I left the theater feeling completely satisfied.",8,2025-09-29 01:49:20.828586,16,9
 89,329,"Simply breathtaking. From the costume design to the sound editing, everything is top-tier quality.",8,2025-03-06 01:49:20.828586,2,17
 76,12160,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-07-03 01:49:20.828586,6,20
 71,9331,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-12-03 01:49:20.828586,0,0
@@ -1356,7 +1342,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 93,2275,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-10-04 01:49:20.829586,3,11
 12,37165,"Bold, ambitious, and visually stunning. It takes risks that pay off beautifully.",8,2025-11-06 01:49:20.829586,4,23
 17,37165,"Honestly, I wasn't expecting much going in, but I was completely blown away. The cinematography alone is worth the ticket price.",8,2025-07-06 01:49:20.829586,4,4
-78,9837,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-02-18 01:49:20.829586,7,2
 78,9837,"I enjoyed it while watching, but looking back, the logic falls apart completely.",7,2025-11-12 01:49:20.829586,2,12
 18,10708,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-12-04 01:49:20.829586,2,16
 50,136400,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-11-13 01:49:20.829586,7,9
@@ -1770,7 +1755,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 40,9390,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",7,2025-05-13 01:49:20.834585,23,0
 14,9390,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",7,2025-05-24 01:49:20.834585,0,3
 48,9390,The trailer gave away all the best parts. There were no surprises left for the actual movie.,7,2024-12-25 01:49:20.834585,1,20
-50,72105,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-04-27 01:49:20.834585,0,0
 50,72105,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-06-20 01:49:20.834585,0,0
 52,2898,It started off strong but completely lost its way by the third act. Such a shame.,7,2025-03-05 01:49:20.834585,0,0
 82,2898,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",7,2025-06-24 01:49:20.834585,18,3
@@ -1902,7 +1886,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 34,12220,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-06-06 01:49:20.834585,11,1
 58,72710,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-05-06 01:49:20.834585,5,0
 65,72710,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-02-04 01:49:20.834585,13,4
-28,10782,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-02-18 01:49:20.834585,12,0
 28,10782,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-06-17 01:49:20.834585,0,11
 42,10782,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-05-30 01:49:20.834585,17,10
 71,9573,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-01-25 01:49:20.834585,3,11
@@ -1959,7 +1942,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 3,47327,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",5,2025-10-22 01:49:20.834585,10,5
 29,15268,Chaotic editing and shaky cam make it impossible to see what's happening. A headache in movie form.,4,2025-09-25 01:49:20.834585,0,6
 37,10796,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-04-23 01:49:20.834585,5,10
-24,10796,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-03-11 01:49:20.834585,3,0
 24,10796,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-05-01 01:49:20.834585,2,6
 65,9548,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-09-29 01:49:20.834585,2,15
 99,9548,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-01-31 01:49:20.834585,5,4
@@ -1994,7 +1976,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 71,11232,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-05-16 01:49:20.834585,12,7
 36,1636,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-09-09 01:49:20.834585,0,26
 99,1636,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-02-03 01:49:20.834585,14,11
-82,2148,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2025-08-11 01:49:20.834585,17,0
 82,2148,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-08-03 01:49:20.834585,20,1
 78,2148,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-08-24 01:49:20.834585,9,0
 58,5176,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-04-26 01:49:20.834585,1,24
@@ -2122,7 +2103,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 87,4688,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-05-14 01:49:20.834585,4,19
 41,4688,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-06-08 01:49:20.834585,22,2
 3,4688,It started off strong but completely lost its way by the third act. Such a shame.,7,2025-07-18 01:49:20.834585,7,1
-27,4148,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",7,2025-03-16 01:49:20.834585,1,3
 27,4148,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-01-03 01:49:20.834585,10,14
 66,4148,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",7,2025-11-05 01:49:20.834585,19,11
 57,2207,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-12-04 01:49:20.834585,9,2
@@ -2243,7 +2223,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 15,65,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2025-02-25 01:49:20.834585,22,3
 57,65,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",7,2025-06-02 01:49:20.834585,2,2
 61,280391,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",5,2025-04-07 01:49:20.834585,0,14
-95,9476,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-01-14 01:49:20.834585,9,1
 95,9476,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-05-20 01:49:20.834585,0,3
 15,10610,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",5,2025-10-26 01:49:20.834585,17,9
 34,10610,"Okay for a streaming night, but I wouldn't pay theater prices for this.",5,2025-03-16 01:49:20.834585,0,6
@@ -2414,7 +2393,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 15,10537,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-08-13 01:49:20.834585,0,30
 31,10537,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-09-12 01:49:20.834585,0,2
 65,10537,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-10-07 01:49:20.834585,7,15
-75,225886,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,5,2025-12-13 01:49:20.834585,9,15
 75,225886,An average entry in the franchise. It plays it safe and takes zero risks.,5,2025-03-05 01:49:20.834585,1,1
 25,225886,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",5,2025-03-01 01:49:20.834585,5,15
 20,10385,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",5,2025-10-09 01:49:20.834585,9,11
@@ -2575,7 +2553,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 93,9488,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",5,2025-07-28 01:49:20.834585,13,5
 55,9488,The trailer gave away all the best parts. There were no surprises left for the actual movie.,5,2025-06-16 01:49:20.834585,0,24
 5,193,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2024-12-18 01:49:20.834585,26,1
-53,193,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-03-31 01:49:20.834585,5,22
 53,193,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-03-17 01:49:20.834585,15,13
 21,44865,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-01-11 01:49:20.834585,18,10
 42,44865,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-02-03 01:49:20.834585,1,1
@@ -2630,7 +2607,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 50,334,"Bold, ambitious, and visually stunning. It takes risks that pay off beautifully.",8,2025-08-17 01:49:20.834585,6,2
 30,23742,"Technically competent filmmaking, but it lacks soul and passion.",5,2025-11-18 01:49:20.834585,7,20
 61,259694,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-05-21 01:49:20.834585,11,18
-59,62837,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-10-31 01:49:20.834585,18,0
 1,62837,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-08-21 01:49:20.834585,5,5
 59,62837,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",7,2025-01-07 01:49:20.834585,0,3
 38,8966,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-01-08 01:49:20.834585,6,8
@@ -2695,8 +2671,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 83,109431,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-05-13 01:49:20.834585,1,0
 7,109431,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-03-24 01:49:20.834585,27,1
 51,109431,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-06-04 01:49:20.834585,3,27
-25,1598,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-06-05 01:49:20.834585,16,3
-23,1598,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-10-11 01:49:20.834585,0,6
 27,8065,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-09-08 01:49:20.834585,3,21
 80,8065,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-11-14 01:49:20.834585,3,0
 84,271718,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-01-23 01:49:20.834585,3,24
@@ -2778,7 +2752,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 2,10066,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-02-28 01:49:20.834585,0,3
 7,10066,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-11-07 01:49:20.834585,0,0
 37,2288,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-08-05 01:49:20.834585,4,3
-39,2288,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-06-10 01:49:20.834585,1,10
 39,2288,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-05-05 01:49:20.834585,3,8
 10,88794,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-08-09 01:49:20.834585,11,6
 52,13515,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-05-27 01:49:20.834585,11,3
@@ -2860,7 +2833,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 88,9616,Every character makes the stupidest decision possible just to move the plot forward. Lazy writing.,5,2025-02-12 01:49:20.834585,14,1
 19,9616,This movie thinks it's smarter than it is. It's just a convoluted mess of bad ideas.,5,2025-03-14 01:49:20.834585,4,17
 35,9616,I honestly don't understand the positive reviews. Did we watch the same movie?,5,2025-12-13 01:49:20.834585,17,3
-4,13056,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-11-12 01:49:20.834585,11,8
 4,13056,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-06-12 01:49:20.834585,12,13
 3,13056,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-03-30 01:49:20.834585,8,18
 67,14113,Save your money. Even watching paint dry would be more entertaining than this.,5,2025-11-24 01:49:20.834585,6,12
@@ -3290,7 +3262,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 1,14844,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-08-20 01:49:20.850515,4,4
 52,14844,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-07-01 01:49:20.850515,1,0
 67,57089,How did this get greenlit? The script feels like a first draft written by a bored teenager.,5,2025-01-04 01:49:20.850515,10,13
-64,57089,"Boring, pretentious, and painfully slow. I checked my watch at least ten times.",5,2025-03-21 01:49:20.850515,6,9
 64,57089,I honestly don't understand the positive reviews. Did we watch the same movie?,5,2025-02-22 01:49:20.850515,2,3
 79,1947,"I enjoyed it while watching, but looking back, the logic falls apart completely.",7,2025-09-19 01:49:20.850515,23,4
 64,1947,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",7,2025-11-22 01:49:20.850515,2,15
@@ -3512,7 +3483,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 9,10188,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-07-23 01:49:20.854280,7,0
 46,63574,"Okay for a streaming night, but I wouldn't pay theater prices for this.",7,2025-10-14 01:49:20.854280,1,7
 43,63574,"Okay for a streaming night, but I wouldn't pay theater prices for this.",7,2025-08-07 01:49:20.854280,3,27
-74,245,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-03-05 01:49:20.854280,5,0
 74,245,"Technically competent filmmaking, but it lacks soul and passion.",7,2025-10-25 01:49:20.854280,16,0
 10,245,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-07-26 01:49:20.854280,0,22
 42,9825,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-11-28 01:49:20.854280,8,0
@@ -3547,7 +3517,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 28,31582,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-04-16 01:49:20.854280,21,4
 20,16617,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-08-07 01:49:20.854280,2,2
 19,8944,"Solid, but forgettable. I probably won't remember the plot by next week.",5,2025-11-29 01:49:20.854280,2,6
-5,8944,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",5,2025-05-13 01:49:20.854280,14,15
 5,8944,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",5,2025-03-30 01:49:20.854280,14,10
 25,41488,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",6,2025-07-01 01:49:20.854280,23,0
 2,37028,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-07-11 01:49:20.854280,16,3
@@ -3594,7 +3563,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 81,11509,"I enjoyed it while watching, but looking back, the logic falls apart completely.",7,2025-10-28 01:49:20.856284,0,0
 78,11509,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-06-22 01:49:20.856284,13,11
 98,7445,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",7,2025-03-30 01:49:20.856284,6,1
-70,17047,It started off strong but completely lost its way by the third act. Such a shame.,5,2025-03-05 01:49:20.856284,1,3
 70,17047,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",5,2025-01-18 01:49:20.856284,13,16
 87,62838,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-01-23 01:49:20.856284,2,10
 84,2057,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-03-15 01:49:20.856284,21,1
@@ -3621,9 +3589,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 65,615,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2024-12-31 01:49:20.856284,10,3
 71,788,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-04-26 01:49:20.856284,0,10
 56,380,"Simply breathtaking. From the costume design to the sound editing, everything is top-tier quality.",8,2025-04-16 01:49:20.856284,10,14
-57,13223,Instant classic. I can already see myself watching this every year for the rest of my life.,8,2024-12-30 01:49:20.856284,9,19
-36,13223,This film defines a generation. It captures the zeitgeist perfectly while telling a deeply personal story.,8,2024-12-19 01:49:20.856284,1,3
-33,13223,"A masterful blend of storytelling and visual art. Every frame looks like a painting, and the score is hauntingly beautiful.",8,2025-07-08 01:49:20.856284,22,1
 58,10523,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-06-09 01:49:20.856284,3,15
 25,10523,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-02-01 01:49:20.856284,3,9
 88,8681,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-09-18 01:49:20.856284,1,26
@@ -3651,7 +3616,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 31,12589,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-10-19 01:49:20.856284,1,18
 86,12589,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-03-25 01:49:20.856284,0,16
 67,7191,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2024-12-28 01:49:20.856284,21,9
-3,7191,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-02-28 01:49:20.856284,6,12
 3,7191,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-03-29 01:49:20.856284,12,4
 53,1497,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-02-08 01:49:20.856284,2,2
 83,117,"A rare gem that respects the audience's intelligence. It doesn't hold your hand, and that's what makes it so rewarding.",8,2025-02-13 01:49:20.856284,1,16
@@ -3723,7 +3687,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 30,12620,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-03-29 01:49:20.856284,1,4
 57,12620,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-06-02 01:49:20.856284,3,3
 54,14177,The trailer gave away all the best parts. There were no surprises left for the actual movie.,5,2025-12-06 01:49:20.856284,5,7
-87,14177,"Solid, but forgettable. I probably won't remember the plot by next week.",5,2025-03-16 01:49:20.856284,23,3
 87,14177,It started off strong but completely lost its way by the third act. Such a shame.,5,2025-03-07 01:49:20.856284,5,2
 82,198185,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2025-10-13 01:49:20.856284,9,1
 80,227156,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-05-20 01:49:20.856284,18,12
@@ -3908,7 +3871,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 21,1246,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-01-30 01:49:20.860293,6,5
 52,1246,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-01-21 01:49:20.860293,0,6
 58,1246,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-01-11 01:49:20.860293,8,14
-21,4233,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-01-10 01:49:20.860293,8,11
 21,4233,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-08-01 01:49:20.860293,19,5
 54,4233,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-07-17 01:49:20.860293,8,17
 12,174751,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",5,2025-09-28 01:49:20.860293,1,27
@@ -4116,7 +4078,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 46,1073,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-05-21 01:49:20.862298,9,6
 97,153158,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-07-11 01:49:20.862298,1,12
 83,153158,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-03-31 01:49:20.862298,3,4
-50,81836,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-11-30 01:49:20.862298,21,6
 96,81836,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-08-09 01:49:20.862298,12,15
 50,81836,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-04-12 01:49:20.862298,3,10
 93,10724,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2024-12-25 01:49:20.862298,3,6
@@ -4323,7 +4284,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 87,25132,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",5,2025-12-03 01:49:20.864302,24,2
 59,577,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-10-17 01:49:20.864302,4,4
 3,577,It started off strong but completely lost its way by the third act. Such a shame.,7,2025-08-17 01:49:20.864302,5,9
-97,328387,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-05-24 01:49:20.864302,4,8
 97,328387,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-04-01 01:49:20.864302,6,4
 67,328387,The trailer gave away all the best parts. There were no surprises left for the actual movie.,7,2025-02-26 01:49:20.864302,1,26
 75,12690,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-04-02 01:49:20.864302,7,2
@@ -4378,7 +4338,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 70,9414,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-03-31 01:49:20.864302,21,3
 85,63492,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-05-12 01:49:20.864302,7,10
 41,81796,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-03-28 01:49:20.864302,15,6
-14,81796,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-06-11 01:49:20.864302,5,7
 14,81796,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-01-24 01:49:20.864302,0,28
 3,10710,I've seen better acting in high school plays. Absolutely dreadful performances.,5,2025-07-27 01:49:20.864302,7,1
 4,15092,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-07-12 01:49:20.864302,15,5
@@ -4456,7 +4415,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 20,3509,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-07-04 01:49:20.866306,25,0
 97,3509,"Okay for a streaming night, but I wouldn't pay theater prices for this.",7,2025-09-19 01:49:20.866306,0,1
 23,3509,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-04-21 01:49:20.866306,11,7
-50,82684,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",7,2025-10-10 01:49:20.866306,19,2
 12,82684,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-10-01 01:49:20.866306,1,4
 50,82684,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-12-11 01:49:20.866306,2,4
 59,12142,A complete insult to the original material. They changed everything that made the source great.,3,2025-06-01 01:49:20.866306,4,0
@@ -4517,7 +4475,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 21,44638,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-05-11 01:49:20.866306,8,0
 86,44638,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-03-13 01:49:20.866306,24,3
 94,44638,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-03-30 01:49:20.866306,7,0
-86,241257,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,5,2025-05-21 01:49:20.866306,10,12
 88,241257,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",5,2025-04-05 01:49:20.866306,20,8
 86,241257,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",5,2025-06-23 01:49:20.866306,5,8
 31,14538,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-11-11 01:49:20.866306,1,0
@@ -4627,7 +4584,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 86,8835,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-01-22 01:49:20.868311,28,0
 65,157,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-09-07 01:49:20.868311,4,3
 33,157,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-03-29 01:49:20.868311,0,12
-21,8643,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-07-11 01:49:20.868311,0,10
 21,8643,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-09-02 01:49:20.868311,10,2
 98,10402,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-03-08 01:49:20.868311,6,4
 11,218043,"A soulless cash grab. It has no heart, no logic, and no reason to exist.",4,2025-11-26 01:49:20.868311,1,1
@@ -4698,7 +4654,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 27,333348,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",5,2025-01-09 01:49:20.868311,13,0
 32,20483,I actually fell asleep halfway through. That's how unengaging this mess was.,5,2025-01-12 01:49:20.868311,0,22
 65,20483,Every character makes the stupidest decision possible just to move the plot forward. Lazy writing.,5,2025-09-14 01:49:20.868311,11,3
-73,11457,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-11-01 01:49:20.868311,1,1
 37,11457,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-01-20 01:49:20.868311,5,0
 73,11457,"Okay for a streaming night, but I wouldn't pay theater prices for this.",7,2025-08-18 01:49:20.868311,6,15
 51,321697,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-09-30 01:49:20.868311,2,2
@@ -4812,13 +4767,11 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 40,9675,"Technically competent filmmaking, but it lacks soul and passion.",7,2025-09-23 01:49:20.870316,27,1
 23,9988,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-05-30 01:49:20.870316,17,2
 82,948,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",7,2025-02-04 01:49:20.870316,2,1
-75,948,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-07-26 01:49:20.870316,12,4
 75,948,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-03-07 01:49:20.870316,11,4
 22,21765,I want my two hours back. This was an absolute train wreck from start to finish.,5,2025-04-30 01:49:20.870316,0,1
 26,21765,How did this get greenlit? The script feels like a first draft written by a bored teenager.,5,2025-07-19 01:49:20.870316,1,1
 69,21765,A waste of a great cast. How did they convince these actors to sign up for this garbage?,5,2025-11-01 01:49:20.870316,0,16
 64,146304,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",7,2025-09-15 01:49:20.870316,17,7
-92,7516,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-01-15 01:49:20.870316,0,0
 84,7516,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-09-22 01:49:20.870316,0,0
 92,7516,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-06-12 01:49:20.870316,15,13
 1,41439,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-11-09 01:49:20.870316,1,14
@@ -4867,7 +4820,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 52,16988,Zero chemistry between the leads. Watching them try to romance was awkward and uncomfortable.,3,2025-08-18 01:49:20.870316,4,10
 70,16988,I've seen better acting in high school plays. Absolutely dreadful performances.,3,2025-06-05 01:49:20.870316,4,3
 18,7304,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-08-20 01:49:20.870316,7,8
-89,7304,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-05-14 01:49:20.870316,3,5
 89,7304,"Solid, but forgettable. I probably won't remember the plot by next week.",7,2025-11-30 01:49:20.870316,1,13
 79,24747,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-08-29 01:49:20.870316,3,0
 87,24747,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-03-02 01:49:20.870316,0,0
@@ -5060,7 +5012,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 17,16769,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-03-20 01:49:20.872320,5,0
 90,16769,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-07-27 01:49:20.872320,3,15
 15,16769,"I enjoyed it while watching, but looking back, the logic falls apart completely.",7,2025-05-12 01:49:20.872320,3,20
-7,33217,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-12-11 01:49:20.872320,27,1
 7,33217,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-06-18 01:49:20.872320,6,16
 74,33217,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-06-27 01:49:20.872320,13,15
 80,132232,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-02-27 01:49:20.872320,1,8
@@ -5109,7 +5060,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 89,10564,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",7,2025-04-09 01:49:20.872320,2,1
 9,947,"The chemistry between the leads is undeniable. I laughed, I cried, and I left the theater feeling completely satisfied.",8,2025-05-28 01:49:20.872320,9,2
 82,947,I've seen this three times already and I keep finding new details. The foreshadowing in the first act is brilliant.,8,2025-11-02 01:49:20.872320,3,0
-33,24150,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",5,2025-04-10 01:49:20.872320,2,16
 33,24150,"Technically competent filmmaking, but it lacks soul and passion.",5,2025-07-12 01:49:20.872320,2,4
 86,24150,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",5,2025-03-01 01:49:20.872320,19,3
 88,228970,"I enjoyed it while watching, but looking back, the logic falls apart completely.",7,2025-06-21 01:49:20.872320,10,6
@@ -5504,7 +5454,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 5,136835,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-11-30 01:49:20.878333,1,8
 6,136835,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2024-12-25 01:49:20.878333,2,16
 45,5876,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-08-03 01:49:20.878333,3,4
-59,5876,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-08-26 01:49:20.878333,11,10
 59,5876,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-06-21 01:49:20.878333,13,6
 72,264660,"I can't recommend this enough. Even if you're not a fan of the genre, give it a shot. You won't regret it.",8,2025-04-11 01:49:20.878333,15,10
 16,492,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-11-30 01:49:20.878333,7,5
@@ -5821,7 +5770,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 92,345003,Save your money. Even watching paint dry would be more entertaining than this.,4,2025-09-24 01:49:20.882084,1,11
 61,345003,"The acting was wooden, the dialogue was cringe-worthy, and the plot made zero sense.",4,2025-05-16 01:49:20.882084,6,4
 17,236751,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-02-08 01:49:20.882084,0,13
-69,236751,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-10-25 01:49:20.882084,1,1
 69,236751,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-01-26 01:49:20.882084,3,11
 16,107,"A masterful blend of storytelling and visual art. Every frame looks like a painting, and the score is hauntingly beautiful.",8,2025-02-03 01:49:20.882084,3,5
 41,107,Instant classic. I can already see myself watching this every year for the rest of my life.,8,2024-12-25 01:49:20.882084,0,12
@@ -6028,7 +5976,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 93,26352,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-01-12 01:49:20.884089,2,14
 49,20616,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",5,2025-09-19 01:49:20.884089,1,12
 47,9794,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",5,2025-10-11 01:49:20.884089,20,0
-58,15037,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-10-31 01:49:20.884089,4,7
 58,15037,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-06-02 01:49:20.884089,12,8
 63,227,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-05-13 01:49:20.884089,12,17
 56,227,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",7,2025-11-25 01:49:20.884089,16,11
@@ -6118,7 +6065,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 67,13160,It started off strong but completely lost its way by the third act. Such a shame.,5,2025-06-30 01:49:20.884089,10,18
 54,88005,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-11-22 01:49:20.884089,11,9
 75,52067,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-08-17 01:49:20.884089,4,1
-59,73,I'm still processing the ending. It stayed with me long after the credits rolled. Absolute perfection.,8,2025-10-18 01:49:20.884089,0,3
 59,73,"An emotional rollercoaster. Bring tissues, because the third act will absolutely destroy you in the best way possible.",8,2025-03-08 01:49:20.884089,5,0
 58,73,I've seen this three times already and I keep finding new details. The foreshadowing in the first act is brilliant.,8,2025-07-17 01:49:20.884089,26,4
 77,134597,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-02-06 01:49:20.884089,1,15
@@ -6130,7 +6076,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 62,14283,It started off strong but completely lost its way by the third act. Such a shame.,7,2025-04-30 01:49:20.884089,5,0
 65,404,"Honestly, I wasn't expecting much going in, but I was completely blown away. The cinematography alone is worth the ticket price.",8,2025-11-11 01:49:20.884089,1,7
 64,13201,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-06-02 01:49:20.884089,5,21
-50,13201,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-09-16 01:49:20.884089,1,12
 50,13201,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-09-02 01:49:20.884089,1,3
 11,209403,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-05-23 01:49:20.884089,24,3
 6,209403,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-06-24 01:49:20.884089,4,1
@@ -6218,7 +6163,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 56,115872,"Okay for a streaming night, but I wouldn't pay theater prices for this.",5,2025-10-07 01:49:20.886094,1,1
 22,115872,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",5,2025-11-16 01:49:20.886094,1,2
 18,115872,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,5,2025-05-21 01:49:20.886094,2,2
-41,101173,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-04-03 01:49:20.886094,1,16
 41,101173,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-08-07 01:49:20.886094,17,1
 65,25350,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-07-25 01:49:20.886094,10,0
 84,25350,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-05-25 01:49:20.886094,12,8
@@ -6535,7 +6479,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 87,14536,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",5,2025-07-07 01:49:20.890103,19,6
 84,1359,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",7,2025-02-02 01:49:20.890103,12,7
 35,1359,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",7,2025-11-17 01:49:20.890103,6,23
-54,9962,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-03-29 01:49:20.890103,19,11
 28,9962,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-06-10 01:49:20.890103,7,0
 54,9962,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-07-01 01:49:20.890103,7,13
 65,15049,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",6,2025-03-01 01:49:20.890103,14,6
@@ -6585,7 +6528,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 8,13072,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-02-16 01:49:20.890103,10,8
 33,153397,I walked out. I just couldn't take it anymore. The dialogue was physically painful.,5,2025-04-16 01:49:20.890103,17,0
 92,153397,Zero chemistry between the leads. Watching them try to romance was awkward and uncomfortable.,5,2025-04-12 01:49:20.890103,1,0
-67,30141,An average entry in the franchise. It plays it safe and takes zero risks.,6,2024-12-20 01:49:20.890103,1,0
 67,30141,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-05-08 01:49:20.890103,22,3
 49,17044,"Technically competent filmmaking, but it lacks soul and passion.",7,2025-06-29 01:49:20.890103,10,11
 30,17044,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-06-15 01:49:20.890103,2,3
@@ -6607,7 +6549,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 10,10913,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-07-08 01:49:20.890103,6,1
 34,251321,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",5,2025-01-05 01:49:20.890103,0,16
 33,251321,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",5,2025-08-12 01:49:20.890103,2,11
-87,149,"Bold, ambitious, and visually stunning. It takes risks that pay off beautifully.",8,2025-08-06 01:49:20.890103,0,3
 1,149,"Hands down the best movie of the year. The pacing was tight, the acting was phenomenal, and the direction was visionary.",8,2024-12-17 01:49:20.890103,2,18
 87,149,Instant classic. I can already see myself watching this every year for the rest of my life.,8,2025-12-07 01:49:20.890103,7,1
 79,10425,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-07-04 01:49:20.890103,5,20
@@ -6689,7 +6630,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 7,7326,An average entry in the franchise. It plays it safe and takes zero risks.,7,2025-02-18 01:49:20.892107,11,0
 86,326284,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-11-14 01:49:20.892107,9,16
 35,326284,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-02-28 01:49:20.892107,2,27
-69,681,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-05-29 01:49:20.892107,2,11
 99,681,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-10-15 01:49:20.892107,12,0
 69,681,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-06-13 01:49:20.892107,0,1
 6,238,"Finally, a movie that lives up to the hype! It delivers on every promise and exceeds expectations in ways I didn't see coming.",8,2025-09-09 01:49:20.892107,1,2
@@ -7012,7 +6952,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 67,27549,I walked out. I just couldn't take it anymore. The dialogue was physically painful.,5,2025-08-31 01:49:20.896116,6,0
 7,59728,I honestly don't understand the positive reviews. Did we watch the same movie?,5,2025-08-26 01:49:20.896116,7,0
 33,59728,"The acting was wooden, the dialogue was cringe-worthy, and the plot made zero sense.",5,2025-03-22 01:49:20.896116,5,9
-45,10930,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-04-26 01:49:20.896116,2,26
 44,10930,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-02-13 01:49:20.896116,13,15
 45,10930,"Solid, but forgettable. I probably won't remember the plot by next week.",6,2025-01-31 01:49:20.896116,2,0
 20,32395,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",6,2025-05-09 01:49:20.896116,2,3
@@ -7117,7 +7056,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 36,253253,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-03-11 01:49:20.896116,4,1
 70,253253,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",6,2025-02-18 01:49:20.896116,10,4
 89,253253,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-10-28 01:49:20.896116,9,15
-71,51995,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",6,2025-03-02 01:49:20.896116,0,8
 71,51995,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-08-08 01:49:20.896116,7,0
 89,51995,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-06-17 01:49:20.896116,3,1
 82,13173,I actually fell asleep halfway through. That's how unengaging this mess was.,5,2025-12-08 01:49:20.896116,14,12
@@ -7161,7 +7099,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 65,11284,An average entry in the franchise. It plays it safe and takes zero risks.,5,2024-12-29 01:49:20.897862,4,4
 56,11284,"Technically competent filmmaking, but it lacks soul and passion.",5,2025-10-27 01:49:20.897862,3,1
 97,504,"Okay for a streaming night, but I wouldn't pay theater prices for this.",7,2025-09-11 01:49:20.897862,0,5
-11,173,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",7,2025-09-23 01:49:20.897862,17,4
 11,173,The trailer gave away all the best parts. There were no surprises left for the actual movie.,7,2025-01-11 01:49:20.897862,3,10
 63,173,"I enjoyed it while watching, but looking back, the logic falls apart completely.",7,2025-10-31 01:49:20.897862,0,2
 51,227348,"Technically competent filmmaking, but it lacks soul and passion.",5,2025-01-29 01:49:20.897862,8,13
@@ -7386,7 +7323,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 41,49365,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-04-18 01:49:20.899866,11,7
 48,49365,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-11-20 01:49:20.899866,10,14
 52,49365,"I enjoyed it while watching, but looking back, the logic falls apart completely.",6,2025-01-30 01:49:20.899866,9,0
-64,11404,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-06-23 01:49:20.899866,7,6
 64,11404,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-11-10 01:49:20.899866,10,8
 44,300706,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-07-11 01:49:20.899866,5,5
 2,16337,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-05-02 01:49:20.899866,20,8
@@ -7411,7 +7347,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 10,166624,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-09-23 01:49:20.899866,10,12
 78,10822,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-10-08 01:49:20.899866,10,5
 46,10844,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-05-22 01:49:20.899866,7,7
-16,10844,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-09-19 01:49:20.899866,14,15
 16,10844,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",6,2025-08-25 01:49:20.899866,23,0
 86,9336,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-09-26 01:49:20.899866,11,13
 75,5689,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-04-07 01:49:20.899866,6,13
@@ -7706,7 +7641,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 42,22007,The worst movie I've seen in years. Avoid it like the plague.,5,2025-08-08 01:49:20.903876,0,1
 3,765,"Simply breathtaking. From the costume design to the sound editing, everything is top-tier quality.",8,2025-09-21 01:49:20.903876,3,8
 91,765,"Simply breathtaking. From the costume design to the sound editing, everything is top-tier quality.",8,2025-08-16 01:49:20.903876,9,15
-27,10615,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,5,2025-09-16 01:49:20.903876,22,3
 33,10615,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,5,2025-03-26 01:49:20.903876,1,5
 27,10615,"The special effects were top-notch, but I just couldn't connect with any of the characters emotionally.",5,2024-12-23 01:49:20.903876,27,0
 59,205321,"The acting was wooden, the dialogue was cringe-worthy, and the plot made zero sense.",4,2025-01-24 01:49:20.903876,28,0
@@ -7818,7 +7752,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 33,82507,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-01-04 01:49:20.903876,10,15
 99,20337,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,5,2025-04-13 01:49:20.903876,0,0
 57,20337,It started off strong but completely lost its way by the third act. Such a shame.,5,2024-12-23 01:49:20.903876,1,3
-19,261,"Simply breathtaking. From the costume design to the sound editing, everything is top-tier quality.",8,2025-11-01 01:49:20.903876,1,4
 78,261,Instant classic. I can already see myself watching this every year for the rest of my life.,8,2024-12-27 01:49:20.903876,17,6
 19,261,"An emotional rollercoaster. Bring tissues, because the third act will absolutely destroy you in the best way possible.",8,2025-07-08 01:49:20.903876,7,4
 80,1685,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-08-02 01:49:20.903876,26,0
@@ -8087,7 +8020,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 100,19316,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2024-12-30 01:49:20.907884,26,1
 23,21074,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",5,2025-10-27 01:49:20.907884,14,14
 63,21074,"Technically competent filmmaking, but it lacks soul and passion.",5,2025-06-19 01:49:20.907884,0,6
-13,84329,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-05-06 01:49:20.907884,26,2
 13,84329,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-11-01 01:49:20.907884,11,15
 39,20,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-08-31 01:49:20.907884,4,6
 45,20,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2025-07-05 01:49:20.907884,18,3
@@ -8121,7 +8053,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 52,7512,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-09-14 01:49:20.907884,25,3
 72,356216,I honestly don't understand the positive reviews. Did we watch the same movie?,4,2025-11-07 01:49:20.907884,5,4
 41,11798,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-02-23 01:49:20.907884,2,1
-100,11798,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",7,2025-02-16 01:49:20.907884,6,0
 100,11798,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",7,2025-11-10 01:49:20.907884,10,5
 64,146631,The worst movie I've seen in years. Avoid it like the plague.,3,2025-07-05 01:49:20.907884,7,2
 45,146631,I walked out. I just couldn't take it anymore. The dialogue was physically painful.,3,2025-01-13 01:49:20.907884,13,4
@@ -8158,7 +8089,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 69,9916,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",6,2025-10-02 01:49:20.907884,9,6
 36,9916,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-04-23 01:49:20.907884,6,5
 73,309425,"Technically competent filmmaking, but it lacks soul and passion.",7,2025-07-05 01:49:20.907884,20,8
-2,309425,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-05-28 01:49:20.907884,5,1
 2,309425,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-05-24 01:49:20.907884,1,4
 92,14156,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-05-21 01:49:20.907884,26,4
 11,43610,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-01-15 01:49:20.907884,2,5
@@ -8244,7 +8174,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 91,7873,"I have mixed feelings. Some scenes were brilliant, while others felt like they belonged in a completely different movie.",6,2025-04-03 01:49:20.909889,3,24
 36,331190,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-07-20 01:49:20.909889,5,14
 46,15186,It tries to be funny but fails miserably. The jokes land with a thud every single time.,5,2025-04-03 01:49:20.909889,4,0
-27,17994,"Technically competent filmmaking, but it lacks soul and passion.",6,2025-01-02 01:49:20.909889,9,11
 27,17994,"Technically competent filmmaking, but it lacks soul and passion.",6,2024-12-27 01:49:20.909889,0,1
 60,1378,An average entry in the franchise. It plays it safe and takes zero risks.,6,2025-02-18 01:49:20.909889,9,14
 66,1378,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-04-22 01:49:20.909889,12,3
@@ -8379,7 +8308,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 83,38358,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-07-23 01:49:20.911894,0,7
 70,38358,"Great concept, poor delivery. The villain had no motivation, and the plot holes were distracting.",6,2025-09-20 01:49:20.911894,8,1
 5,38358,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-01-24 01:49:20.911894,14,9
-8,33511,"It's... fine. Just fine. Nothing memorable, nothing terrible. It exists.",7,2025-02-06 01:49:20.911894,3,4
 8,33511,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,7,2025-02-24 01:49:20.911894,19,4
 3,702,A tour de force performance by the entire cast. There isn't a single weak link in this ensemble.,8,2025-07-13 01:49:20.911894,8,0
 48,935,I've seen this three times already and I keep finding new details. The foreshadowing in the first act is brilliant.,8,2025-02-01 01:49:20.911894,5,1
@@ -8436,7 +8364,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 44,206284,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-07-31 01:49:20.911894,17,2
 23,206284,It started off strong but completely lost its way by the third act. Such a shame.,6,2025-11-23 01:49:20.911894,9,5
 26,27455,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-03-09 01:49:20.911894,3,5
-3,27455,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-07-12 01:49:20.911894,2,3
 3,27455,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",6,2025-01-09 01:49:20.911894,0,4
 62,66468,Chaotic editing and shaky cam make it impossible to see what's happening. A headache in movie form.,4,2024-12-15 01:49:20.911894,6,2
 12,7973,It started off strong but completely lost its way by the third act. Such a shame.,7,2025-01-09 01:49:20.911894,0,0
@@ -8808,7 +8735,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 56,29015,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-01-27 01:49:20.915644,13,7
 71,29015,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-09-18 01:49:20.915644,19,7
 39,91122,"Boring, pretentious, and painfully slow. I checked my watch at least ten times.",4,2025-03-30 01:49:20.915644,5,19
-68,18206,"Okay for a streaming night, but I wouldn't pay theater prices for this.",6,2025-01-14 01:49:20.915644,6,12
 68,18206,"It's not as bad as the critics say, but it's certainly not a masterpiece. A solid 6/10.",6,2025-10-18 01:49:20.915644,7,16
 60,18206,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-01-04 01:49:20.915644,15,3
 53,320146,"Technically competent filmmaking, but it lacks soul and passion.",5,2025-09-25 01:49:20.915644,0,3
@@ -8845,7 +8771,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 3,335874,The CGI looked like a PS2 game from 2004. Completely took me out of the experience.,4,2025-03-20 01:49:20.915644,1,12
 21,34592,Zero chemistry between the leads. Watching them try to romance was awkward and uncomfortable.,5,2025-09-25 01:49:20.915644,0,3
 64,92635,I actually fell asleep halfway through. That's how unengaging this mess was.,5,2025-02-10 01:49:20.915644,9,21
-40,92635,I walked out. I just couldn't take it anymore. The dialogue was physically painful.,5,2024-12-14 01:49:20.915644,3,1
 40,92635,I walked out. I just couldn't take it anymore. The dialogue was physically painful.,5,2025-09-10 01:49:20.915644,4,2
 76,258755,"Hands down the best movie of the year. The pacing was tight, the acting was phenomenal, and the direction was visionary.",8,2025-05-03 01:49:20.915644,11,9
 85,258755,"Simply breathtaking. From the costume design to the sound editing, everything is top-tier quality.",8,2025-09-25 01:49:20.915644,14,14
@@ -9107,7 +9032,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 67,139715,I've seen better acting in high school plays. Absolutely dreadful performances.,4,2025-05-22 01:49:20.919654,8,7
 1,45380,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",7,2025-11-11 01:49:20.919654,3,10
 57,30867,"Okay for a streaming night, but I wouldn't pay theater prices for this.",7,2025-09-05 01:49:20.919654,9,9
-26,30867,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",7,2025-02-25 01:49:20.919654,4,1
 26,30867,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",7,2025-02-16 01:49:20.919654,5,2
 65,81220,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",5,2025-03-12 01:49:20.919654,0,0
 87,81220,"Visually, it's a treat. Narratively? It's a bit of a mess. Style over substance, unfortunately.",5,2025-12-04 01:49:20.919654,1,19
@@ -9135,7 +9059,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 26,285743,"It had so much potential, but the execution fell a bit flat in the second half. Still worth a watch, though.",6,2025-05-15 01:49:20.919654,5,14
 88,285743,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-11-05 01:49:20.919654,13,14
 91,362765,I honestly don't understand the positive reviews. Did we watch the same movie?,0,2025-10-11 01:49:20.919654,1,1
-49,362765,A waste of a great cast. How did they convince these actors to sign up for this garbage?,0,2025-11-17 01:49:20.919654,4,4
 49,362765,Zero chemistry between the leads. Watching them try to romance was awkward and uncomfortable.,0,2025-01-10 01:49:20.919654,3,4
 37,379532,"The acting saves a mediocre script. If it weren't for the lead performance, this would be unwatchable.",6,2025-05-05 01:49:20.919654,9,4
 74,379532,The trailer gave away all the best parts. There were no surprises left for the actual movie.,6,2025-09-12 01:49:20.919654,5,1
@@ -9410,7 +9333,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 60,21334,This film defines a generation. It captures the zeitgeist perfectly while telling a deeply personal story.,8,2025-04-26 01:49:20.923662,0,1
 43,79120,"Technically competent filmmaking, but it lacks soul and passion.",7,2025-05-17 01:49:20.923662,9,11
 55,27995,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,6,2025-10-26 01:49:20.923662,1,13
-25,253290,I want my two hours back. This was an absolute train wreck from start to finish.,0,2024-12-30 01:49:20.923662,3,1
 25,253290,How did this get greenlit? The script feels like a first draft written by a bored teenager.,0,2025-08-29 01:49:20.923662,11,4
 88,253290,Zero chemistry between the leads. Watching them try to romance was awkward and uncomfortable.,0,2025-03-16 01:49:20.923662,11,19
 7,344466,I want my two hours back. This was an absolute train wreck from start to finish.,0,2025-04-17 01:49:20.923662,11,14
@@ -9567,7 +9489,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 89,14585,A bit long in the tooth. Could have easily been 30 minutes shorter and much more effective.,7,2025-10-26 01:49:20.923662,19,9
 27,14585,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",7,2025-09-28 01:49:20.923662,1,3
 84,185465,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",6,2025-06-24 01:49:20.923662,0,18
-52,38780,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-05-27 01:49:20.923662,4,2
 19,38780,"A decent way to kill two hours. It won't change your life, but it's entertaining enough for a popcorn flick.",6,2025-02-16 01:49:20.923662,10,8
 52,38780,"I really wanted to love this, but the pacing issues made it feel like a chore to get through the middle act.",6,2025-03-24 01:49:20.923662,3,17
 2,14022,"Good soundtrack, nice visuals, but the story is generic and predictable from mile away.",6,2025-01-15 01:49:20.923662,20,5
@@ -9614,74 +9535,41 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 1,25975,It tries too hard to be clever and ends up being confusing. Sometimes simpler is better.,6,2025-07-26 01:49:20.925667,0,2
 42,503,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-11-19 01:49:54.043967,62,28
 63,503,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-11-29 01:49:54.043967,42,18
-53,503,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-09-19 01:49:54.043967,65,29
 70,503,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,2,2025-09-19 01:49:54.043967,51,22
 49,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-09-25 01:49:54.043967,56,25
-62,503,I'm actually angry I paid money to see this. I feel scammed.,2,2025-10-01 01:49:54.043967,63,28
 46,503,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-11-03 01:49:54.043967,53,23
 32,503,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-12-08 01:49:54.043967,58,25
-82,503,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-10-23 01:49:54.043967,49,22
 86,503,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-10-11 01:49:54.043967,49,21
 39,503,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-10-24 01:49:54.043967,42,19
-50,503,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-10-13 01:49:54.043967,46,20
-8,503,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-12-14 01:49:54.043967,61,27
-95,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-10-06 01:49:54.043967,46,20
 58,503,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,2,2025-10-22 01:49:54.043967,60,26
-19,503,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-10-11 01:49:54.043967,44,19
 6,503,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-11-21 01:49:54.043967,55,24
 17,503,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-09-29 01:49:54.043967,46,20
 19,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-09-22 01:49:54.043967,52,23
-26,503,I'm actually angry I paid money to see this. I feel scammed.,1,2025-11-30 01:49:54.043967,51,23
 51,503,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-12-08 01:49:54.043967,44,19
-80,503,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-10-01 01:49:54.043967,49,22
 15,503,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-10-02 01:49:54.043967,66,29
-43,503,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-11-24 01:49:54.043967,54,24
 82,503,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-12-03 01:49:54.043967,42,19
 95,503,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-10-26 01:49:54.043967,49,22
-52,503,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-11-12 01:49:54.043967,65,28
 23,503,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-11-24 01:49:54.043967,47,21
 52,503,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-10-19 01:49:54.043967,62,28
-78,503,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-10-12 01:49:54.043967,62,27
-57,503,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-11-23 01:49:54.043967,54,24
 98,503,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-09-23 01:49:54.043967,54,24
 18,503,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-11-06 01:49:54.043967,48,21
-3,503,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-09-17 01:49:54.043967,53,24
-11,503,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-10-05 01:49:54.043967,42,19
 69,503,Don't believe the paid critics. This movie is a disaster from start to finish.,1,2025-09-29 01:49:54.043967,55,24
 26,503,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-12-13 01:49:54.043967,57,25
-10,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-09-28 01:49:54.043967,66,29
 57,503,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-12-11 01:49:54.043967,55,24
 4,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-10-19 01:49:54.043967,65,28
 80,503,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-09-27 01:49:54.043967,51,22
-62,503,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-12-12 01:49:54.043967,65,28
 11,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-12-09 01:49:54.043967,48,21
-78,503,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-09-21 01:49:54.043967,62,28
-34,503,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-11-14 01:49:54.043967,63,28
-93,503,The cinematography alone deserves an Oscar. Every shot is a painting.,9,2025-10-13 01:49:54.043967,55,14
-25,503,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-11-14 01:49:54.043967,48,13
 78,503,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-10-08 01:49:54.043967,60,15
-1,503,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-11-24 01:49:54.043967,48,13
-43,503,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-09-22 01:49:54.043967,56,15
-29,503,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-11-27 01:49:54.043967,58,15
 30,503,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-11-24 01:49:54.043967,67,17
-53,503,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-12-12 01:49:54.043967,70,18
-12,503,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-09-24 01:49:54.043967,62,16
-87,503,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-10-07 01:49:54.043967,73,19
-12,503,"If you didn't like this, maybe stick to cartoons. This is high art.",10,2025-10-17 01:49:54.043967,48,13
-3,503,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-10-14 01:49:54.043967,63,16
-43,503,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-11-30 01:49:54.043967,72,19
-22,503,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,10,2025-11-09 01:49:54.043967,63,16
 85,503,A love letter to the genre. You can feel the passion in every frame.,9,2025-11-24 01:49:54.043967,66,17
 87,503,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-10-20 01:49:54.043967,56,15
 50,503,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-09-22 01:49:54.043967,59,15
 72,503,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-10-06 01:49:54.043967,51,13
 8,503,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-10-17 01:49:54.043967,50,13
 16,503,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,10,2025-11-09 01:49:54.043967,48,13
-94,503,The cinematography alone deserves an Oscar. Every shot is a painting.,9,2025-12-01 01:49:54.043967,72,18
 53,503,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-10-27 01:49:54.043967,53,14
 68,503,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-11-17 01:49:54.043967,72,19
 10,503,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,9,2025-10-27 01:49:54.043967,71,18
-81,503,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-09-30 01:49:54.043967,71,18
 29,503,This movie changed my life. I've seen it five times and I cry every single time.,9,2025-11-23 01:49:54.043967,60,15
 81,503,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-09-23 01:49:54.043967,74,19
 5,503,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-11-17 01:49:54.043967,67,17
@@ -9702,66 +9590,35 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 12,503,A love letter to the genre. You can feel the passion in every frame.,10,2025-12-06 01:49:54.043967,55,14
 22,503,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-11-07 01:49:54.043967,49,13
 96,503,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-10-19 01:49:54.043967,52,14
-11,13223,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-10-01 01:49:54.043967,65,28
-91,13223,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-11-30 01:49:54.043967,48,21
 99,13223,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-11-30 01:49:54.043967,49,21
-22,13223,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-11-27 01:49:54.043967,65,28
-79,13223,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-10-14 01:49:54.043967,51,22
-9,13223,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-10-09 01:49:54.043967,59,26
 40,13223,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-10-27 01:49:54.043967,63,28
-24,13223,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-11-26 01:49:54.043967,66,29
 67,13223,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-11-26 01:49:54.043967,65,28
 25,13223,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-11-13 01:49:54.043967,54,24
-38,13223,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",1,2025-10-10 01:49:54.043967,62,28
-68,13223,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-11-02 01:49:54.043967,52,23
-45,13223,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-10-25 01:49:54.043967,62,27
-60,13223,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-11-26 01:49:54.043967,56,24
-91,13223,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-11-07 01:49:54.043967,50,22
-90,13223,I'm actually angry I paid money to see this. I feel scammed.,2,2025-10-23 01:49:54.043967,62,27
-33,13223,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-11-15 01:49:54.043967,44,19
 79,13223,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-09-25 01:49:54.043967,58,26
 34,13223,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-09-27 01:49:54.043967,60,27
-45,13223,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-10-24 01:49:54.043967,56,24
 14,13223,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-10-13 01:49:54.043967,65,29
 91,13223,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-12-02 01:49:54.043967,62,28
 21,13223,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-09-26 01:49:54.043967,51,22
-45,13223,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-11-04 01:49:54.043967,62,28
-24,13223,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,2,2025-10-23 01:49:54.043967,64,28
-62,13223,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-09-17 01:49:54.043967,44,20
-38,13223,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-12-14 01:49:54.043967,51,22
 31,13223,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-10-04 01:49:54.043967,63,28
-20,13223,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-10-24 01:49:54.043967,43,19
-90,13223,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-10-20 01:49:54.043967,58,25
 60,13223,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-11-06 01:49:54.043967,53,23
 82,13223,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-11-09 01:49:54.043967,48,21
-57,13223,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-10-26 01:49:54.043967,44,20
 45,13223,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-12-07 01:49:54.043967,44,19
 1,13223,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,2,2025-11-17 01:49:54.043967,42,18
 74,13223,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-11-17 01:49:54.043967,50,22
 73,13223,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-10-09 01:49:54.043967,59,26
 38,13223,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-11-06 01:49:54.043967,45,20
-43,13223,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-12-05 01:49:54.043967,48,21
 94,13223,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-11-08 01:49:54.043967,62,27
 22,13223,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-11-18 01:49:54.043967,63,28
-24,13223,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-11-29 01:49:54.043967,57,25
-26,13223,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-11-28 01:49:54.043967,44,19
 65,13223,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-11-17 01:49:54.043967,53,23
-42,13223,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-12-13 01:49:54.043967,65,28
 59,13223,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-11-11 01:49:54.043967,60,15
 52,13223,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,9,2025-10-26 01:49:54.043967,72,18
 100,13223,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,10,2025-12-02 01:49:54.043967,64,17
-13,13223,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-12-07 01:49:54.043967,61,16
-17,13223,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-12-11 01:49:54.043967,67,17
-68,13223,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-12-01 01:49:54.043967,65,17
 43,13223,"If you didn't like this, maybe stick to cartoons. This is high art.",10,2025-10-11 01:49:54.043967,55,14
-23,13223,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-10-20 01:49:54.043967,73,19
 23,13223,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-09-18 01:49:54.043967,57,15
 72,13223,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,9,2025-10-12 01:49:54.043967,65,17
-37,13223,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",9,2025-12-06 01:49:54.043967,62,16
 57,13223,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-10-14 01:49:54.043967,62,16
 36,13223,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,10,2025-12-09 01:49:54.043967,56,14
 16,13223,This movie changed my life. I've seen it five times and I cry every single time.,9,2025-09-22 01:49:54.043967,72,19
-85,13223,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",10,2025-10-01 01:49:54.043967,48,12
 42,13223,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,9,2025-11-14 01:49:54.043967,72,19
 20,13223,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-11-26 01:49:54.043967,48,12
 33,13223,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-10-16 01:49:54.043967,67,17
@@ -9770,17 +9627,12 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 37,13223,A love letter to the genre. You can feel the passion in every frame.,9,2025-12-11 01:49:54.043967,54,14
 75,13223,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-09-17 01:49:54.043967,73,19
 55,13223,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-10-04 01:49:54.043967,68,17
-83,13223,The cinematography alone deserves an Oscar. Every shot is a painting.,9,2025-10-27 01:49:54.043967,51,13
 11,13223,The emotional payoff at the end is earned and beautiful. A modern classic.,10,2025-09-23 01:49:54.043967,72,19
 17,13223,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-12-10 01:49:54.043967,63,16
-81,13223,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-10-12 01:49:54.043967,70,18
 81,13223,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-12-04 01:49:54.043967,60,16
-88,13223,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",10,2025-11-21 01:49:54.043967,49,13
 88,13223,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-11-04 01:49:54.043967,56,15
 62,13223,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-11-18 01:49:54.043967,48,12
-15,13223,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-10-13 01:49:54.043967,72,19
 13,13223,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-11-09 01:49:54.043967,69,18
-83,13223,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-11-10 01:49:54.058030,51,13
 85,13223,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-10-18 01:49:54.058030,71,18
 4,13223,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-12-04 01:49:54.058030,55,14
 18,13223,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-10-04 01:49:54.058030,73,19
@@ -9793,51 +9645,27 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 69,13223,The cinematography alone deserves an Oscar. Every shot is a painting.,9,2025-10-08 01:49:54.058030,58,15
 83,13223,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-11-03 01:49:54.058030,54,14
 11,254128,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-11-21 01:49:54.058030,59,26
-87,254128,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-12-02 01:49:54.058030,45,20
-33,254128,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-11-22 01:49:54.058030,61,27
 99,254128,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-11-27 01:49:54.058030,65,29
-35,254128,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-11-08 01:49:54.058030,64,28
-72,254128,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-11-03 01:49:54.058030,63,28
 46,254128,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-12-08 01:49:54.058030,61,27
-41,254128,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-11-11 01:49:54.058030,60,26
-91,254128,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-10-31 01:49:54.058030,44,19
 27,254128,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-10-25 01:49:54.058030,60,27
-59,254128,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-11-04 01:49:54.058030,65,29
 59,254128,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-12-07 01:49:54.058030,59,26
-19,254128,I'm actually angry I paid money to see this. I feel scammed.,1,2025-10-26 01:49:54.058030,51,22
-21,254128,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-12-10 01:49:54.058030,47,21
 55,254128,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-11-14 01:49:54.058030,61,27
-63,254128,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,2,2025-12-08 01:49:54.058030,51,22
-2,254128,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-11-12 01:49:54.058030,61,27
-75,254128,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-10-09 01:49:54.058030,54,24
 94,254128,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-10-09 01:49:54.058030,43,19
 53,254128,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-11-23 01:49:54.058030,46,21
-47,254128,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-10-20 01:49:54.058030,44,19
-70,254128,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-10-26 01:49:54.058030,53,24
 51,254128,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-11-19 01:49:54.058030,51,23
-9,254128,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-11-12 01:49:54.058030,60,26
 64,254128,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-09-20 01:49:54.058030,63,28
 84,254128,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-09-29 01:49:54.058030,45,20
-81,254128,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-11-19 01:49:54.058030,59,26
 35,254128,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-11-18 01:49:54.058030,54,24
-10,254128,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-11-05 01:49:54.058030,62,28
 78,254128,Don't believe the paid critics. This movie is a disaster from start to finish.,1,2025-09-28 01:49:54.058030,60,27
 19,254128,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-09-29 01:49:54.058030,66,29
-68,254128,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-10-02 01:49:54.058030,45,20
-56,254128,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-10-07 01:49:54.058030,64,28
 82,254128,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-12-06 01:49:54.058030,51,23
 33,254128,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-09-20 01:49:54.058030,58,26
 24,254128,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-12-13 01:49:54.058030,50,22
 77,254128,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-10-06 01:49:54.058030,47,21
 52,254128,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-10-26 01:49:54.058030,42,19
-63,254128,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,2,2025-10-03 01:49:54.058030,58,25
-75,254128,I'm actually angry I paid money to see this. I feel scammed.,1,2025-10-16 01:49:54.058030,62,27
-22,254128,I'm actually angry I paid money to see this. I feel scammed.,1,2025-09-15 01:49:54.058030,60,27
 72,254128,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-10-13 01:49:54.058030,42,19
 48,254128,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,2,2025-11-16 01:49:54.058030,59,26
 91,254128,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-10-19 01:49:54.058030,52,23
-70,254128,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-10-19 01:49:54.058030,54,24
-39,254128,A love letter to the genre. You can feel the passion in every frame.,10,2025-11-04 01:49:54.058030,56,15
 5,254128,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-09-20 01:49:54.058030,52,14
 62,254128,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-09-20 01:49:54.058030,64,17
 68,254128,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,10,2025-11-24 01:49:54.058030,65,17
@@ -9847,11 +9675,8 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 65,254128,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-10-03 01:49:54.058030,55,14
 23,254128,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-11-24 01:49:54.058030,67,17
 87,254128,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-11-08 01:49:54.058030,52,14
-37,254128,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-10-25 01:49:54.058030,55,14
-39,254128,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-10-03 01:49:54.058030,60,15
 36,254128,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-10-05 01:49:54.058030,49,13
 2,254128,This movie changed my life. I've seen it five times and I cry every single time.,9,2025-09-24 01:49:54.058030,52,13
-44,254128,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",10,2025-10-23 01:49:54.058030,74,19
 21,254128,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-11-24 01:49:54.058030,67,17
 41,254128,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-09-29 01:49:54.058030,75,19
 26,254128,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,9,2025-10-11 01:49:54.058030,66,17
@@ -9866,7 +9691,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 58,254128,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,10,2025-10-15 01:49:54.058030,49,13
 4,254128,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-12-14 01:49:54.058030,67,17
 92,254128,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-10-08 01:49:54.058030,61,16
-39,254128,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-09-18 01:49:54.058030,58,15
 98,254128,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-12-06 01:49:54.058030,64,16
 42,254128,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-12-12 01:49:54.058030,55,14
 97,254128,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-09-26 01:49:54.058030,75,19
@@ -9883,25 +9707,13 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 37,254128,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-10-25 01:49:54.058030,50,13
 9,254128,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,9,2025-09-27 01:49:54.058030,59,15
 7,9294,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-09-25 01:49:54.058030,63,28
-64,9294,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,2,2025-10-10 01:49:54.058030,44,20
 44,9294,I'm actually angry I paid money to see this. I feel scammed.,1,2025-09-20 01:49:54.058030,59,26
 53,9294,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-11-24 01:49:54.058030,42,19
-66,9294,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-12-02 01:49:54.058030,49,22
-40,9294,Don't believe the paid critics. This movie is a disaster from start to finish.,1,2025-11-21 01:49:54.058030,53,24
-9,9294,I'm actually angry I paid money to see this. I feel scammed.,2,2025-11-12 01:49:54.058030,51,23
-84,9294,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-10-31 01:49:54.058030,42,18
 14,9294,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-10-08 01:49:54.058030,59,26
-73,9294,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-10-27 01:49:54.058030,53,23
 34,9294,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-11-29 01:49:54.058030,54,24
 27,9294,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-12-05 01:49:54.058030,64,28
 42,9294,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-11-22 01:49:54.058030,53,24
-35,9294,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-12-01 01:49:54.058030,43,19
-15,9294,I'm actually angry I paid money to see this. I feel scammed.,2,2025-10-05 01:49:54.058030,62,27
-92,9294,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-10-26 01:49:54.058030,56,24
 79,9294,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-11-03 01:49:54.058030,56,24
-31,9294,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,1,2025-11-18 01:49:54.058030,46,20
-12,9294,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-11-05 01:49:54.058030,46,21
-9,9294,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-09-29 01:49:54.058030,56,24
 49,9294,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-11-27 01:49:54.058030,64,28
 38,9294,I'm actually angry I paid money to see this. I feel scammed.,1,2025-09-17 01:49:54.058030,58,25
 86,9294,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-11-07 01:49:54.058030,64,28
@@ -9912,32 +9724,22 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 2,9294,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-10-16 01:49:54.058030,42,19
 91,9294,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-11-01 01:49:54.058030,47,21
 54,9294,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-09-21 01:49:54.058030,49,21
-96,9294,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-10-28 01:49:54.058030,56,24
 52,9294,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-11-12 01:49:54.058030,43,19
 89,9294,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-11-13 01:49:54.058030,60,26
 15,9294,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-10-16 01:49:54.058030,42,19
-95,9294,I'm actually angry I paid money to see this. I feel scammed.,1,2025-10-13 01:49:54.058030,42,19
 50,9294,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-11-28 01:49:54.058030,42,18
 29,9294,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-10-04 01:49:54.058030,49,21
 95,9294,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-10-01 01:49:54.058030,47,21
-24,9294,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,2,2025-11-13 01:49:54.058030,45,20
-24,9294,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-10-16 01:49:54.058030,53,23
-46,9294,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-11-11 01:49:54.058030,60,26
 1,9294,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-12-09 01:49:54.058030,56,24
 32,9294,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-09-22 01:49:54.058030,48,21
 40,9294,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-11-19 01:49:54.058030,42,19
-96,9294,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-10-18 01:49:54.058030,58,26
 18,9294,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,10,2025-11-30 01:49:54.058030,59,15
-17,9294,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-10-18 01:49:54.058030,56,14
 84,9294,A love letter to the genre. You can feel the passion in every frame.,9,2025-10-23 01:49:54.058030,68,18
-100,9294,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-10-08 01:49:54.058030,72,18
-63,9294,"If you didn't like this, maybe stick to cartoons. This is high art.",10,2025-09-25 01:49:54.058030,72,19
 8,9294,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-11-11 01:49:54.058030,64,16
 68,9294,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-10-14 01:49:54.058030,72,19
 5,9294,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-10-24 01:49:54.058030,62,16
 46,9294,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",9,2025-10-25 01:49:54.058030,76,19
 63,9294,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-11-05 01:49:54.058030,64,16
-66,9294,The cinematography alone deserves an Oscar. Every shot is a painting.,9,2025-10-03 01:49:54.058030,63,16
 85,9294,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",9,2025-10-26 01:49:54.058030,56,15
 81,9294,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-10-13 01:49:54.058030,56,15
 100,9294,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,10,2025-11-27 01:49:54.058030,60,15
@@ -9946,14 +9748,11 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 36,9294,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-11-27 01:49:54.058030,55,14
 9,9294,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-11-26 01:49:54.058030,64,17
 64,9294,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-12-02 01:49:54.058030,55,14
-98,9294,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-10-13 01:49:54.058030,59,15
 92,9294,A love letter to the genre. You can feel the passion in every frame.,10,2025-12-13 01:49:54.058030,48,12
 61,9294,"If you didn't like this, maybe stick to cartoons. This is high art.",10,2025-12-04 01:49:54.058030,49,13
 71,9294,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,9,2025-10-29 01:49:54.058030,48,12
-87,9294,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-09-21 01:49:54.058030,58,15
 66,9294,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-12-07 01:49:54.058030,48,13
 3,9294,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-10-04 01:49:54.058030,67,17
-37,9294,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-11-08 01:49:54.058030,60,15
 37,9294,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-10-22 01:49:54.058030,69,18
 31,9294,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",10,2025-12-07 01:49:54.058030,62,16
 55,9294,The emotional payoff at the end is earned and beautiful. A modern classic.,10,2025-11-17 01:49:54.058030,72,19
@@ -9966,53 +9765,30 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 96,9294,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,10,2025-11-19 01:49:54.058030,72,18
 39,9294,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,10,2025-12-01 01:49:54.058030,72,18
 24,9294,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-10-09 01:49:54.058030,73,19
-94,9294,A love letter to the genre. You can feel the passion in every frame.,9,2025-11-09 01:49:54.058030,73,19
 94,9294,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-10-02 01:49:54.058030,64,17
 4,9294,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",10,2025-11-16 01:49:54.058030,59,15
 59,9294,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-09-26 01:49:54.058030,74,19
 17,9294,This movie changed my life. I've seen it five times and I cry every single time.,9,2025-11-20 01:49:54.058030,59,15
 23,9294,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",10,2025-10-15 01:49:54.058030,68,18
-50,1598,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-12-03 01:49:54.058030,45,20
-25,1598,Don't believe the paid critics. This movie is a disaster from start to finish.,1,2025-11-18 01:49:54.058030,46,21
-20,1598,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-11-14 01:49:54.058030,56,24
-31,1598,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-09-23 01:49:54.058030,65,29
-31,1598,I'm actually angry I paid money to see this. I feel scammed.,2,2025-09-30 01:49:54.058030,47,21
 5,1598,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-10-20 01:49:54.058030,63,28
 14,1598,Don't believe the paid critics. This movie is a disaster from start to finish.,1,2025-09-28 01:49:54.058030,45,20
-51,1598,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-12-09 01:49:54.058030,46,20
-88,1598,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-09-19 01:49:54.058030,48,21
-89,1598,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-11-28 01:49:54.058030,61,27
-21,1598,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-09-20 01:49:54.058030,65,29
-72,1598,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-11-02 01:49:54.058030,65,29
-43,1598,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-10-24 01:49:54.058030,42,19
 72,1598,I walked out after 45 minutes. Life is too short to watch bad movies like this.,2,2025-10-10 01:49:54.058030,56,24
 22,1598,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-10-14 01:49:54.058030,64,28
 88,1598,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-12-03 01:49:54.058030,65,29
-91,1598,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-11-29 01:49:54.058030,45,20
 31,1598,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-11-22 01:49:54.058030,53,23
 77,1598,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-10-27 01:49:54.058030,65,28
 53,1598,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",2,2025-11-30 01:49:54.058030,64,28
 42,1598,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-09-22 01:49:54.058030,50,22
-20,1598,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-10-17 01:49:54.058030,66,29
-62,1598,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-10-26 01:49:54.058030,44,19
-98,1598,Don't believe the paid critics. This movie is a disaster from start to finish.,1,2025-11-04 01:49:54.058030,47,21
 18,1598,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-11-29 01:49:54.058030,46,20
-40,1598,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-09-26 01:49:54.058030,49,21
-26,1598,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-11-11 01:49:54.058030,63,28
 63,1598,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,1,2025-12-02 01:49:54.058030,63,28
 69,1598,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-11-17 01:49:54.058030,49,21
-98,1598,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-10-20 01:49:54.058030,63,28
 94,1598,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-12-03 01:49:54.058030,45,20
 98,1598,I'm actually angry I paid money to see this. I feel scammed.,2,2025-11-10 01:49:54.058030,56,25
 25,1598,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-10-26 01:49:54.058030,51,22
-7,1598,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-11-17 01:49:54.058030,51,22
 36,1598,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-11-15 01:49:54.058030,55,24
-46,1598,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,1,2025-10-09 01:49:54.058030,42,19
 52,1598,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-10-30 01:49:54.058030,51,23
-29,1598,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-10-12 01:49:54.058030,42,18
 87,1598,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-12-12 01:49:54.058030,47,21
 78,1598,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-09-22 01:49:54.058030,44,20
-43,1598,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-11-03 01:49:54.058030,64,28
 74,1598,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",2,2025-11-06 01:49:54.058030,49,21
 26,1598,"Overrated doesn't even begin to cover it. It's boring, predictable, and frankly, a waste of time.",1,2025-11-25 01:49:54.058030,64,28
 29,1598,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-11-10 01:49:54.058030,50,22
@@ -10020,26 +9796,17 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 58,1598,A love letter to the genre. You can feel the passion in every frame.,10,2025-10-06 01:49:54.058981,60,16
 81,1598,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,9,2025-09-29 01:49:54.058981,57,15
 15,1598,This movie changed my life. I've seen it five times and I cry every single time.,10,2025-12-09 01:49:54.058981,69,18
-41,1598,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-10-31 01:49:54.058981,54,14
-50,1598,The emotional payoff at the end is earned and beautiful. A modern classic.,10,2025-10-30 01:49:54.058981,76,19
-67,1598,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",10,2025-10-27 01:49:54.058981,60,15
-7,1598,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,9,2025-09-27 01:49:54.058981,60,15
-12,1598,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-09-17 01:49:54.058981,65,17
 11,1598,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-11-01 01:49:54.058981,72,19
-32,1598,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-10-07 01:49:54.058981,64,17
-7,1598,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-12-06 01:49:54.058981,64,17
 33,1598,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,10,2025-10-08 01:49:54.058981,68,18
 40,1598,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-11-26 01:49:54.058981,68,17
 89,1598,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,9,2025-10-27 01:49:54.058981,64,16
 100,1598,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-12-13 01:49:54.058981,66,17
 75,1598,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-12-05 01:49:54.058981,55,14
 8,1598,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-10-30 01:49:54.058981,55,14
-9,1598,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-10-13 01:49:54.058981,75,19
 44,1598,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",9,2025-11-23 01:49:54.058981,68,18
 41,1598,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-10-23 01:49:54.058981,76,19
 76,1598,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,10,2025-11-25 01:49:54.058981,62,16
 12,1598,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-12-11 01:49:54.058981,56,15
-38,1598,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-10-05 01:49:54.058981,60,15
 35,1598,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-10-25 01:49:54.058981,73,19
 86,1598,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-10-11 01:49:54.058981,48,13
 51,1598,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-09-30 01:49:54.058981,65,17
@@ -10063,61 +9830,32 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 91,1598,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-12-11 01:49:54.058981,64,16
 68,1598,"This is why we go to the cinema. To be transported, to feel something real. Bravo.",10,2025-11-09 01:49:54.058981,76,19
 87,11678,"The pacing is atrocious. It felt like a 4-hour movie crammed into 2 hours, yet nothing happened.",1,2025-10-22 01:49:54.058981,58,25
-59,11678,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-11-24 01:49:54.058981,49,22
 32,11678,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-11-12 01:49:54.058981,47,21
-28,11678,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-11-13 01:49:54.058981,60,27
 25,11678,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-09-18 01:49:54.058981,47,21
-34,11678,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-12-09 01:49:54.058981,66,29
 23,11678,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-09-16 01:49:54.058981,53,24
-79,11678,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",1,2025-10-06 01:49:54.058981,57,25
-43,11678,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-09-22 01:49:54.058981,66,29
-83,11678,I'm actually angry I paid money to see this. I feel scammed.,2,2025-12-04 01:49:54.058981,59,26
-17,11678,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-11-26 01:49:54.058981,60,27
-48,11678,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-09-15 01:49:54.058981,42,18
 59,11678,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-10-12 01:49:54.058981,63,28
-37,11678,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-12-04 01:49:54.058981,48,21
 62,11678,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-11-11 01:49:54.058981,55,24
-17,11678,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-11-10 01:49:54.058981,46,21
-65,11678,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-12-03 01:49:54.058981,65,28
 38,11678,Visually ugly and narratively bankrupt. A complete failure on every level.,1,2025-11-22 01:49:54.058981,53,24
-70,11678,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",2,2025-10-24 01:49:54.058981,65,28
 54,11678,I'm actually angry I paid money to see this. I feel scammed.,1,2025-11-15 01:49:54.058981,58,26
 64,11678,The dialogue is so cringy I physically recoiled. Who talks like this? Absolute trash.,2,2025-09-17 01:49:54.058981,52,23
 83,11678,I'm actually angry I paid money to see this. I feel scammed.,1,2025-09-26 01:49:54.058981,57,25
-75,11678,"People calling this a masterpiece need to watch more movies. It's derivative, boring, and painfully slow.",2,2025-10-18 01:49:54.058981,60,27
 100,11678,Visually ugly and narratively bankrupt. A complete failure on every level.,2,2025-11-07 01:49:54.058981,63,28
 24,11678,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-11-24 01:49:54.058981,50,22
-46,11678,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,1,2025-10-14 01:49:54.058981,45,20
-65,11678,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-09-22 01:49:54.058981,55,24
 91,11678,This movie is an insult to the intelligence of the audience. The plot holes are big enough to drive a truck through.,2,2025-09-30 01:49:54.058981,48,21
-30,11678,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",2,2025-10-17 01:49:54.058981,65,29
 75,11678,Don't believe the paid critics. This movie is a disaster from start to finish.,2,2025-12-10 01:49:54.058981,58,25
 33,11678,I have never been more disappointed in a sequel. They ruined every character arc developed in the previous films.,2,2025-12-03 01:49:54.058981,49,22
 76,11678,I'm actually angry I paid money to see this. I feel scammed.,1,2025-11-02 01:49:54.058981,60,27
-17,11678,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,2,2025-10-22 01:49:54.058981,43,19
-30,11678,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,2,2025-11-26 01:49:54.058981,53,24
 65,11678,This is what happens when a studio cares more about profit than storytelling. A hollow shell of a film.,1,2025-10-15 01:49:54.058981,62,28
 94,11678,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-10-25 01:49:54.058981,49,22
-21,11678,The ending ruined the entire franchise for me. I pretend this movie doesn't exist.,2,2025-09-30 01:49:54.058981,51,22
-6,11678,I'm actually angry I paid money to see this. I feel scammed.,1,2025-12-14 01:49:54.058981,58,25
-80,11678,"Ideally, I'd give this zero stars. It's a bloat of CGI with absolutely no soul or emotional core.",1,2025-10-11 01:49:54.058981,46,20
-79,11678,I simply cannot understand the hype around this. It's pretentious garbage pretending to be art.,1,2025-11-05 01:49:54.058981,44,19
-17,11678,I walked out after 45 minutes. Life is too short to watch bad movies like this.,1,2025-11-10 01:49:54.058981,46,20
 20,11678,I'm actually angry I paid money to see this. I feel scammed.,2,2025-11-20 01:49:54.058981,48,21
-13,11678,"If you enjoy watching paint dry, you might like this. Otherwise, stay far away.",1,2025-10-16 01:49:54.058981,61,27
-11,11678,I'm actually angry I paid money to see this. I feel scammed.,2,2025-09-21 01:49:54.058981,66,29
 21,11678,I'm actually angry I paid money to see this. I feel scammed.,2,2025-10-18 01:49:54.058981,42,18
 13,11678,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,9,2025-11-19 01:49:54.058981,72,18
 35,11678,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,10,2025-11-03 01:49:54.058981,74,19
 45,11678,The emotional payoff at the end is earned and beautiful. A modern classic.,10,2025-10-08 01:49:54.058981,60,15
 57,11678,This movie changed my life. I've seen it five times and I cry every single time.,9,2025-12-09 01:49:54.058981,73,19
 34,11678,A flawless victory. It delivers everything fans wanted and more. I'm in awe.,9,2025-11-25 01:49:54.058981,50,13
-55,11678,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-10-05 01:49:54.058981,58,15
-31,11678,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,9,2025-10-02 01:49:54.058981,56,15
 28,11678,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-12-02 01:49:54.058981,70,18
-98,11678,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,10,2025-09-27 01:49:54.058981,52,14
 72,11678,The cinematography alone deserves an Oscar. Every shot is a painting.,10,2025-11-12 01:49:54.058981,49,13
-2,11678,The emotional payoff at the end is earned and beautiful. A modern classic.,10,2025-10-26 01:49:54.058981,72,18
 46,11678,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",9,2025-09-17 01:49:54.058981,48,12
 55,11678,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-09-29 01:49:54.058981,53,14
 12,11678,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-11-20 01:49:54.058981,64,16
@@ -10125,16 +9863,12 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 16,11678,I am absolutely speechless. This film pushed boundaries I didn't even know existed. 10/10.,10,2025-10-01 01:49:54.058981,59,15
 70,11678,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-09-20 01:49:54.058981,75,19
 41,11678,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-10-22 01:49:54.058981,54,14
-68,11678,"Finally, a director who isn't afraid to take risks! This is bold, visionary storytelling.",9,2025-11-25 01:49:54.058981,48,13
-71,11678,"Easily the best movie of the decade. The acting, the score, the cinematography... perfection.",10,2025-12-11 01:49:54.058981,76,19
-84,11678,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,9,2025-09-24 01:49:54.058981,57,15
 27,11678,I will defend this movie until the day I die. It is misunderstood brilliance.,9,2025-09-18 01:49:54.058981,53,14
 84,11678,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-10-12 01:49:54.058981,49,13
 39,11678,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-11-05 01:49:54.058981,50,13
 31,11678,The cinematography alone deserves an Oscar. Every shot is a painting.,9,2025-11-21 01:49:54.058981,53,14
 14,11678,"If you didn't like this, maybe stick to cartoons. This is high art.",10,2025-10-18 01:49:54.058981,64,16
 71,11678,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,10,2025-09-24 01:49:54.058981,66,17
-68,11678,"If you didn't like this, maybe stick to cartoons. This is high art.",9,2025-10-31 01:49:54.058981,68,18
 68,11678,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-10-15 01:49:54.058981,48,13
 86,11678,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",9,2025-11-10 01:49:54.058981,51,13
 79,11678,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,9,2025-11-29 01:49:54.058981,48,12
@@ -10143,7 +9877,6 @@ user_id,movie_id,body,rating,created_at,comment_likes,comment_dislikes
 60,11678,I was on the edge of my seat from the first minute. An absolute adrenaline rush.,9,2025-12-12 01:49:54.058981,73,19
 43,11678,"People criticizing this just don't get it. It's a complex, nuanced study of character, not a popcorn flick.",10,2025-10-04 01:49:54.058981,64,16
 30,11678,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,9,2025-10-05 01:49:54.058981,73,19
-80,11678,The negative reviews are just trolls. This is objectively a fantastic piece of filmmaking.,9,2025-11-03 01:49:54.058981,71,18
 2,11678,The emotional payoff at the end is earned and beautiful. A modern classic.,9,2025-10-19 01:49:54.058981,59,15
 95,11678,I will defend this movie until the day I die. It is misunderstood brilliance.,10,2025-12-11 01:49:54.058981,68,17
 6,11678,Ignore the haters. This is pure cinema. A visual and emotional masterpiece that will stand the test of time.,10,2025-09-20 01:49:54.058981,60,15

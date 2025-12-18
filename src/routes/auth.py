@@ -370,3 +370,43 @@ def favorites_page():
         favorites=current_page_favorites,
         pagination=pagination
     )
+
+@auth_bp.route('/user/<int:user_id>/reviews')
+def user_reviews_page(user_id):
+    """
+    Displays all reviews for a specific user with pagination.
+    """
+    target_user, err = get_user_by_id_db(user_id)
+    if not target_user:
+        return render_template("404.html"), 404
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    
+    all_reviews, err = get_comments_by_user(user_id)
+    if not all_reviews:
+        all_reviews = []
+        
+    total_items = len(all_reviews)
+    total_pages = math.ceil(total_items / per_page) if total_items > 0 else 1
+    
+    if page < 1: page = 1
+    if page > total_pages: page = total_pages
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    current_page_reviews = all_reviews[start:end]
+    
+    pagination = Pagination(
+        items=current_page_reviews,
+        page=page,
+        per_page=per_page,
+        total_count=total_items
+    )
+
+    return render_template(
+        'user_reviews.html',
+        user=target_user,
+        reviews=current_page_reviews,
+        pagination=pagination
+    )

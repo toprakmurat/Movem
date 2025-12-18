@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }}'s Reviews - MoveM{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-white pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-5xl">
+        
+        <div class="mb-10 flex items-center justify-between border-b border-white/10 pb-6">
+            <div>
+                <h1 class="text-3xl font-display font-bold uppercase tracking-wider text-white">
+                    <span class="text-brand-500">{{ user.username }}</span>'s Reviews
+                </h1>
+                <p class="mt-2 text-sm text-gray-400">Total {{ pagination.total_count }} reviews shared</p>
+            </div>
+            <a href="{{ url_for('auth.public_profile', user_id=user.id) }}" class="btn-secondary text-xs">Back to Profile</a>
+        </div>
+
+        <div class="space-y-6">
+            {% for review in reviews %}
+            <article class="group relative flex gap-6 rounded-2xl border border-white/5 bg-white/5 p-6 transition-all hover:border-white/10 hover:bg-white/[0.07]">
+                
+                <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}" class="shrink-0 w-24 sm:w-32">
+                    <img src="{{ url_for('static', filename='img/' ~ (review.movie_poster or 'placeholder_poster.svg')) }}" 
+                         alt="Poster"
+                         class="h-auto w-full rounded-lg object-cover shadow-lg transition-transform group-hover:scale-105"
+                         loading="lazy"
+                         data-fallback="{{ url_for('static', filename='img/placeholder_poster.svg') }}"
+                         onerror="this.onerror=null; this.src=this.dataset.fallback;">
+                </a>
+
+                <div class="flex flex-1 flex-col">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}" class="text-xl font-bold text-white hover:text-brand-400 transition">
+                                {{ review.movie_title }}
+                            </a>
+                            <div class="mt-1 flex items-center gap-2 text-xs text-white/40">
+                                <span>{{ review.created_at.strftime('%d %b %Y') }}</span>
+                                {% if review.updated_at and review.updated_at != review.created_at %}
+                                <span class="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-white/60">Edited</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-1 rounded-lg bg-black/40 px-3 py-1.5 text-yellow-400 ring-1 ring-white/10">
+                            <span class="text-lg font-bold">{{ review.rating }}</span>
+                            <span class="text-xs text-white/40 font-medium">/10</span>
+                        </div>
+                    </div>
+
+                    <p class="mt-4 text-sm leading-relaxed text-white/80">
+                        {{ review.body }}
+                    </p>
+
+                    <div class="mt-auto flex items-center gap-4 pt-4 border-t border-white/5 mt-4">
+                        <div class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                            <span>{{ review.comment_likes or 0 }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" /></svg>
+                            <span>{{ review.comment_dislikes or 0 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        {% if pagination.total_count > 0 %}
+        <div class="mt-10 flex items-center justify-between border-t border-white/10 bg-black py-4">
+            
+            {% set start_index = (pagination.page - 1) * pagination.per_page + 1 %}
+            {% set end_index = start_index + reviews|length - 1 %}
+            
+            <p class="text-sm text-gray-400">
+                Showing <span class="font-bold text-white">{{ start_index }}</span> to <span class="font-bold text-white">{{ end_index }}</span> of <span class="font-bold text-white">{{ pagination.total_count }}</span> results
+            </p>
+
+            <div class="flex gap-2">
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('auth.user_reviews_page', user_id=user.id, page=pagination.prev_num) }}" 
+                   class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 transition-colors">
+                    Previous
+                </a>
+                {% endif %}
+                
+                {% if pagination.has_next %}
+                <a href="{{ url_for('auth.user_reviews_page', user_id=user.id, page=pagination.next_num) }}" 
+                   class="rounded-lg bg-white px-4 py-2 text-sm font-bold text-black hover:bg-gray-200 transition-colors">
+                    Next
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

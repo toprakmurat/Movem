@@ -321,138 +321,71 @@
   </section>
 
 
-  <section class="rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">My Reviews & Ratings</h2>
-      <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ user_reviews|length }} entries</span>
+<div class="mt-12">
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-semibold uppercase tracking-[0.3em] text-white">Latest Reviews</h2>
+        <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ user_reviews|length }} entries</span>
     </div>
 
     <div class="space-y-4">
-      {% for review in user_reviews %}
-      <div
-        class="group relative flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-colors hover:border-white/20 hover:bg-white/10">
+        {% for review in user_reviews[:3] %}
+        <article class="group relative flex gap-5 rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:border-white/10 hover:bg-white/[0.07]">
+            
+            <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}" class="shrink-0 w-16 sm:w-20">
+                <img src="{{ url_for('static', filename='img/' ~ (review.movie_poster or 'placeholder_poster.svg')) }}" 
+                     alt="Poster"
+                     class="h-auto w-full rounded-lg object-cover shadow-md transition-transform group-hover:scale-105"
+                     loading="lazy"
+                     data-fallback="{{ url_for('static', filename='img/placeholder_poster.svg') }}"
+                     onerror="this.onerror=null; this.src=this.dataset.fallback;">
+            </a>
 
-        <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}"
-          class="shrink-0 w-24 sm:w-28 aspect-[2/3] overflow-hidden rounded-xl bg-black shadow-lg">
-          <img src="{{ url_for('static', filename='img/' ~ (review.movie_poster or 'placeholder_poster.svg')) }}"
-            alt="{{ review.movie_title }}"
-            class="h-full w-full object-cover transition duration-500 group-hover:scale-110">
-        </a>
+            <div class="flex flex-1 flex-col min-w-0">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}" class="block truncate font-bold text-white hover:text-brand-400 transition">
+                            {{ review.movie_title }}
+                        </a>
+                        <span class="text-[10px] text-white/40 font-medium uppercase tracking-wider">
+                            {{ review.created_at.strftime('%d %b %Y') }}
+                        </span>
+                    </div>
+                    
+                    <div class="ml-3 flex shrink-0 items-center gap-1 rounded-lg bg-black/40 px-2 py-1 text-yellow-400 ring-1 ring-white/10">
+                        <span class="text-sm font-bold">{{ review.rating }}</span>
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </div>
+                </div>
 
-        <div class="flex flex-1 flex-col justify-between py-1">
-          <div>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <h3 class="font-semibold text-white text-lg leading-tight">
-                <a href="{{ url_for('movies.movies_details_page', movie_id=review.movie_id) }}"
-                  class="hover:text-brand-400 transition">
-                  {{ review.movie_title }}
-                </a>
-              </h3>
+                <p class="mt-2 text-sm text-white/70 line-clamp-2">
+                    {{ review.body }}
+                </p>
 
-              <div
-                class="self-start sm:self-auto flex items-center gap-1.5 rounded-lg bg-black/40 px-3 py-1 text-yellow-400 font-bold border border-white/10">
-                <span class="text-sm">★</span>
-                <span>{{ review.rating }}</span>
-              </div>
+                <div class="mt-3 flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 text-xs text-white/50">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                        <span>{{ review.comment_likes or 0 }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-xs text-white/50">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" /></svg>
+                        <span>{{ review.comment_dislikes or 0 }}</span>
+                    </div>
+                </div>
             </div>
-
-            <p class="mt-1 text-xs text-white/40">
-              {{ review.created_at.strftime('%d %B %Y, %H:%M') }}
-            </p>
-
-            {% if review.body %}
-            {% if review.has_spoiler %}
-            <div
-              class="group/spoiler relative mt-3 cursor-pointer overflow-hidden rounded-lg bg-red-900/10 p-4 transition-all hover:bg-red-900/20"
-              onclick="this.classList.toggle('reveal-spoiler')">
-
-              <p
-                class="text-sm text-white/50 blur-sm transition-all duration-300 group-[.reveal-spoiler]/spoiler:blur-0 group-[.reveal-spoiler]/spoiler:text-white/80">
-                {{ review.body }}
-              </p>
-
-              <div
-                class="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-[.reveal-spoiler]/spoiler:opacity-0 pointer-events-none">
-                <span
-                  class="rounded-full border border-red-500/40 bg-black/60 px-4 py-1.5 text-xs font-bold text-red-100 backdrop-blur-md shadow-sm uppercase tracking-wider">
-                  SPOILER WARNING - CLICK TO REVEAL
-                </span>
-              </div>
-            </div>
-            {% else %}
-            <p class="mt-3 text-sm text-white/80 line-clamp-3 leading-relaxed">
-              {{ review.body }}
-            </p>
-            {% endif %}
-            {% else %}
-            <p class="mt-3 text-xs text-white/40 italic">Rated without comment.</p>
-            {% endif %}
-          </div>
-
-          <div class="mt-4 flex items-center gap-4 text-xs text-white/40 border-t border-white/5 pt-3">
-
-            <span class="flex items-center gap-1.5 transition-colors duration-200 hover:text-green-400 cursor-default">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
-                <path
-                  d="M1 8.25a1.25 1.25 0 112.5 0v7.5a1.25 1.25 0 11-2.5 0v-7.5zM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0114 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 01-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 01-1.341-.317l-2.734-1.366A3 3 0 006.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 012.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388z" />
-              </svg>
-              <span>{{ review.comment_likes or 0 }} Helpful</span>
-            </span>
-
-            <span class="flex items-center gap-1.5 transition-colors duration-200 hover:text-red-400 cursor-default">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                class="w-3.5 h-3.5 transform rotate-180">
-                <path
-                  d="M1 8.25a1.25 1.25 0 112.5 0v7.5a1.25 1.25 0 11-2.5 0v-7.5zM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0114 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 01-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 01-1.341-.317l-2.734-1.366A3 3 0 006.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 012.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388z" />
-              </svg>
-              <span>0 Helpless</span>
-            </span>
-
-          </div>
-        </div>
-      </div>
-      {% else %}
-      <div
-        class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 py-12 text-center">
-        <p class="text-lg font-medium text-white">No reviews yet</p>
-      </div>
-      {% endfor %}
+        </article>
+        {% else %}
+        <p class="text-sm text-gray-500 italic px-2">No reviews shared yet.</p>
+        {% endfor %}
     </div>
-  </section>
 
-</section>
-
-<script>
-  function toggleVote(btn, type) {
-    if (type === 'helpful') {
-      if (btn.classList.contains('text-green-500')) {
-        btn.classList.remove('text-green-500');
-        btn.classList.add('text-white/40');
-      } else {
-        const sibling = btn.nextElementSibling;
-        if (sibling) {
-          sibling.classList.remove('text-red-500');
-          sibling.classList.add('text-white/40');
-        }
-
-        btn.classList.remove('text-white/40');
-        btn.classList.add('text-green-500');
-      }
-    } else if (type === 'helpless') {
-      if (btn.classList.contains('text-red-500')) {
-        btn.classList.remove('text-red-500');
-        btn.classList.add('text-white/40');
-      } else {
-        const sibling = btn.previousElementSibling;
-        if (sibling) {
-          sibling.classList.remove('text-green-500');
-          sibling.classList.add('text-white/40');
-        }
-
-        btn.classList.remove('text-white/40');
-        btn.classList.add('text-red-500');
-      }
-    }
-  }
-</script>
+    {% if user_reviews|length > 3 %}
+    <div class="mt-6 text-center">
+        <a href="{{ url_for('auth.user_reviews_page', user_id=(current_user.id if current_user.id is defined else user.id)) }}" 
+           class="group inline-flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-6 py-3 text-sm font-medium text-white/60 transition-all hover:border-white/20 hover:bg-white/5 hover:text-white">
+            View all reviews
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
