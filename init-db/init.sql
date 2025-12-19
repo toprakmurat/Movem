@@ -9,7 +9,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL CHECK (email LIKE '%@%'),
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     bio TEXT,
