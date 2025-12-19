@@ -52,8 +52,11 @@
         {# --- HEADER --- #}
         <div class="mb-4 flex items-start justify-between">
             <div class="flex items-center gap-4">
-                <img src="{{ review['avatar'] or url_for('static', filename='img/placeholder_avatar.svg') }}" 
-                     class="h-11 w-11 rounded-full border border-white/10 bg-white/5 object-cover shadow-sm">
+                <img 
+                    src="{{ url_for('static', filename=review['avatar']) if review['avatar'] else url_for('static', filename='img/placeholder_avatar.svg') }}" 
+                    alt="{{ review['author'] }}"
+                    class="h-11 w-11 rounded-full border border-white/10 bg-white/5 object-cover shadow-sm"
+                >
                 <div class="flex flex-col">
                     <a href="{{ url_for('auth.public_profile', user_id=review['user_id']) }}" class="font-bold text-white transition-colors hover:text-brand-400">
                         {{ review['author'] or 'User #' ~ review['user_id'] }}
