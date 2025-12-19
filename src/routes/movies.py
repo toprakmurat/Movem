@@ -121,7 +121,7 @@ def movies_details_page(movie_id):
     all_comments, comm_err = get_comments_for_movie(movie_id, user_id=current_uid)
     all_comments = all_comments or []
 
-    similar_movies_list = get_recommendations_db(movie_id, current_uid)
+    similar_movies_list, err = get_recommendations_db(movie_id, current_uid)
 
     user_lists = []
     if current_user.is_authenticated:
@@ -177,15 +177,6 @@ def create_movie():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    # File uploads
-    if 'poster_file' in request.files:
-        fn = save_upload_file(request.files['poster_file'])
-        if fn: data['poster_file'] = fn
-        
-    if 'banner_file' in request.files:
-        fn = save_upload_file(request.files['banner_file'])
-        if fn: data['banner_file'] = fn
-
     new_movie, err = create_movie_db(data)
     if err:
         return jsonify({"error": err}), 500
@@ -203,17 +194,8 @@ def update_movie(id):
     else:
         data = request.form.to_dict()
 
-    if not data and not request.files:
+    if not data:
         return jsonify({"error": "No data provided"}), 400
-
-    # File uploads
-    if 'poster_file' in request.files:
-        fn = save_upload_file(request.files['poster_file'])
-        if fn: data['poster_file'] = fn
-
-    if 'banner_file' in request.files:
-        fn = save_upload_file(request.files['banner_file'])
-        if fn: data['banner_file'] = fn
 
     updated_movie, err = update_movie_db(id, data)
     if err:
@@ -240,9 +222,6 @@ def delete_movie(id):
         return jsonify({"error": err}), 500
     if not deleted_movie:
         return jsonify({"message": "Movie not found"}), 404
-        
-    delete_file(movie.get('poster_file'))
-    delete_file(movie.get('banner_file'))
     
     return jsonify(deleted_movie), 200
 

@@ -20,6 +20,7 @@ def get_movies_db():
             fetch=True
         )
         return movies, None
+    
     except Exception as e:
         return None, str(e)
 
@@ -341,81 +342,99 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
     # 2. Same Director: +30 points
     # 3. Same Genre:    +10 points (Cumulative for each matching genre)
     # 4. Same Platform: +3 points
+    # 5. Same Actor:    +5 points
     # Max score is 100
     
-    sql = """
-    SELECT 
-        m.id,
-        m.title,
-        m.poster_file,
-        m.release_date,
-        s.vote_avg,
-        STRING_AGG(DISTINCT g.genre_name, ', ') as genres,
-        
-        LEAST(final_scores.total_score, 100) as match_score
-
-    FROM (
+    try:
+        sql = """
         SELECT 
-            movie_id, 
-            SUM(score) as total_score 
-        FROM (
-            -- Other favorites of favorited users
-            SELECT f2.movie_id, 5 as score
-            FROM favorites f1
-            JOIN favorites f2 ON f1.user_id = f2.user_id
-            WHERE f1.movie_id = %s AND f2.movie_id != %s
+            m.id,
+            m.title,
+            m.poster_file,
+            m.release_date,
+            s.vote_avg,
+            STRING_AGG(DISTINCT g.genre_name, ', ') as genres,
             
-            UNION ALL
-            
-            -- Same director
-            SELECT mc2.movie_id, 30 as score
-            FROM movie_cast mc1
-            JOIN movie_cast mc2 ON mc1.person_id = mc2.person_id
-            WHERE mc1.movie_id = %s 
-              AND mc2.movie_id != %s
-              AND mc1.role = 'Director' 
-              AND mc2.role = 'Director'
-            
-            UNION ALL
-            
-            -- Same genres
-            SELECT mg2.movie_id, 10 as score
-            FROM movies_genres mg1
-            JOIN movies_genres mg2 ON mg1.genre_id = mg2.genre_id
-            WHERE mg1.movie_id = %s AND mg2.movie_id != %s
+            LEAST(final_scores.total_score, 100) as match_score
 
-            UNION ALL
-            
-            -- Same platform
-            SELECT m2.id as movie_id, 3 as score
-            FROM movies m1
-            JOIN movies m2 ON m1.platform_id = m2.platform_id
-            WHERE m1.id = %s AND m2.id != %s
-        ) raw_scores
-        GROUP BY movie_id
-    ) AS final_scores
-    
-    JOIN movies m
-        ON final_scores.movie_id = m.id
-    LEFT JOIN statistic s 
-        ON m.id = s.movie_id
-    JOIN movies_genres mg
-        ON m.id = mg.movie_id
-    JOIN genres g
-        ON mg.genre_id = g.id
-    
-    WHERE m.id NOT IN (
-        SELECT movie_id FROM favorites WHERE user_id = %s
-    ) AND s.vote_count>1000
-    
-    GROUP BY m.id, m.title, m.poster_file, m.release_date, s.vote_avg, final_scores.total_score
-    ORDER BY match_score DESC, s.vote_avg DESC
-    LIMIT 5;
-    """
-    
-    params = (movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, current_user_id)
-    
-    return execute_query(sql, params, fetch=True)
+        FROM (
+            SELECT 
+                movie_id, 
+                SUM(score) as total_score 
+            FROM (
+                -- Other favorites of favorited users
+                SELECT f2.movie_id, 5 as score
+                FROM favorites f1
+                JOIN favorites f2 ON f1.user_id = f2.user_id
+                WHERE f1.movie_id = %s AND f2.movie_id != %s
+                
+                UNION ALL
+                
+                -- Same director
+                SELECT mc2.movie_id, 30 as score
+                FROM movie_cast mc1
+                JOIN movie_cast mc2 ON mc1.person_id = mc2.person_id
+                WHERE mc1.movie_id = %s 
+                AND mc2.movie_id != %s
+                AND mc1.role = 'Director' 
+                AND mc2.role = 'Director'
+                
+                UNION ALL
+                
+                -- Same genres
+                SELECT mg2.movie_id, 10 as score
+                FROM movies_genres mg1
+                JOIN movies_genres mg2 ON mg1.genre_id = mg2.genre_id
+                WHERE mg1.movie_id = %s AND mg2.movie_id != %s
+
+                UNION ALL
+                
+                -- Same platform
+                SELECT m2.id as movie_id, 3 as score
+                FROM movies m1
+                JOIN movies m2 ON m1.platform_id = m2.platform_id
+                WHERE m1.id = %s AND m2.id != %s
+
+                UNION ALL
+
+                -- Same actors (+5 per shared actor)
+                SELECT mc2.movie_id, 5 as score
+                FROM movie_cast mc1
+                JOIN movie_cast mc2 
+                    ON mc1.person_id = mc2.person_id
+                WHERE mc1.movie_id = %s
+                AND mc2.movie_id != %s
+                AND mc1.role != 'Director'
+                AND mc2.role != 'Director'
+            ) raw_scores
+            GROUP BY movie_id
+        ) AS final_scores
+        
+        JOIN movies m
+            ON final_scores.movie_id = m.id
+        LEFT JOIN statistic s 
+            ON m.id = s.movie_id
+        JOIN movies_genres mg
+            ON m.id = mg.movie_id
+        JOIN genres g
+            ON mg.genre_id = g.id
+        
+        WHERE m.id NOT IN (
+            SELECT movie_id FROM favorites WHERE user_id = %s
+        ) AND s.vote_count>1000
+        
+        GROUP BY m.id, m.title, m.poster_file, m.release_date, s.vote_avg, final_scores.total_score
+        ORDER BY match_score DESC, s.vote_avg DESC
+        LIMIT 5;
+        """
+        
+        params = (movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, movie_id, current_user_id)
+        
+        recommendations = execute_query(sql, params, fetch=True)
+        return recommendations, None
+
+    except Exception as e:
+        return [], str(e)
 
 def get_best_movies_detailed_db(limit: int = 10):
     """
@@ -528,6 +547,77 @@ def get_best_movies_for_genres_detailed_db(limit_per_genre: int = 10, top_genres
                     seen_movie_ids.add(movie["id"])
 
         return all_movies, None
+
+    except Exception as e:
+        return [], str(e)
+
+def get_tonights_pick_director_detailed_db():
+    try:
+        sql = """
+        WITH top_directors AS (
+            SELECT 
+                mc.person_id, 
+                p.name AS director_name,
+                AVG(s.vote_avg) as avg_rating,
+                SUM(s.vote_count) as total_votes
+            FROM movie_cast mc
+            JOIN people p ON mc.person_id = p.id
+            JOIN statistic s ON mc.movie_id = s.movie_id
+            WHERE mc.role = 'Director'
+            GROUP BY mc.person_id, p.name
+            HAVING COUNT(DISTINCT mc.movie_id) >= 4 
+               AND AVG(s.vote_avg) >= 7.0
+               AND SUM(s.vote_count) >= 1000
+        ),
+        daily_selection AS (
+            SELECT person_id, director_name 
+            FROM top_directors
+            ORDER BY md5(person_id::text || CURRENT_DATE::text)
+            LIMIT 1
+        )
+        SELECT
+            m.id,
+            m.title,
+            m.tagline,
+            m.release_date,
+            m.poster_file,
+            m.banner_file,
+            COALESCE(s.vote_avg, 0) AS vote_avg,
+            COALESCE(s.runtime, 0) AS runtime,
+            array_agg(DISTINCT g.genre_name) AS genre_list,
+            (SELECT director_name FROM daily_selection) AS director_name
+        FROM movies m
+        JOIN movie_cast mc ON mc.movie_id = m.id
+        JOIN statistic s ON s.movie_id = m.id
+        LEFT JOIN movies_genres mg ON mg.movie_id = m.id
+        LEFT JOIN genres g ON g.id = mg.genre_id
+        WHERE mc.role = 'Director'
+          AND mc.person_id = (SELECT person_id FROM daily_selection)
+        GROUP BY m.id, s.vote_avg, s.runtime
+        ORDER BY s.vote_avg DESC
+        LIMIT 10;
+        """
+
+        result = execute_query(sql, fetch=True)
+
+        if not result:
+            return [], None 
+
+        movies = []
+        for row in result:
+            movies.append({
+                "id": row["id"],
+                "title": row["title"],
+                "release_date": row["release_date"],
+                "tagline": row.get("tagline"),
+                "poster_file": row.get("poster_file"),
+                "rating": float(row.get("vote_avg") or 0),
+                "genre_list": row.get("genre_list") or [],
+                "director_name": row.get("director_name"),
+                "runtime": float(row.get("runtime") or 0),
+            })
+
+        return movies, None
 
     except Exception as e:
         return [], str(e)

@@ -118,6 +118,33 @@
   </div>
 </section>
 
+{# -------------------- TONIGHT'S PICKS -------------------- #}
+{% if tonights_pick and tonights_pick is iterable and tonights_pick|length >= 4 %}
+<section class="mb-12 mx-auto max-w-6xl">
+  <div class="mb-3 flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-semibold uppercase tracking-[0.3em]">Tonight’s Picks</h2>
+      <span class="text-xs uppercase tracking-[0.4em] text-brand-400">
+        The {{ tonights_pick[0].director_name | upper }} Cut
+      </span>
+    </div>
+    
+    <div class="flex gap-3">
+      <button class="btn-icon" type="button" data-rail-nav data-direction="prev"
+        data-rail-target="tonight-rail">&larr;</button>
+      <button class="btn-icon" type="button" data-rail-nav data-direction="next"
+        data-rail-target="tonight-rail">&rarr;</button>
+    </div>
+  </div>
+
+  <div class="rail-scroll" data-rail="tonight-rail">
+    {% for movie in tonights_pick %}
+      {% include 'partials/movie_card.html' %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {# -------------------- PEOPLE SPOTLIGHT -------------------- #}
 <section class="mx-auto max-w-6xl space-y-6 mb-12">
   <div class="flex items-center justify-between">

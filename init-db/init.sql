@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS movies(
     release_date DATE,
     poster_file VARCHAR(100),
     banner_file VARCHAR(100),
-    platform_id INTEGER REFERENCES platforms(id) ON DELETE CASCADE,
+    platform_id INTEGER REFERENCES platforms(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS people (
 CREATE TABLE IF NOT EXISTS movie_cast (
     id SERIAL PRIMARY KEY,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
-    person_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
+    person_id INTEGER REFERENCES people(id) ON DELETE SET NULL,
     role VARCHAR(100),
     character_name VARCHAR(1024)
 );
@@ -158,16 +158,6 @@ CREATE TABLE IF NOT EXISTS movie_question (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-------------------------------------------------------------
--- people_question table
-------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS people_question (
-    id SERIAL PRIMARY KEY,
-    question_type INTEGER REFERENCES question_types(id) ON DELETE CASCADE,   -- 'has more movie', 'age' etc
-    actor1_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
-    actor2_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 ------------------------------------------------------------
 -- user_lists table
 ------------------------------------------------------------

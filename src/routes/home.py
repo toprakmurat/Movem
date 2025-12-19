@@ -58,36 +58,56 @@ def home():
     ]
 
     # fetch dynamic images for cinemetrics cards
+
     for option in discovery_options:
-        movies_paginated, err = get_cinemetrics_movies_db(option['link_param'], page=1, per_page=1)
-        if movies_paginated and movies_paginated.items:
-            first_movie = movies_paginated.items[0]
-            if first_movie.get('poster_file') or first_movie.get('poster_path'):
-                option['image'] = url_for('static', filename='img/' + (first_movie.get('poster_file') or first_movie.get('poster_path')))
+        try:
+            movies_paginated, err = get_cinemetrics_movies_db(option['link_param'], page=1, per_page=1)
+            if not err and movies_paginated and movies_paginated.items:
+                first_movie = movies_paginated.items[0]
+                if first_movie.get('poster_file') or first_movie.get('poster_path'):
+                    option['image'] = url_for('static', filename='img/' + (first_movie.get('poster_file') or first_movie.get('poster_path')))
+        except Exception:
+            pass # Keep default image on error
+            
+    # Safely fetch data with error handling
+    best_movies, err = get_best_movies_detailed_db(8)
+    if err: best_movies = []
 
-    best_movies, _ = get_best_movies_detailed_db(8)
-    featured_movies, _ = get_random_movies_detailed_db(8)
-    genres_available, _ = get_top_genres_db(10)
+    featured_movies, err = get_random_movies_detailed_db(8)
+    if err: featured_movies = []
 
-    featured_people, _ = get_featured_people_db(4)
-    if not featured_people:
-        featured_people = []
+    tonights_pick, err = get_tonights_pick_director_detailed_db()
+    if err: tonights_pick = None
+
+    genres_available, err = get_top_genres_db(10)
+    if err: genres_available = []
+
+    featured_people, err = get_featured_people_db(4)
+    if err or not featured_people: featured_people = []
     
-    best_movies_for_genres, _ = get_best_movies_for_genres_detailed_db(10,10)
-    best_movies_for_genres = [dict(m) for m in best_movies_for_genres]
+    best_movies_for_genres, err = get_best_movies_for_genres_detailed_db(10,10)
+    if err or not best_movies_for_genres:
+        best_movies_for_genres = []
+    else:
+        try:
+            best_movies_for_genres = [dict(m) for m in best_movies_for_genres]
+        except:
+            best_movies_for_genres = []
 
     top_reviewers, err = get_top_reviewers(limit=10)
-    if not top_reviewers:
-        top_reviewers = []
+    if err or not top_reviewers: top_reviewers = []
 
     # Fetch public lists from admin users for Collections Spotlight
-    admin_lists, _ = get_public_admin_lists_db(limit=6)
-    featured_collections = [
-        {"id": lst['id'], "title": lst['list_name'], "count": lst['movie_count'], "curator": lst['curator_name']}
-        for lst in admin_lists
-    ] if admin_lists else []
+    admin_lists, err = get_public_admin_lists_db(limit=6)
+    featured_collections = []
+    if not err and admin_lists:
+        featured_collections = [
+            {"id": lst['id'], "title": lst['list_name'], "count": lst['movie_count'], "curator": lst['curator_name']}
+            for lst in admin_lists
+        ]
 
     data = {
+        "tonights_pick": tonights_pick,
         "trending_movies": best_movies,
         "random_movies": featured_movies,
         "genres": genres_available,
