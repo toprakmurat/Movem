@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
+from src.utils.pagination_utils import Pagination
 
 from src.services.users_service import (
     get_users_db,
@@ -33,7 +34,15 @@ from src.services.genres_service import (
     get_movies_genres_db
 )
 
-from src.services.comments_service import get_all_comments
+from src.services.comments_service import (
+    get_all_comments_detailed, 
+    delete_comment_by_id, 
+    toggle_spoiler_status,
+    get_all_votes_detailed,
+    delete_vote,
+    get_comment_by_id,
+    get_vote_by_id
+)
 
 from src.services.actors_service import get_actors_paginated_db
 
@@ -72,7 +81,6 @@ def dashboard():
     favorites_paginated, _ = get_favorites_paginated_db(page=fav_page, per_page=per_page)
 
     # Others (non-paginated or pre-limited)
-    comments, _ = get_all_comments()
     actors_result, _ = get_actors_paginated_db(page=1, per_page=1000)
     actors = actors_result['actors'] if actors_result else []
     
@@ -82,7 +90,7 @@ def dashboard():
     
     statistics_paginated, _ = get_statistics_paginated_db(page=stats_page, per_page=per_page)
     questions_paginated, _ = get_questions_paginated_db(page=game_page, per_page=per_page)
-    
+
     # Placeholders for search results
     selected_user = None
     selected_list = None
@@ -113,11 +121,10 @@ def dashboard():
         movies=movies_paginated,
         genres=genres_paginated,
         movies_genres=movies_genres_paginated,
-        comments=comments,
         actors=actors,
         statistics=statistics_paginated,
         questions=questions_paginated,
-        favorites=favorites_paginated,
+        favorites=favorites_paginated
     )
 
 # --- USER MANAGEMENT ROUTES ---
@@ -264,3 +271,99 @@ def view_list():
     list_id = request.form.get('list_id')
     return redirect(url_for('admin.dashboard', view_list_id=list_id))
 
+@admin_bp.route('/api/comments', methods=['GET'])
+def api_get_comments():
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    search_query = request.args.get('search', '')
+    
+    comments, total = get_all_comments_detailed(page, per_page, search_query)
+    
+    items = []
+    if comments:
+        for c in comments:
+            items.append({
+                'id': c['id'],
+                'user_id': c['user_id'],
+                'username': c['username'],
+                'movie_id': c['movie_id'],
+                'movie_title': c['movie_title'],
+                'body': c['body'],
+                'rating': c['rating'],
+                'has_spoiler': c['has_spoiler'],
+                'comment_likes': c.get('comment_likes', 0),
+                'comment_dislikes': c.get('comment_dislikes', 0),
+                'created_at': c['created_at'].strftime('%Y-%m-%d %H:%M') if c['created_at'] else '-'
+            })
+            
+    return jsonify({
+        'items': items,
+        'pagination': {
+            'total': total,
+            'page': page,
+            'pages': (total + per_page - 1) // per_page
+        }
+    })
+
+@admin_bp.route('/api/comments/<int:id>', methods=['GET'])
+def api_get_comment_by_id(id):
+    comment, err = get_comment_by_id(id)
+    if err: return jsonify({'error': err}), 404
+    return jsonify(dict(comment))
+
+@admin_bp.route('/api/comments/<int:id>', methods=['DELETE'])
+def api_delete_comment(id):
+    success, err = delete_comment_by_id(id)
+    if err: return jsonify({'error': err}), 400
+    return jsonify({'success': True}), 200
+
+@admin_bp.route('/api/comments/toggle-spoiler', methods=['POST'])
+def api_toggle_spoiler():
+    data = request.get_json()
+    comment_id = data.get('id')
+    if not comment_id: return jsonify({'error': 'ID required'}), 400
+    
+    success, err = toggle_spoiler_status(comment_id)
+    if not success: return jsonify({'error': err}), 400
+    return jsonify({'success': True}), 200
+
+@admin_bp.route('/api/votes', methods=['GET'])
+def api_get_votes():
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    
+    votes, total = get_all_votes_detailed(page, per_page)
+    
+    items = []
+    if votes:
+        for v in votes:
+            items.append({
+                'id': v['id'],
+                'user_id': v['user_id'],
+                'username': v['username'],
+                'comment_id': v['comment_id'],
+                'vote_type': v['vote_type'],
+                'comment_snippet': v['comment_snippet'],
+                'created_at': v['created_at'].strftime('%Y-%m-%d %H:%M') if v['created_at'] else '-'
+            })
+            
+    return jsonify({
+        'items': items,
+        'pagination': {
+            'total': total,
+            'page': page,
+            'pages': (total + per_page - 1) // per_page
+        }
+    })
+
+@admin_bp.route('/api/votes/<int:id>', methods=['GET'])
+def api_get_vote_by_id(id):
+    vote, err = get_vote_by_id(id)
+    if err: return jsonify({'error': err}), 404
+    return jsonify(dict(vote))
+
+@admin_bp.route('/api/votes/<int:id>', methods=['DELETE'])
+def api_delete_vote(id):
+    success, err = delete_vote(id)
+    if err: return jsonify({'error': err}), 400
+    return jsonify({'success': True}), 200

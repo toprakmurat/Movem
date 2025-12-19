@@ -574,3 +574,68 @@ def get_controversial_movies():
         return results, None
     except Exception as e:
         return None, str(e)
+    
+# For Admin page
+
+def get_all_comments_detailed(page=1, per_page=20, search_query=None):
+    offset = (page - 1) * per_page
+    params = []
+    
+    sql = """
+        SELECT c.*, u.username, m.title as movie_title 
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        JOIN movies m ON c.movie_id = m.id
+    """
+    
+    if search_query:
+        sql += """ WHERE CAST(c.id AS TEXT) ILIKE %s 
+                   OR u.username ILIKE %s 
+                   OR m.title ILIKE %s """
+        search_term = f"%{search_query}%"
+        params.extend([search_term, search_term, search_term])
+        
+    sql += " ORDER BY c.created_at DESC LIMIT %s OFFSET %s"
+    params.extend([per_page, offset])
+    
+    comments = execute_query(sql, tuple(params), fetch=True)
+    
+    count_sql = "SELECT COUNT(*) FROM comments c JOIN users u ON c.user_id = u.id JOIN movies m ON c.movie_id = m.id"
+    if search_query:
+        count_sql += " WHERE CAST(c.id AS TEXT) ILIKE %s OR u.username ILIKE %s OR m.title ILIKE %s"
+        total = execute_query(count_sql, tuple(params[:3]), fetch=True)[0]['count']
+    else:
+        total = execute_query(count_sql, fetch=True)[0]['count']
+        
+    return comments, total
+
+def get_all_votes_detailed(page=1, per_page=20):
+    offset = (page - 1) * per_page
+    
+    sql = """
+        SELECT v.*, u.username, left(c.body, 50) as comment_snippet
+        FROM comment_votes v
+        JOIN users u ON v.user_id = u.id
+        JOIN comments c ON v.comment_id = c.id
+        ORDER BY v.created_at DESC 
+        LIMIT %s OFFSET %s
+    """
+    votes = execute_query(sql, (per_page, offset), fetch=True)
+    total = execute_query("SELECT COUNT(*) FROM comment_votes", fetch=True)[0]['count']
+    
+    return votes, total
+
+def toggle_spoiler_status(comment_id):
+    try:
+        curr = execute_query("SELECT has_spoiler FROM comments WHERE id = %s", (comment_id,), fetch=True)
+        if not curr: return False, "Comment not found"
+        
+        new_status = not curr[0]['has_spoiler']
+        
+        execute_query(
+            "UPDATE comments SET has_spoiler = %s WHERE id = %s",
+            (new_status, comment_id)
+        )
+        return True, None
+    except Exception as e:
+        return False, str(e)

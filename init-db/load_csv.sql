@@ -56,3 +56,5 @@ SELECT setval('movies_genres_id_seq', (SELECT MAX(id) FROM movies_genres));
 SELECT setval('movie_question_id_seq', (SELECT MAX(id) FROM movie_question));
 
 SELECT setval('question_types_id_seq', (SELECT MAX(id) FROM question_types));
+
+SELECT setval('platforms_id_seq', (SELECT MAX(id) FROM platforms));
