@@ -203,17 +203,14 @@ def public_profile(user_id):
         'score': target_user.get('game_score', 0)
     }
 
-    # Fetch User Stats
     genre_stats, _ = get_user_favorite_genre_stats_db(user_id)
     actor_stats = get_user_favorite_actor_stats_db(user_id)
-    
-    # Fetch User Lists
     user_lists, _ = get_lists_by_user_db(user_id)
     if not user_lists: user_lists = []
 
     return render_template(
         'account.html', 
-        current_user=target_user, 
+        user=target_user,
         user_reviews=user_reviews, 
         stats=stats, 
         is_public=True,

@@ -5,6 +5,8 @@
 {% block content %}
 <section class="mx-auto max-w-6xl space-y-10">
 
+  {% set display_user = user if user is defined and user else current_user %}
+
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
   <div class="space-y-2">
@@ -24,22 +26,23 @@
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-4">
           {% set default_avatar = url_for('static', filename='img/placeholder_avatar.svg') %}
-          {% set user_avatar = current_user.avatar if current_user.avatar is defined else
-          current_user.get('profile_picture') %}
+          
+          {% set user_avatar = display_user.avatar if display_user.avatar is defined else display_user.get('profile_picture') %}
+          
           <img src="{{ url_for('static', filename=user_avatar) if user_avatar else default_avatar }}"
             onerror="this.src='{{ default_avatar }}';"
             class="h-24 w-24 rounded-3xl object-cover ring-2 ring-white/20 bg-black"
-            alt="{{ current_user.first_name }} avatar" />
+            alt="{{ display_user.first_name }} avatar" />
           <div>
             <p class="text-xs uppercase tracking-[0.4em] text-white/60">Profile</p>
             <h1 class="text-4xl font-display tracking-widest text-white">
-              {{ current_user.first_name }} {{ current_user.last_name }}
+              {{ display_user.first_name }} {{ display_user.last_name }}
             </h1>
-            <p class="text-white/60">@{{ current_user.username }}</p>
+            <p class="text-white/60">@{{ display_user.username }}</p>
           </div>
         </div>
         <p class="max-w-3xl text-lg text-white/80">
-          {{ current_user.bio or 'Keep watching and build your cinematic fingerprint on MoveM.' }}
+          {{ display_user.bio or 'Keep watching and build your cinematic fingerprint on MoveM.' }}
         </p>
         <div class="flex flex-wrap gap-4">
           <a href="{{ url_for('movies.movies_page') }}" class="btn-secondary">View catalog</a>
@@ -62,7 +65,8 @@
 
   <div class="grid gap-6 lg:grid-cols-[1.15fr,0.85fr]">
 
-    {% if not is_public %}
+    {% if not is_public and current_user.is_authenticated and current_user.id == display_user.id %}
+    <div class="space-y-6"> 
     <form method="post" enctype="multipart/form-data" autocomplete="off"
       class="space-y-6 rounded-3xl border border-white/10 bg-black/60 p-6 sm:p-8">
       <div class="flex items-center justify-between">
@@ -142,13 +146,13 @@
         Delete Account
       </button>
     </form>
+    </div>
     {% endif %}
 
-    <div class="space-y-6">
+    <div class="space-y-6 {% if is_public or (current_user.is_authenticated and current_user.id != display_user.id) %} col-span-2 lg:col-span-2 {% endif %}">
       <section class="rounded-3xl border border-white/10 bg-black/60 p-6">
         <h3 class="text-lg font-semibold uppercase tracking-[0.3em] text-white">Movie stats</h3>
         <dl class="mt-4 space-y-4 text-sm">
-          <!-- Favorite Genres -->
           <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
             <dt class="text-xs uppercase tracking-[0.4em] text-white/60 mb-2">Top Genres</dt>
             {% if genre_stats %}
@@ -165,7 +169,6 @@
             {% endif %}
           </div>
 
-          <!-- Favorite Actor -->
           <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
             <dt class="text-xs uppercase tracking-[0.4em] text-white/60 mb-2">Top People</dt>
             {% if actor_stats %}
@@ -187,8 +190,6 @@
             <p class="text-white/40 italic">No actors yet</p>
             {% endif %}
           </div>
-
-
 
         </dl>
       </section>
@@ -273,7 +274,7 @@
         <span class="text-xs uppercase tracking-[0.4em] text-white/60">{{ user_lists | length }} lists</span>
       </div>
 
-      {% if not is_public %}
+      {% if not is_public and current_user.is_authenticated and current_user.id == display_user.id %}
       <form method="post" class="mb-6 flex gap-2">
         <input type="hidden" name="create_list" value="1">
         <div class="relative flex-1">
@@ -380,7 +381,7 @@
 
     {% if user_reviews|length > 3 %}
     <div class="mt-6 text-center">
-        <a href="{{ url_for('auth.user_reviews_page', user_id=(current_user.id if current_user.id is defined else user.id)) }}" 
+        <a href="{{ url_for('auth.user_reviews_page', user_id=(display_user.id if display_user.id is defined else user.id)) }}" 
            class="group inline-flex items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-6 py-3 text-sm font-medium text-white/60 transition-all hover:border-white/20 hover:bg-white/5 hover:text-white">
             View all reviews
             <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
