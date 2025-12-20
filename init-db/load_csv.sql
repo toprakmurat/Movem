@@ -63,4 +63,8 @@ CREATE INDEX IF NOT EXISTS idx_movies_platform_id ON movies(platform_id);
 CREATE INDEX IF NOT EXISTS idx_movies_genres_genre_id ON movies_genres(genre_id);
 -- Index for finding who favorited a movie 
 CREATE INDEX IF NOT EXISTS idx_favorites_movie_id ON favorites(movie_id);
+-- Index for searching actors/directors by name
+CREATE INDEX IF NOT EXISTS idx_people_name ON people(name);
+-- Index for finding a person's filmography (reverse lookup)
+CREATE INDEX IF NOT EXISTS idx_movie_cast_person_id ON movie_cast(person_id);
 
