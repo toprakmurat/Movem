@@ -96,6 +96,7 @@ def get_cast_by_movie_db(movie_id: int):
         cast_entries = execute_query(
             """
             SELECT 
+                mc.id AS cast_entry_id,
                 p.id,
                 p.name,
                 p.birth_date,

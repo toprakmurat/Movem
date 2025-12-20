@@ -90,6 +90,8 @@
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Votes</button>
         <button onclick="openTab(event, 'tab-people')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">People</button>
+        <button onclick="openTab(event, 'tab-movie-cast')"
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Movie Cast</button>
         <button onclick="openTab(event, 'tab-stats')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Statistic</button>
         <button onclick="openTab(event, 'tab-game')"
@@ -1294,6 +1296,177 @@
         </section>
     </div>
 
+    <div id="tab-movie-cast" class="tab-content hidden space-y-8">
+        <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
+            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Movie Cast Management</h2>
+            
+            <!-- Table Definition -->
+            <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: MOVIE_CAST</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-blue-200/70">
+                        <thead class="uppercase tracking-wider border-b border-blue-500/30">
+                            <tr>
+                                <th class="px-2 py-1">Column</th>
+                                <th class="px-2 py-1">Type</th>
+                                <th class="px-2 py-1">Nullable</th>
+                                <th class="px-2 py-1">Key</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-500/10">
+                            <tr>
+                                <td class="px-2 py-1 font-mono">id</td>
+                                <td class="px-2 py-1">SERIAL</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">movie_id</td>
+                                <td class="px-2 py-1">INTEGER</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1">FK → movies</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">person_id</td>
+                                <td class="px-2 py-1">INTEGER</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1">FK → people</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">role</td>
+                                <td class="px-2 py-1">VARCHAR(100)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">character_name</td>
+                                <td class="px-2 py-1">VARCHAR(1024)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Search Helpers for Movies and People -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                <!-- Search Movies by Name -->
+                <div class="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-500/30 p-6 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white mb-4">🎬 Search Movie by Title</h3>
+                    <form onsubmit="searchMovieByName(event)" class="space-y-4">
+                        <input id="movie-name-search" type="text" placeholder="Enter movie title..."
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                        <button type="submit"
+                            class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition">
+                            Search Movie
+                        </button>
+                    </form>
+                    
+                    <div id="movie-search-results" class="mt-4 hidden">
+                        <h4 class="text-sm font-semibold text-blue-300 mb-2">Results:</h4>
+                        <div id="movie-results-list" class="space-y-2 max-h-[300px] overflow-y-auto">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search People by Name -->
+                <div class="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 p-6 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white mb-4">👤 Search Person by Name</h3>
+                    <form onsubmit="searchPersonByName(event)" class="space-y-4">
+                        <input id="person-name-search" type="text" placeholder="Enter person name..."
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
+                        <button type="submit"
+                            class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition">
+                            Search Person
+                        </button>
+                    </form>
+                    
+                    <div id="person-search-results" class="mt-4 hidden">
+                        <h4 class="text-sm font-semibold text-purple-300 mb-2">Results:</h4>
+                        <div id="person-results-list" class="space-y-2 max-h-[300px] overflow-y-auto">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Create Movie Cast Form -->
+                <div class="bg-black/50 p-6 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">➕ Create New Cast Entry</h4>
+                    <form onsubmit="createMovieCast(event)" class="space-y-4">
+                        <input id="create-cast-movie-id" name="movie_id" type="number" placeholder="Movie ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input id="create-cast-person-id" name="person_id" type="number" placeholder="Person ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input id="create-cast-role" name="role" placeholder="Role (e.g., Actor, Director)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input id="create-cast-character" name="character_name" placeholder="Character Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button type="submit" class="btn-primary w-full py-2 rounded-xl">Create Cast Entry</button>
+                    </form>
+                </div>
+
+                <!-- Update Movie Cast Form -->
+                <div class="bg-black/50 p-6 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">✏️ Update Cast Entry</h4>
+                    <form onsubmit="updateMovieCast(event)" class="space-y-4">
+                        <input id="update-cast-id" name="id" type="number" placeholder="Cast Entry ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input id="update-cast-movie-id" name="movie_id" type="number" placeholder="Movie ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input id="update-cast-person-id" name="person_id" type="number" placeholder="Person ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input id="update-cast-role" name="role" placeholder="Role"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input id="update-cast-character" name="character_name" placeholder="Character Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button type="submit"
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">
+                            Update Cast Entry
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Movie Cast List with AJAX -->
+            <div class="bg-black/50 p-6 rounded-2xl border border-white/5">
+                <h4 class="text-lg font-semibold text-white mb-4">🎬 Movie Cast Entries</h4>
+                <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                    <table class="w-full text-left text-sm text-white/70">
+                        <thead class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-0 bg-black/80">
+                            <tr>
+                                <th class="px-4 py-2">ID</th>
+                                <th class="px-4 py-2">Movie</th>
+                                <th class="px-4 py-2">Person</th>
+                                <th class="px-4 py-2">Role</th>
+                                <th class="px-4 py-2">Character</th>
+                                <th class="px-4 py-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movie-cast-table-body" class="divide-y divide-white/5">
+                            <tr>
+                                <td colspan="6" class="px-4 py-3 text-center text-white/40">
+                                    Click "Load Cast Entries" to view data
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="movie-cast-pagination" class="mt-4"></div>
+                <button onclick="loadMovieCastEntries(1)" 
+                    class="mt-4 w-full bg-orange-600/80 hover:bg-orange-500 text-white rounded-xl py-2 font-medium transition">
+                    Load Cast Entries
+                </button>
+            </div>
+        </section>
+    </div>
+
     <div id="tab-stats" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Game Statistics</h2>
@@ -2444,6 +2617,449 @@
         } catch (error) {
             alert('Update failed: ' + error);
         }
+    }
+
+    // --- MOVIE CAST MANAGEMENT FUNCTIONS ---
+    
+    let currentCastId = null;
+
+    async function loadMovieCastByMovie(movieId, movieTitle) {
+        try {
+            const response = await fetch(`/movie_cast/movie/${movieId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                const tbody = document.getElementById('movie-cast-table-body');
+                tbody.innerHTML = '';
+
+                // Update the table header to show which movie we're viewing
+                const tableContainer = tbody.closest('.bg-black\\/50');
+                const heading = tableContainer.querySelector('h4');
+                heading.textContent = `🎬 Cast for "${movieTitle}" (Movie ID: ${movieId})`;
+
+                if (data.cast_entries && data.cast_entries.length > 0) {
+                    data.cast_entries.forEach(entry => {
+                        const row = `
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="px-4 py-2 font-mono text-orange-300">${entry.cast_entry_id || '-'}</td>
+                                <td class="px-4 py-2">${movieTitle}</td>
+                                <td class="px-4 py-2">${entry.name || 'Person #' + entry.person_id}</td>
+                                <td class="px-4 py-2">${entry.role || '-'}</td>
+                                <td class="px-4 py-2 truncate max-w-xs" title="${entry.character_name || ''}">${entry.character_name || '-'}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteMovieCastFromTable(${entry.cast_entry_id})" 
+                                        class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-2 py-1 rounded text-xs border border-red-500/20 transition">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                    
+                    // Clear pagination for movie-specific view
+                    document.getElementById('movie-cast-pagination').innerHTML = '';
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-3 text-center text-white/40">No cast entries found for this movie</td></tr>';
+                    document.getElementById('movie-cast-pagination').innerHTML = '';
+                }
+            } else {
+                alert('Error loading cast entries: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Failed to load cast entries: ' + error);
+        }
+    }
+
+    async function loadMovieCastEntries(page = 1) {
+        const perPage = 50;
+        try {
+            const response = await fetch(`/movie_cast/?page=${page}&per_page=${perPage}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                const tbody = document.getElementById('movie-cast-table-body');
+                tbody.innerHTML = '';
+
+                // Reset the table header
+                const tableContainer = tbody.closest('.bg-black\\/50');
+                const heading = tableContainer.querySelector('h4');
+                heading.textContent = '🎬 Movie Cast Entries';
+
+                if (data.cast_entries && data.cast_entries.length > 0) {
+                    data.cast_entries.forEach(entry => {
+                        const row = `
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="px-4 py-2 font-mono text-orange-300">${entry.id}</td>
+                                <td class="px-4 py-2">${entry.movie_title || 'Movie #' + entry.movie_id}</td>
+                                <td class="px-4 py-2">${entry.person_name || 'Person #' + entry.person_id}</td>
+                                <td class="px-4 py-2">${entry.role || '-'}</td>
+                                <td class="px-4 py-2 truncate max-w-xs" title="${entry.character_name || ''}">${entry.character_name || '-'}</td>
+                                <td class="px-4 py-2">
+                                    <button onclick="deleteMovieCastFromTable(${entry.id})" 
+                                        class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-2 py-1 rounded text-xs border border-red-500/20 transition">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+
+                    // Handle pagination
+                    if (data.pagination && data.pagination.total_pages > 1) {
+                        renderMovieCastPagination(data.pagination);
+                    } else {
+                        document.getElementById('movie-cast-pagination').innerHTML = '';
+                    }
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-3 text-center text-white/40">No entries found</td></tr>';
+                }
+            } else {
+                alert('Error loading cast entries: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Failed to load cast entries: ' + error);
+        }
+    }
+
+    function renderMovieCastPagination(pagination) {
+        const container = document.getElementById('movie-cast-pagination');
+        const prevDisabled = pagination.page === 1 ? 'pointer-events-none opacity-50' : '';
+        const nextDisabled = pagination.page === pagination.total_pages ? 'pointer-events-none opacity-50' : '';
+
+        container.innerHTML = `
+            <div class="flex justify-between items-center px-2 py-3 bg-black/40 rounded-xl border border-white/5">
+                <button onclick="loadMovieCastEntries(${pagination.page - 1})" class="${prevDisabled} px-3 py-1.5 bg-orange-600/20 hover:bg-orange-600/40 text-orange-200 rounded-lg text-xs">
+                    ← Previous
+                </button>
+                <div class="text-xs text-white/50">
+                    Page <span class="text-white font-bold">${pagination.page}</span> of ${pagination.total_pages}
+                </div>
+                <button onclick="loadMovieCastEntries(${pagination.page + 1})" class="${nextDisabled} px-3 py-1.5 bg-orange-600/20 hover:bg-orange-600/40 text-orange-200 rounded-lg text-xs">
+                    Next →
+                </button>
+            </div>
+        `;
+    }
+
+    async function searchMovieCastById(event) {
+        event.preventDefault();
+        const castId = document.getElementById('movie-cast-search-id').value;
+        
+        if (!castId) {
+            alert('Please enter a cast entry ID');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/movie_cast/${castId}`);
+            const data = await response.json();
+
+            if (response.ok && data.cast_entry) {
+                currentCastId = data.cast_entry[0].id;
+                displayMovieCastDetails(data.cast_entry[0]);
+            } else {
+                alert('Error: ' + (data.error || 'Cast entry not found'));
+                document.getElementById('movie-cast-search-result').classList.add('hidden');
+            }
+        } catch (error) {
+            alert('Search failed: ' + error);
+            document.getElementById('movie-cast-search-result').classList.add('hidden');
+        }
+    }
+
+    function displayMovieCastDetails(entry) {
+        const detailsDiv = document.getElementById('movie-cast-details');
+        detailsDiv.innerHTML = `
+            <div class="grid grid-cols-2 gap-2">
+                <span class="text-white/50">ID:</span>
+                <span class="text-orange-300 font-mono">${entry.id}</span>
+                
+                <span class="text-white/50">Movie ID:</span>
+                <span class="text-white">${entry.movie_id}</span>
+                
+                <span class="text-white/50">Movie Title:</span>
+                <span class="text-white">${entry.movie_title || '-'}</span>
+                
+                <span class="text-white/50">Person ID:</span>
+                <span class="text-white">${entry.person_id}</span>
+                
+                <span class="text-white/50">Person Name:</span>
+                <span class="text-white">${entry.person_name || '-'}</span>
+                
+                <span class="text-white/50">Role:</span>
+                <span class="text-white/70">${entry.role || '-'}</span>
+                
+                <span class="text-white/50">Character:</span>
+                <span class="text-white/70">${entry.character_name || '-'}</span>
+            </div>
+        `;
+        
+        document.getElementById('movie-cast-search-result').classList.remove('hidden');
+    }
+
+    function closeMovieCastSearch() {
+        document.getElementById('movie-cast-search-result').classList.add('hidden');
+        document.getElementById('movie-cast-search-id').value = '';
+        currentCastId = null;
+    }
+
+    function editMovieCast() {
+        if (!currentCastId) return;
+        
+        document.getElementById('update-cast-id').value = currentCastId;
+        
+        document.querySelector('#tab-movie-cast .bg-black\\/50:last-of-type').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        
+        const updateForm = document.querySelector('#tab-movie-cast .bg-black\\/50:last-of-type');
+        updateForm.classList.add('ring-2', 'ring-orange-500');
+        setTimeout(() => {
+            updateForm.classList.remove('ring-2', 'ring-orange-500');
+        }, 2000);
+    }
+
+    async function deleteMovieCastEntry() {
+        if (!currentCastId) return;
+        
+        if (!confirm(`Are you sure you want to delete cast entry ID ${currentCastId}?`)) return;
+
+        try {
+            const response = await fetch(`/movie_cast/${currentCastId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Cast entry deleted successfully!');
+                closeMovieCastSearch();
+                loadMovieCastEntries(1);
+            } else {
+                const data = await response.json();
+                alert('Error: ' + (data.error || 'Failed to delete cast entry'));
+            }
+        } catch (error) {
+            alert('Delete failed: ' + error);
+        }
+    }
+
+    async function deleteMovieCastFromTable(castId) {
+        if (!confirm(`Are you sure you want to delete cast entry ID ${castId}?`)) return;
+
+        try {
+            const response = await fetch(`/movie_cast/${castId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Cast entry deleted successfully!');
+                // Reload the current page of entries
+                loadMovieCastEntries(1);
+            } else {
+                const data = await response.json();
+                alert('Error: ' + (data.error || 'Failed to delete cast entry'));
+            }
+        } catch (error) {
+            alert('Delete failed: ' + error);
+        }
+    }
+
+    async function createMovieCast(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const castData = {
+            movie_id: parseInt(formData.get('movie_id')),
+            person_id: parseInt(formData.get('person_id')),
+            role: formData.get('role') || null,
+            character_name: formData.get('character_name') || null
+        };
+
+        try {
+            const response = await fetch('/movie_cast/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(castData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Cast entry created successfully!\n' + JSON.stringify(data, null, 2));
+                event.target.reset();
+                loadMovieCastEntries(1);
+            } else {
+                alert('Error: ' + (data.error || 'Failed to create cast entry'));
+            }
+        } catch (error) {
+            alert('Create failed: ' + error);
+        }
+    }
+
+    async function updateMovieCast(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const castId = parseInt(formData.get('id'));
+        
+        if (!castId) {
+            alert('Cast Entry ID is required');
+            return;
+        }
+
+        const updateData = {};
+        if (formData.get('movie_id')) updateData.movie_id = parseInt(formData.get('movie_id'));
+        if (formData.get('person_id')) updateData.person_id = parseInt(formData.get('person_id'));
+        if (formData.get('role')) updateData.role = formData.get('role');
+        if (formData.get('character_name')) updateData.character_name = formData.get('character_name');
+
+        if (Object.keys(updateData).length === 0) {
+            alert('Please provide at least one field to update');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/movie_cast/${castId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updateData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Cast entry updated successfully!\n' + JSON.stringify(data, null, 2));
+                event.target.reset();
+                loadMovieCastEntries(1);
+            } else {
+                alert('Error: ' + (data.error || 'Failed to update cast entry'));
+            }
+        } catch (error) {
+            alert('Update failed: ' + error);
+        }
+    }
+
+    // Search Movies by Name
+    async function searchMovieByName(event) {
+        event.preventDefault();
+        const searchQuery = document.getElementById('movie-name-search').value.trim();
+        
+        if (!searchQuery) {
+            alert('Please enter a movie title');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/movies/?format=json&search=${encodeURIComponent(searchQuery)}&per_page=20`);
+            const data = await response.json();
+
+            const resultsList = document.getElementById('movie-results-list');
+            const resultsContainer = document.getElementById('movie-search-results');
+            
+            resultsList.innerHTML = '';
+
+            if (response.ok && data.items && data.items.length > 0) {
+                data.items.forEach(movie => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'bg-black/40 border border-blue-500/20 p-3 rounded-lg hover:bg-blue-500/10 transition cursor-pointer';
+                    resultItem.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-white font-medium">${movie.title}</div>
+                                <div class="text-white/50 text-xs">${movie.release_date || 'No date'}</div>
+                            </div>
+                            <div class="text-blue-300 font-mono text-sm">ID: ${movie.id}</div>
+                        </div>
+                    `;
+                    resultItem.onclick = () => useMovieId(movie.id, movie.title);
+                    resultsList.appendChild(resultItem);
+                });
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsList.innerHTML = '<div class="text-white/40 text-sm p-2">No movies found</div>';
+                resultsContainer.classList.remove('hidden');
+            }
+        } catch (error) {
+            alert('Search failed: ' + error);
+        }
+    }
+
+    function useMovieId(movieId, movieTitle) {
+        // Load cast entries for this movie
+        loadMovieCastByMovie(movieId, movieTitle);
+        
+        // Scroll to the cast entries table
+        document.querySelector('#movie-cast-table-body').closest('.bg-black\\/50').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+    }
+
+    // Search People by Name
+    async function searchPersonByName(event) {
+        event.preventDefault();
+        const searchQuery = document.getElementById('person-name-search').value.trim();
+        
+        if (!searchQuery) {
+            alert('Please enter a person name');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/actors/?q=${encodeURIComponent(searchQuery)}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+
+            const resultsList = document.getElementById('person-results-list');
+            const resultsContainer = document.getElementById('person-search-results');
+            
+            resultsList.innerHTML = '';
+
+            if (response.ok && data.actors && data.actors.length > 0) {
+                data.actors.forEach(person => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'bg-black/40 border border-purple-500/20 p-3 rounded-lg hover:bg-purple-500/10 transition cursor-pointer';
+                    resultItem.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-white font-medium">${person.name}</div>
+                                <div class="text-white/50 text-xs">${person.birth_date || 'Unknown'}</div>
+                            </div>
+                            <div class="text-purple-300 font-mono text-sm">ID: ${person.id}</div>
+                        </div>
+                    `;
+                    resultItem.onclick = () => usePersonId(person.id, person.name);
+                    resultsList.appendChild(resultItem);
+                });
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsList.innerHTML = '<div class="text-white/40 text-sm p-2">No people found</div>';
+                resultsContainer.classList.remove('hidden');
+            }
+        } catch (error) {
+            alert('Search failed: ' + error);
+        }
+    }
+
+    function usePersonId(personId, personName) {
+        document.getElementById('create-cast-person-id').value = personId;
+        document.getElementById('create-cast-person-id').placeholder = `Person ID (${personName})`;
+        
+        // Scroll to create form
+        document.querySelector('#tab-movie-cast .bg-black\\/50:first-of-type').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        
+        // Highlight the field
+        const field = document.getElementById('create-cast-person-id');
+        field.classList.add('ring-2', 'ring-purple-500');
+        setTimeout(() => {
+            field.classList.remove('ring-2', 'ring-purple-500');
+        }, 1500);
     }
 </script>
 
