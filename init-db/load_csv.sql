@@ -49,12 +49,20 @@ SELECT setval('user_lists_id_seq', (SELECT MAX(id) FROM user_lists));
 
 SELECT setval('list_items_id_seq', (SELECT MAX(id) FROM list_items));
 
-SELECT setval('favorites_id_seq', (SELECT MAX(id) FROM favorites));
-
-SELECT setval('movies_genres_id_seq', (SELECT MAX(id) FROM movies_genres));
 
 SELECT setval('movie_question_id_seq', (SELECT MAX(id) FROM movie_question));
 
 SELECT setval('question_types_id_seq', (SELECT MAX(id) FROM question_types));
 
-SELECT setval('platforms_id_seq', (SELECT MAX(id) FROM platforms));
+
+-- Create Indexes 
+
+-- Index for title search
+CREATE INDEX IF NOT EXISTS idx_movies_title ON movies(title);
+-- Index for finding movies by platform 
+CREATE INDEX IF NOT EXISTS idx_movies_platform_id ON movies(platform_id);
+-- Index for finding movies by genre 
+CREATE INDEX IF NOT EXISTS idx_movies_genres_genre_id ON movies_genres(genre_id);
+-- Index for finding who favorited a movie 
+CREATE INDEX IF NOT EXISTS idx_favorites_movie_id ON favorites(movie_id);
+

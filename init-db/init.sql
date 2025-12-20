@@ -91,19 +91,19 @@ CREATE TABLE IF NOT EXISTS genres (
 -- movies_genres table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies_genres (
-    id SERIAL PRIMARY KEY,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
-    genre_id INTEGER REFERENCES genres(id) ON DELETE CASCADE
+    genre_id INTEGER REFERENCES genres(id) ON DELETE CASCADE,
+    PRIMARY KEY (movie_id, genre_id)
 );
 
 ------------------------------------------------------------
 -- favorites table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS favorites (
-    id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, movie_id)
 );
 
 ------------------------------------------------------------
