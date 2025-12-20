@@ -13,12 +13,14 @@ from src.services.comments_service import (
     toggle_comment_vote_db,
     get_user_vote_status,
     create_vote,
-    get_vote_by_id,
     update_vote,
     delete_vote,
-    get_controversial_movies
+    get_vote_by_user_and_comment,
+    get_controversial_movies,
+    get_all_votes_detailed
 )
 from src.services.movie_service import get_movies_paginated_db
+
 
 comments_bp = Blueprint('comments', __name__)
 
@@ -215,14 +217,21 @@ def battleground_page():
         search_error=search_error
     )
 
+# COMMENT VOTES ROUTES
 
-# comment_votes CRUD routes
-
-@comments_bp.route('/votes/<int:vote_id>', methods=['GET'])
+@comments_bp.route('/votes', methods=['GET'])
 @login_required
-def get_vote_route(vote_id):
-    """Get a single vote by its ID"""
-    vote, err = get_vote_by_id(vote_id)
+def get_vote_route():
+    """
+    Get a single vote by user_id and comment_id (Query params)
+    """
+    user_id = request.args.get('user_id')
+    comment_id = request.args.get('comment_id')
+    
+    if not user_id or not comment_id:
+        return jsonify({"error": "Missing user_id or comment_id params"}), 400
+
+    vote, err = get_vote_by_user_and_comment(user_id, comment_id)
     if err:
         return jsonify({"error": err}), 404
     return jsonify(dict(vote)), 200
@@ -232,55 +241,73 @@ def get_vote_route(vote_id):
 @login_required
 def create_vote_route():
     """
-    Directly create a vote record (Admin/API use).
-    Unlike toggle, this will fail if vote already exists.
-    Expects JSON: { "comment_id": 1, "vote_type": "like" }
+    Directly create a vote record
     """
     data = request.get_json()
     comment_id = data.get('comment_id')
     vote_type = data.get('vote_type')
+    
+    target_user_id = data.get('user_id', current_user.id)
+
     if not comment_id or not vote_type:
         return jsonify({'error': 'Missing comment_id or vote_type'}), 400
+    
     if vote_type not in ['like', 'dislike']:
         return jsonify({'error': 'Invalid vote type'}), 400
-    new_vote, err = create_vote(current_user.id, comment_id, vote_type)
+
+    new_vote, err = create_vote(target_user_id, comment_id, vote_type)
+    
     if err:
+        if "already voted" in str(err) or "unique" in str(err) or "duplicate" in str(err):
+             return jsonify({"error": "This user has already voted on this comment."}), 409
         return jsonify({"error": err}), 400
+        
     return jsonify(dict(new_vote)), 201
 
 
-@comments_bp.route('/votes/<int:vote_id>', methods=['PUT', 'PATCH'])
+@comments_bp.route('/votes', methods=['PUT', 'PATCH'])
 @login_required
-def update_vote_route(vote_id):
+def update_vote_route():
     """
     Update a vote (e.g. change 'like' to 'dislike').
-    Expects JSON: { "vote_type": "dislike" }
+    Expects JSON: { "user_id": 1, "comment_id": 2, "vote_type": "dislike" }
     """
-    vote, err = get_vote_by_id(vote_id)
-    if err:
-        return jsonify({"error": "Vote not found"}), 404   
-    if vote['user_id'] != current_user.id and current_user.role != 'admin':
-        return jsonify({"error": "Unauthorized"}), 403
     data = request.get_json()
+    user_id = data.get('user_id')
+    comment_id = data.get('comment_id')
     new_type = data.get('vote_type')
+
+    if not user_id or not comment_id or not new_type:
+        return jsonify({"error": "Missing user_id, comment_id or vote_type"}), 400
+
     if new_type not in ['like', 'dislike']:
         return jsonify({"error": "Invalid vote type"}), 400
-    updated_vote, err = update_vote(vote_id, new_type)
+
+    if int(user_id) != current_user.id and current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+
+    updated_vote, err = update_vote(user_id, comment_id, new_type)
     if err:
         return jsonify({"error": err}), 500
     return jsonify(dict(updated_vote)), 200
 
 
-@comments_bp.route('/votes/<int:vote_id>', methods=['DELETE'])
+@comments_bp.route('/votes', methods=['DELETE'])
 @login_required
-def delete_vote_route(vote_id):
-    """Delete a vote permanently"""
-    vote, err = get_vote_by_id(vote_id)
-    if err:
-        return jsonify({"error": "Vote not found"}), 404
-    if vote['user_id'] != current_user.id and current_user.role != 'admin':
+def delete_vote_route():
+    """
+    Delete a vote permanently using user_id and comment_id.
+    """
+    user_id = request.args.get('user_id')
+    comment_id = request.args.get('comment_id')
+
+    if not user_id or not comment_id:
+        return jsonify({"error": "Missing user_id or comment_id"}), 400
+
+    if int(user_id) != current_user.id and current_user.role != 'admin':
         return jsonify({"error": "Unauthorized"}), 403
-    deleted, err = delete_vote(vote_id)
+
+    deleted, err = delete_vote(user_id, comment_id)
     if err:
         return jsonify({"error": err}), 500   
     return jsonify({"message": "Vote deleted successfully", "vote": dict(deleted)}), 200

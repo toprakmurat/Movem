@@ -126,7 +126,6 @@ CREATE TABLE IF NOT EXISTS comments (
 -- comment_votes table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS comment_votes (
-    id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
     vote_type VARCHAR(10) CHECK (vote_type IN ('like', 'dislike')),

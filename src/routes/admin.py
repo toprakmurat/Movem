@@ -35,13 +35,16 @@ from src.services.genres_service import (
 )
 
 from src.services.comments_service import (
-    get_all_comments_detailed, 
+    get_all_comments_detailed,
+    create_comment,
+    update_comment,
     delete_comment_by_id, 
     toggle_spoiler_status,
     get_all_votes_detailed,
+    create_vote,
+    update_vote,
     delete_vote,
-    get_comment_by_id,
-    get_vote_by_id
+    get_comment_by_id
 )
 
 from src.services.actors_service import get_actors_paginated_db
@@ -311,6 +314,29 @@ def api_get_comment_by_id(id):
     if err: return jsonify({'error': err}), 404
     return jsonify(dict(comment))
 
+@admin_bp.route('/api/comments', methods=['POST'])
+def api_create_comment():
+    data = request.get_json()
+    new_comment, error = create_comment(data)
+    
+    if error:
+        return jsonify({'error': error}), 400
+    return jsonify({'id': new_comment['id']}), 201
+
+@admin_bp.route('/api/comments', methods=['PUT'])
+def api_update_comment():
+    data = request.get_json()
+    comment_id = data.get('id')
+    
+    if not comment_id:
+        return jsonify({'error': 'ID required'}), 400
+    
+    updated_comment, error = update_comment(comment_id, data)
+    
+    if error:
+        return jsonify({'error': error}), 400
+    return jsonify({'success': True}), 200
+
 @admin_bp.route('/api/comments/<int:id>', methods=['DELETE'])
 def api_delete_comment(id):
     success, err = delete_comment_by_id(id)
@@ -338,7 +364,6 @@ def api_get_votes():
     if votes:
         for v in votes:
             items.append({
-                'id': v['id'],
                 'user_id': v['user_id'],
                 'username': v['username'],
                 'comment_id': v['comment_id'],
@@ -356,14 +381,55 @@ def api_get_votes():
         }
     })
 
-@admin_bp.route('/api/votes/<int:id>', methods=['GET'])
-def api_get_vote_by_id(id):
-    vote, err = get_vote_by_id(id)
-    if err: return jsonify({'error': err}), 404
-    return jsonify(dict(vote))
+@admin_bp.route('/api/comments/votes', methods=['POST'])
+def api_create_vote():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    comment_id = data.get('comment_id')
+    vote_type = data.get('vote_type')
+    
+    if not (user_id and comment_id and vote_type):
+        return jsonify({'error': 'Missing fields (user_id, comment_id, vote_type)'}), 400
 
-@admin_bp.route('/api/votes/<int:id>', methods=['DELETE'])
-def api_delete_vote(id):
-    success, err = delete_vote(id)
-    if err: return jsonify({'error': err}), 400
+    new_vote, error = create_vote(user_id, comment_id, vote_type)
+    
+    if error:
+        return jsonify({'error': error}), 400
+    return jsonify({'id': new_vote['id']}), 201
+
+@admin_bp.route('/api/comments/votes', methods=['PUT'])
+def api_update_vote():
+    data = request.get_json()
+    
+    user_id = data.get('user_id')
+    comment_id = data.get('comment_id')
+    vote_type = data.get('vote_type')
+    
+    if not (user_id and comment_id and vote_type):
+        return jsonify({'error': 'User ID, Comment ID and Vote Type required'}), 400
+    
+    updated_vote, error = update_vote(user_id, comment_id, vote_type)
+    
+    if error:
+        return jsonify({'error': error}), 400
+    return jsonify({'success': True}), 200
+
+
+@admin_bp.route('/api/comments/votes', methods=['DELETE'])
+def api_delete_vote():
+    user_id = request.args.get('user_id')
+    comment_id = request.args.get('comment_id')
+
+    if not (user_id and comment_id):
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        comment_id = data.get('comment_id')
+
+    if not (user_id and comment_id):
+        return jsonify({'error': 'User ID and Comment ID required'}), 400
+
+    deleted_vote, error = delete_vote(user_id, comment_id)
+    
+    if error:
+        return jsonify({'error': error}), 400
     return jsonify({'success': True}), 200

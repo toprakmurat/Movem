@@ -87,7 +87,7 @@
         <button onclick="openTab(event, 'tab-comments')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Comments</button>
         <button onclick="openTab(event, 'tab-votes')"
-            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Votes</button>
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Comment Votes</button>
         <button onclick="openTab(event, 'tab-people')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">People</button>
         <button onclick="openTab(event, 'tab-movie-cast')"
@@ -725,6 +725,7 @@
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Create Platform</h4>
                     <form onsubmit="handleApiSubmit(event, '/movies/platforms/', 'POST')" class="space-y-4">
+                        <input name="id" type="number" placeholder="Platform ID (Required)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
                         <input name="platform_name" placeholder="Name (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
@@ -769,9 +770,9 @@
                             class="bg-black/90 text-xs uppercase tracking-wider font-bold border-b border-white/10 sticky top-0 z-10">
                             <tr>
                                 <th class="px-4 py-3 text-blue-300 w-24">ID</th>
-                                <th class="px-4 py-3 text-blue-300">Name</th>
-                                <th class="px-4 py-3 text-blue-300">Logo</th>
-                                <th class="px-4 py-3 text-blue-300 text-right w-32">Actions</th>
+                                <th class="px-4 py-3 text-blue-300">PLATFORM NAME</th>
+                                <th class="px-4 py-3 text-blue-300">LOGO PATH</th>
+                                <th class="px-4 py-3 text-blue-300 text-right w-32">ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody id="platforms-table-body" class="divide-y divide-white/5"></tbody>
@@ -992,70 +993,103 @@
 
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                    <h4 class="text-lg font-semibold text-white mb-4">Toggle Spoiler</h4>
-                    <form onsubmit="handleApiSubmit(event, '/admin/api/comments/toggle-spoiler', 'POST', loadComments)"
-                        class="space-y-4">
-                        <input name="id" type="number" placeholder="Comment ID (Required)"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
-                            required>
-                        <button
-                            class="w-full bg-yellow-600/80 hover:bg-yellow-500 text-white rounded-xl py-2 font-medium transition">Toggle
-                            Spoiler</button>
+                    
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Comment</h4>
+                    <form onsubmit="handleApiSubmit(event, '/admin/api/comments', 'POST', loadComments)" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="user_id" type="number" placeholder="User ID (Req)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                            <input name="movie_id" type="number" placeholder="Movie ID (Req)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        </div>
+                        <textarea name="body" placeholder="Comment Body" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required></textarea>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="rating" type="number" min="1" max="10" placeholder="Rating (1-10)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                            <select name="has_spoiler" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                                <option value="false">No Spoiler</option>
+                                <option value="true">Contains Spoiler</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary w-full py-2 rounded-xl">Create Comment</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Toggle Spoiler</h4>
+                    <form onsubmit="handleApiSubmit(event, '/admin/api/comments/toggle-spoiler', 'POST', loadComments)" class="space-y-4">
+                        <input name="id" type="number" placeholder="Comment ID (Required)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <button class="w-full bg-yellow-600/80 hover:bg-yellow-500 text-white rounded-xl py-2 font-medium transition">Toggle Spoiler</button>
                     </form>
                 </div>
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                    <h4 class="text-lg font-semibold text-white mb-4">Delete Comment</h4>
+                    
+                    <h4 class="text-lg font-semibold text-white mb-4">Update Comment</h4>
+                    <form onsubmit="handleUpdateComment(event)" class="space-y-4">
+                        <input name="id" type="number" placeholder="ID to Update (Required)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <textarea name="body" placeholder="New Body" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input name="rating" type="number" min="1" max="10" placeholder="New Rating" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                            <select name="has_spoiler" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                                <option value="">- Keep Status -</option>
+                                <option value="false">No Spoiler</option>
+                                <option value="true">Contains Spoiler</option>
+                            </select>
+                        </div>
+                        <button class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update Comment</button>
+                    </form>
+
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Comment</h4>
                     <form onsubmit="handleDeleteById(event, '/admin/api/comments', loadComments)" class="space-y-4">
-                        <input name="id" type="number" placeholder="ID to Delete (Required)"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
-                            required>
-                        <button
-                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
-                            Comment</button>
+                        <input name="id" type="number" placeholder="ID to Delete (Required)" class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <button class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete Comment</button>
                     </form>
                 </div>
             </div>
-            <div class="mt-8 overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
-                <h4
-                    class="text-lg font-semibold text-white p-4 border-b border-white/10 bg-black/80 backdrop-blur w-full block">
-                    Comments List
-                    <div class="float-right relative">
-                        <input type="text" id="comments-search" placeholder="Search Review, User..."
-                            onkeyup="if(event.key === 'Enter') loadComments()"
-                            class="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-sm text-white focus:outline-none w-64">
-                        <button onclick="loadComments()"
-                            class="absolute right-2 top-1 text-white/50 hover:text-white">🔍</button>
-                    </div>
-                </h4>
-                <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[600px]">
-                    <table class="w-full text-left text-sm text-white/70 border-collapse table-fixed">
-                        <thead
-                            class="bg-black/90 text-xs uppercase tracking-wider font-bold border-b border-white/10 sticky top-0 z-10">
-                            <tr>
-                                <th class="px-4 py-3 text-blue-300 w-16">ID</th>
-                                <th class="px-4 py-3 text-blue-300 w-32">User</th>
-                                <th class="px-4 py-3 text-blue-300 w-48">Movie</th>
-                                <th class="px-4 py-3 text-blue-300">Body</th>
-                                <th class="px-4 py-3 text-blue-300 w-16">Rating</th>
-                                <th class="px-4 py-3 text-blue-300 w-32">Likes/Dislikes</th>
-                                <th class="px-4 py-3 text-blue-300 w-24">Spoiler</th>
-                                <th class="px-4 py-3 text-blue-300 w-32">Date</th>
-                                <th class="px-4 py-3 text-blue-300 text-right w-24">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="comments-table-body" class="divide-y divide-white/5"></tbody>
-                    </table>
-                </div>
-                <div id="comments-pagination"></div>
-            </div>
+            <div class="mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+        <h3 class="text-xl font-bold text-white">Comments List</h3>
+        
+        <div class="relative w-full md:w-64">
+            <input type="text" 
+                   placeholder="Search User or Movie..." 
+                   onkeyup="handleSearch(this.value)"
+                   class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 pl-10 text-white focus:outline-none focus:border-blue-500 transition placeholder-gray-500">
+            <svg class="w-5 h-5 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="bg-black/50 border border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-white/10 text-xs uppercase tracking-wider text-gray-400">
+                        <th class="p-4 font-medium">ID</th>
+                        <th class="p-4 font-medium">User ID</th>
+                        <th class="p-4 font-medium">Movie ID</th>
+                        <th class="p-4 font-medium w-64">Body</th>
+                        <th class="p-4 font-medium">Rating</th>
+                        <th class="p-4 font-medium text-center">Likes</th>
+                        <th class="p-4 font-medium text-center">Dislikes</th>
+                        <th class="p-4 font-medium text-center">Spoiler</th>
+                        <th class="p-4 font-medium">Created At</th>
+                        <th class="p-4 font-medium">Updated At</th>
+                        <th class="p-4 font-medium text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="commentsTableBody" class="text-sm divide-y divide-white/5">
+                    </tbody>
+            </table>
+        </div>
+        <div id="comments-pagination"></div>
+    </div>
+</div>
         </section>
     </div>
 
     <div id="tab-votes" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-2xl font-semibold uppercase tracking-widest text-white mb-6">Votes Management</h2>
+            
             <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
-                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: COMMENT_VOTES</h3>
+                <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: COMMENT_VOTES (Composite Key)</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-blue-200/70">
                         <thead class="uppercase tracking-wider border-b border-blue-500/30">
@@ -1068,22 +1102,16 @@
                         </thead>
                         <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-2 py-1 font-mono">id</td>
-                                <td class="px-2 py-1">serial</td>
-                                <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">PK</td>
-                            </tr>
-                            <tr>
                                 <td class="px-2 py-1 font-mono">user_id</td>
                                 <td class="px-2 py-1">int</td>
                                 <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">FK</td>
+                                <td class="px-2 py-1 text-yellow-500">Composite PK, FK</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">comment_id</td>
                                 <td class="px-2 py-1">int</td>
                                 <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">FK</td>
+                                <td class="px-2 py-1 text-yellow-500">Composite PK, FK</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">vote_type</td>
@@ -1101,53 +1129,94 @@
                     </table>
                 </div>
             </div>
-            <form onsubmit="handleGetVoteById(event)"
+
+            <form onsubmit="handleGetVoteByComposite(event)"
                 class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10 mb-6">
-                <input name="id" type="number" placeholder="Get Vote by ID"
-                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
-                    required>
-                <button
-                    class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm transition">Go</button>
+                <input name="user_id" type="number" placeholder="User ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-32 text-sm" required>
+                <input name="comment_id" type="number" placeholder="Comment ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-32 text-sm" required>
+                <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm transition">Find Vote</button>
             </form>
+
             <div id="result-container-votes" class="mt-4 mb-6 hidden p-4 bg-white/5 border border-white/10 rounded-xl">
                 <h5 class="text-sm font-bold text-blue-300 mb-2">Search Result:</h5>
                 <pre class="text-xs text-white/80 font-mono overflow-x-auto"></pre>
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Create Vote</h4>
+                    <form onsubmit="handleCreate(event, '/admin/api/comments/votes', loadVotes)" class="space-y-4">
+                        <input name="user_id" type="number" placeholder="User ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <input name="comment_id" type="number" placeholder="Comment ID"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <select name="vote_type"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full appearance-none" required>
+                            <option value="" disabled selected class="text-gray-500">Select Type</option>
+                            <option value="like" class="text-black">Like</option>
+                            <option value="dislike" class="text-black">Dislike</option>
+                        </select>
+                        <button class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Create Vote</button>
+                    </form>
+                </div>
+
+                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">Update Vote</h4>
+                    <form onsubmit="handleUpdateVoteComposite(event)" class="space-y-4">
+                        <div class="text-xs text-white/50 mb-2">Identify vote to update:</div>
+                        <input name="user_id" type="number" placeholder="User ID (Target)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <input name="comment_id" type="number" placeholder="Comment ID (Target)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        
+                        <div class="text-xs text-white/50 mb-2 mt-4">New Value:</div>
+                        <select name="vote_type"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full appearance-none">
+                            <option value="" selected class="text-gray-500">New Vote Type</option>
+                            <option value="like" class="text-black">Like</option>
+                            <option value="dislike" class="text-black">Dislike</option>
+                        </select>
+                        <button class="w-full bg-emerald-600/80 hover:bg-emerald-500 text-white rounded-xl py-2 font-medium transition">Update Vote</button>
+                    </form>
+                </div>
+
                 <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">Delete Vote</h4>
-                    <form onsubmit="handleDeleteById(event, '/admin/api/votes', loadVotes)" class="space-y-4">
-                        <input name="id" type="number" placeholder="ID to Delete (Required)"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
-                            required>
-                        <button
-                            class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete
-                            Vote</button>
+                    <form onsubmit="handleDeleteVoteForm(event)" class="space-y-4">
+                        <input name="user_id" type="number" placeholder="User ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <input name="comment_id" type="number" placeholder="Comment ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full" required>
+                        <button class="w-full bg-red-600/80 hover:bg-red-500 text-white rounded-xl py-2 font-medium transition">Delete Vote</button>
                     </form>
                 </div>
             </div>
-            <div class="mt-8 overflow-hidden bg-black/50 backdrop-blur-md rounded-2xl border border-white/5">
-                <h4
-                    class="text-lg font-semibold text-white p-4 border-b border-white/10 bg-black/80 backdrop-blur w-full block">
-                    Votes List</h4>
-                <div class="overflow-x-auto overflow-y-auto custom-scrollbar max-h-[600px]">
-                    <table class="w-full text-left text-sm text-white/70 border-collapse">
-                        <thead
-                            class="bg-black/90 text-xs uppercase tracking-wider font-bold border-b border-white/10 sticky top-0 z-10">
-                            <tr>
-                                <th class="px-4 py-3 text-blue-300 w-24">ID</th>
-                                <th class="px-4 py-3 text-blue-300">User</th>
-                                <th class="px-4 py-3 text-blue-300">Type</th>
-                                <th class="px-4 py-3 text-blue-300">Snippet</th>
-                                <th class="px-4 py-3 text-blue-300">Date</th>
-                                <th class="px-4 py-3 text-blue-300 text-right w-24">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="votes-table-body" class="divide-y divide-white/5"></tbody>
-                    </table>
+
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                    <h3 class="text-xl font-bold text-white">Votes List</h3>
                 </div>
-                <div id="votes-pagination"></div>
+                
+                <div class="bg-black/50 border border-white/5 rounded-2xl overflow-hidden backdrop-blur-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-white/10 text-xs uppercase tracking-wider text-gray-400">
+                                    <th class="p-4 font-medium">USER ID</th>
+                                    <th class="p-4 font-medium">COMMENT ID</th>
+                                    <th class="p-4 font-medium text-center">VOTE TYPE</th>
+                                    <th class="p-4 font-medium">CREATED AT</th>
+                                    <th class="p-4 font-medium text-right">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="votesTableBody" class="text-sm divide-y divide-white/5"></tbody>
+                        </table>
+                        <div id="votes-pagination"></div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -2136,37 +2205,6 @@
             </td>
         </tr>`);
 
-    window.loadComments = (page = 1) => {
-        const q = document.getElementById('comments-search') ? document.getElementById('comments-search').value : '';
-        fetchData(`/admin/api/comments?page=${page}&search=${encodeURIComponent(q)}`, 'comments-table-body', 'comments-pagination', (c) => `
-            <tr class="hover:bg-blue-500/10 transition group">
-                <td class="px-4 py-2 font-mono text-white/50">${c.id}</td>
-                <td class="px-4 py-2 text-white font-bold">${c.username}</td>
-                <td class="px-4 py-2 text-white/60">${c.movie_title}</td>
-                <td class="px-4 py-2 text-white/60 truncate max-w-xs" title="${c.body}">
-                    ${c.body}
-                </td>
-                <td class="px-4 py-2 text-yellow-400 font-bold">${c.rating}★</td>
-                <td class="px-4 py-2 text-white/60 text-xs">👍${c.comment_likes || 0} / 👎${c.comment_dislikes || 0}</td>
-                <td class="px-4 py-2">${c.has_spoiler ? '<span class="text-red-400 text-xs border border-red-500/20 px-2 rounded">SPOILER</span>' : '<span class="text-green-400 text-xs border border-green-500/20 px-2 rounded">CLEAN</span>'}</td>
-                <td class="px-4 py-2 text-white/50 text-xs">${c.created_at}</td>
-                <td class="px-4 py-2 text-right flex justify-end gap-2">
-                    <button onclick="handleApiSubmit(null, '/admin/api/comments/toggle-spoiler', 'POST', loadComments, {id: ${c.id}})" class="text-yellow-400 text-xs border border-yellow-500/20 px-2 py-1 rounded">⚠️</button>
-                    <button onclick="deleteResource('/admin/api/comments/${c.id}', loadComments)" class="text-red-400 text-xs border border-red-500/20 px-2 py-1 rounded">Delete</button>
-                </td>
-            </tr>`);
-    };
-
-    window.loadVotes = (page = 1) => fetchData(`/admin/api/votes?page=${page}`, 'votes-table-body', 'votes-pagination', (v) => `
-        <tr class="hover:bg-blue-500/10 transition group">
-            <td class="px-4 py-2 font-mono text-white/50">${v.id}</td>
-            <td class="px-4 py-2 text-white">${v.username}</td>
-            <td class="px-4 py-2"><span class="${v.vote_type === 'like' ? 'text-green-400' : 'text-red-400'} font-bold uppercase text-xs">${v.vote_type}</span></td>
-            <td class="px-4 py-2 text-white/60 italic text-xs">"${v.comment_snippet}..."</td>
-            <td class="px-4 py-2 text-white/60 text-xs">${v.created_at}</td>
-            <td class="px-4 py-2 text-right"><button onclick="deleteResource('/admin/api/votes/${v.id}', loadVotes)" class="text-red-400 text-xs border border-red-500/20 px-2 py-1 rounded">Delete</button></td>
-        </tr>`);
-
     window.loadGenres = (page = 1) => fetchData(`/movies/genres?page=${page}&per_page=100`, 'genres-table-body', 'genres-pagination', (g) => `
         <tr class="hover:bg-blue-500/10 transition duration-150 group">
             <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${g.id}</td>
@@ -2231,7 +2269,7 @@
 
     window.changePage = (baseUrl, page) => {
         if (baseUrl.includes('/admin/api/comments')) loadComments(page);
-        else if (baseUrl.includes('/admin/api/votes')) loadVotes(page);
+        else if (baseUrl.includes('/admin/api/comments/votes')) loadVotes(page);
         else if (baseUrl.includes('/movies/genres')) loadGenres(page);
         else if (baseUrl.includes('/movies/movies-genres')) loadMovieGenres(page);
         else if (baseUrl.includes('/movies/favorites')) loadFavorites(page);
@@ -2388,36 +2426,6 @@
             if (res.ok) pre.textContent = JSON.stringify(data, null, 2);
             else pre.textContent = 'Error: ' + (data.message || data.error);
         } catch (e) { container.classList.remove('hidden'); pre.textContent = 'Request failed: ' + e; }
-    }
-
-    // Generic Delete via Form (Delete by ID)
-    async function handleDeleteById(event, urlPrefix, reloadFn) {
-        event.preventDefault();
-        if (!confirm('Are you sure you want to delete this item?')) return;
-        const formData = new FormData(event.target);
-        const id = formData.get('id');
-        if (!id) return alert("ID required");
-
-        // Remove trailing slash if present to avoid double slashes
-        const cleanPrefix = urlPrefix.endsWith('/') ? urlPrefix.slice(0, -1) : urlPrefix;
-        const url = `${cleanPrefix}/${id}`;
-
-        try {
-            const response = await fetch(url, { method: 'DELETE' });
-            if (response.ok) {
-                const resData = await response.json().catch(() => ({}));
-                if (resData) alert('Deleted:\n' + JSON.stringify(resData, null, 2));
-
-                if (reloadFn) reloadFn();
-                else location.reload();
-                event.target.reset();
-            } else {
-                const result = await response.json();
-                alert('Error: ' + (result.error || result.message || 'Unknown error'));
-            }
-        } catch (error) {
-            alert('Delete failed: ' + error);
-        }
     }
 
     // Generic Delete
@@ -3060,6 +3068,369 @@
         setTimeout(() => {
             field.classList.remove('ring-2', 'ring-purple-500');
         }, 1500);
+    }
+    async function handleUpdateComment(event) {
+        const id = new FormData(event.target).get('id');
+        if (!id) return alert("ID required");
+        handleApiSubmit(event, '/admin/api/comments', 'PUT', loadComments);
+    }
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadComments(); 
+        loadVotes();
+    });
+
+    window.handleCreate = async function(event, url, callback) {
+        if (event) event.preventDefault();
+        await handleApiSubmit(event, url, 'POST', callback);
+    }
+
+    async function handleApiSubmit(event, url, method, successCallback, manualData = null) {
+        if (event) event.preventDefault();
+
+        let jsonData = {};
+        if (manualData) {
+            jsonData = manualData;
+        } else if (event) {
+            const formData = new FormData(event.target);
+            formData.forEach((value, key) => {
+                if (value !== "") {
+                    if (!isNaN(value) && value.trim() !== "") {
+                        jsonData[key] = parseFloat(value);
+                    } else {
+                        jsonData[key] = value;
+                    }
+                }
+            });
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
+
+            const result = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                alert('Success! Operation completed.');
+                if (event && event.target && event.target.reset) event.target.reset();
+                if (successCallback) successCallback();
+            } else {
+                let errorMessage = result.error || result.message || 'Unknown error occurred';
+                
+                if (errorMessage.includes('IntegrityError') || 
+                    errorMessage.includes('Duplicate') || 
+                    errorMessage.includes('already exists') ||
+                    response.status === 409) {
+                    alert('Error: This record already exists. You cannot create a duplicate entry.');
+                } else {
+                    alert('Error: ' + errorMessage);
+                }
+            }
+        } catch (error) {
+            console.error('Request failed:', error);
+            alert('Request failed: ' + error);
+        }
+    }
+
+    let searchTimeout;
+    function handleSearch(query) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadComments(1, query);
+        }, 500);
+    }
+
+    async function loadComments(page = 1, searchQuery = null) {
+        try {
+            if (searchQuery === null) {
+                const input = document.querySelector('#tab-comments input[type="text"]');
+                searchQuery = input ? input.value : '';
+            }
+
+            const url = `/admin/api/comments?page=${page}&search=${encodeURIComponent(searchQuery)}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            renderComments(data.items);
+            
+            if (typeof renderPaginationControl === 'function') {
+                renderPaginationControl('comments-pagination', data.pagination, '/admin/api/comments');
+            }
+        } catch (error) {
+            console.error('Yorumlar yüklenirken hata:', error);
+        }
+    }
+
+    async function loadVotes(page = 1) {
+        try {
+            const url = `/admin/api/votes?page=${page}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            renderVotes(data.items);
+
+            if (typeof renderPaginationControl === 'function') {
+                renderPaginationControl('votes-pagination', data.pagination, '/admin/api/votes');
+            }
+        } catch (error) {
+            console.error('Oylar yüklenirken hata:', error);
+        }
+    }
+
+    function renderComments(comments) {
+        const tbody = document.getElementById('commentsTableBody');
+        
+        if (!comments || comments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-gray-500">No comments found matching your search.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = comments.map(comment => `
+            <tr class="group hover:bg-white/5 transition-colors">
+                <td class="p-4 text-white font-medium">#${comment.id}</td>
+                <td class="p-4 text-blue-400 font-mono" title="Username: ${comment.username}">${comment.user_id}</td> 
+                <td class="p-4 text-purple-400 font-mono" title="Movie: ${comment.movie_title}">${comment.movie_id}</td>
+                <td class="p-4 text-gray-400 max-w-[250px] truncate" title="${comment.body}">${comment.body}</td>
+                <td class="p-4 text-yellow-500 font-bold flex items-center gap-1">${comment.rating} <span class="text-yellow-500/50 text-xs">★</span></td>
+                <td class="p-4 text-gray-300 text-center">${comment.comment_likes || 0}</td>
+                <td class="p-4 text-gray-300 text-center">${comment.comment_dislikes || 0}</td>
+                <td class="p-4 text-center">
+                    <span class="${comment.has_spoiler ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'} px-2 py-1 rounded text-xs font-medium">
+                        ${comment.has_spoiler ? 'SPOILER' : 'CLEAN'}
+                    </span>
+                </td>
+                <td class="p-4 text-gray-500 text-xs whitespace-nowrap">${comment.created_at}</td>
+                <td class="p-4 text-gray-500 text-xs whitespace-nowrap">-</td>
+                <td class="p-4 flex justify-end gap-2">
+                    <button onclick="toggleSpoiler(${comment.id})" class="p-2 hover:bg-yellow-500/20 rounded-lg text-yellow-500/80 hover:text-yellow-400 transition" title="Toggle Spoiler">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                    <button onclick="handleDeleteById(${comment.id}, '/admin/api/comments', () => loadComments(document.querySelector('#tab-comments input[type=text]')?.value || ''))" 
+                            class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-medium transition border border-red-500/10">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function handleDeleteVote(userId, commentId) {
+        if(!confirm(`Delete vote for User ${userId} on Comment ${commentId}?`)) return;
+
+        try {
+            const url = `/admin/api/votes?user_id=${userId}&comment_id=${commentId}`;
+            
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                loadVotes(); 
+            } else {
+                const result = await response.json().catch(() => ({}));
+                alert('Error deleting: ' + (result.error || result.message || 'Failed'));
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Delete failed: ' + error);
+        }
+    }
+
+    function renderVotes(votes) {
+        const tbody = document.getElementById('votesTableBody');
+        
+        if (!votes || votes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No votes found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = votes.map(vote => `
+            <tr class="group hover:bg-white/5 transition-colors">
+                <td class="p-4 text-blue-400 font-mono">
+                    <div class="flex flex-col">
+                        <span class="text-white font-bold text-sm">User: ${vote.user_id}</span>
+                        <span class="text-xs text-gray-500">${vote.username || 'Unknown'}</span>
+                    </div>
+                </td>
+                
+                <td class="p-4 text-purple-400 font-mono">
+                    <div class="flex flex-col">
+                        <span class="text-white font-bold text-sm">Comment: ${vote.comment_id}</span>
+                        <span class="text-xs text-gray-500 italic truncate max-w-[150px]" title="${vote.comment_snippet}">
+                            "${vote.comment_snippet || '...'}"
+                        </span>
+                    </div>
+                </td>
+                
+                <td class="p-4 text-center">
+                    <span class="${vote.vote_type === 'like' 
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                        : 'bg-red-500/10 text-red-400 border border-red-500/20'} 
+                        px-3 py-1 rounded text-xs font-medium uppercase tracking-wide">
+                        ${vote.vote_type}
+                    </span>
+                </td>
+                
+                <td class="p-4 text-gray-500 text-xs whitespace-nowrap">
+                    ${vote.created_at || '-'}
+                </td>
+                
+                <td class="p-4 flex justify-end gap-2">
+                    <button onclick="handleDeleteVote(${vote.user_id}, ${vote.comment_id})" 
+                            class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs font-medium transition border border-red-500/10">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function toggleSpoiler(id) {
+        try {
+            const response = await fetch('/admin/api/comments/toggle-spoiler', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+            const result = await response.json();
+            if (result.success) {
+                const currentSearch = document.querySelector('#tab-comments input[type=text]')?.value || '';
+                loadComments(1, currentSearch);
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Spoiler error:', error);
+        }
+    }
+
+    async function handleDeleteById(source, endpoint, reloadCallback) {
+        let id = source;
+
+        if (source && typeof source.preventDefault === 'function') {
+            source.preventDefault();
+            const formData = new FormData(source.target);
+            id = formData.get('id');
+        }
+
+        if (!id) return alert("ID required");
+        
+        if(!confirm('Are you sure you want to delete this item?')) return;
+
+        const cleanEndpoint = endpoint.endsWith('/') ? endpoint.slice(0, -1) : endpoint;
+        const url = `${cleanEndpoint}/${id}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                if (typeof reloadCallback === 'function') {
+                    reloadCallback(); 
+                } 
+                if (source && typeof source.target !== 'undefined' && source.target.reset) {
+                    source.target.reset();
+                }
+                
+                const resData = await response.json().catch(() => ({}));
+                if (resData && (resData.message || resData.success)) {
+                }
+            } else {
+                const result = await response.json().catch(() => ({}));
+                alert('Error deleting: ' + (result.error || result.message || 'Failed to delete'));
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Delete failed due to network or server error.');
+        }
+    }
+
+    async function handleUpdateVoteComposite(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const jsonData = {
+            user_id: parseInt(formData.get('user_id')),
+            comment_id: parseInt(formData.get('comment_id')),
+            vote_type: formData.get('vote_type')
+        };
+
+        try {
+            const response = await fetch('/admin/api/comments/votes', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Vote updated successfully!');
+                event.target.reset();
+                loadVotes(); 
+            } else {
+                alert('Error updating: ' + (result.error || result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Update error:', error);
+            alert('Update failed: ' + error);
+        }
+    }
+
+    async function handleDeleteVoteForm(event) {
+        event.preventDefault(); 
+        const formData = new FormData(event.target);
+        const userId = formData.get('user_id');
+        const commentId = formData.get('comment_id');
+
+        if (!userId || !commentId) {
+            alert("User ID and Comment ID are required");
+            return;
+        }
+        await handleDeleteVote(userId, commentId);
+        event.target.reset(); 
+    }
+
+    async function handleDeleteVote(userId, commentId) {
+        if(!confirm(`Delete vote for User ${userId} on Comment ${commentId}?`)) return;
+
+        try {
+            const url = `/admin/api/comments/votes?user_id=${userId}&comment_id=${commentId}`;
+            
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                loadVotes(); 
+            } else {
+                const result = await response.json().catch(() => ({}));
+                alert('Error deleting: ' + (result.error || result.message || 'Failed'));
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Delete failed: ' + error);
+        }
+    }
+
+    async function handleGetVoteByComposite(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const userId = formData.get('user_id');
+        const commentId = formData.get('comment_id');
+        
+        const url = `/admin/api/comments/votes?user_id=${userId}&comment_id=${commentId}`;
+        showDataInDiv(url, '', 'result-container-votes');
     }
 </script>
 

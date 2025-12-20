@@ -702,24 +702,36 @@ def get_platform_by_id(platform_id):
 
 
 def create_platform(platform_data):
-    """Creates a new platform"""
+    """Creates a new platform with MANDATORY ID"""
     try:
         platform_name = platform_data.get('platform_name')
         logo_path = platform_data.get('logo_path', None)
-        
-        new_platform = execute_query(
-            """
-            INSERT INTO platforms (platform_name, logo_path)
-            VALUES (%s, %s)
-            RETURNING *
-            """,
-            (platform_name, logo_path),
-            fetch=True
-        )
+        platform_id = platform_data.get('id')  
+
+        if not platform_id:
+            return None, "Platform ID is required!"
+
+        query = """
+        INSERT INTO platforms (id, platform_name, logo_path)
+        VALUES (%s, %s, %s)
+        RETURNING *
+        """
+        params = (platform_id, platform_name, logo_path)
+
+        new_platform = execute_query(query, params, fetch=True)
         if new_platform:
+            try:
+                execute_query("SELECT setval('platforms_id_seq', (SELECT MAX(id) FROM platforms))", fetch=False)
+            except Exception:
+                pass 
+
             return new_platform[0], None
+            
         return None, "Failed to create platform"
+        
     except Exception as e:
+        if "duplicate key" in str(e):
+            return None, f"Platform ID {platform_id} already exists!"
         return None, str(e)
 
 

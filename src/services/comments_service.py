@@ -329,32 +329,31 @@ def get_top_reviewers(limit: int = 10):
         return top_reviewers, None
     except Exception as e:
         return None, str(e)
-    
+
+# COMMENT VOTES SERVICES 
 
 def toggle_comment_vote_db(user_id, comment_id, vote_type='like'):
     """
     Toggles a vote. 
-    - If vote exists and is same: Remove vote (Unlike)
-    - If vote exists and is diff: Change vote (Like -> Dislike)
-    - If no vote: Add vote
     """
     try:
-        check_query = "SELECT id, vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
+        check_query = "SELECT vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
         existing_vote = execute_query(check_query, (user_id, comment_id), fetch=True)
+        
         if existing_vote:
             current_type = existing_vote[0]['vote_type']
-            vote_db_id = existing_vote[0]['id']
+            
             if current_type == vote_type:
-                execute_query("DELETE FROM comment_votes WHERE id = %s", (vote_db_id,))
+                execute_query("DELETE FROM comment_votes WHERE user_id = %s AND comment_id = %s", (user_id, comment_id))
                 col = "comment_likes" if vote_type == 'like' else "comment_dislikes"
-                execute_query(f"UPDATE comments SET {col} = {col} - 1 WHERE id = %s", (comment_id,))
+                execute_query(f"UPDATE comments SET {col} = GREATEST(0, {col} - 1) WHERE id = %s", (comment_id,))
                 return {"action": "removed", "type": vote_type}, None
             else:
-                execute_query("UPDATE comment_votes SET vote_type = %s WHERE id = %s", (vote_type, vote_db_id))
+                execute_query("UPDATE comment_votes SET vote_type = %s WHERE user_id = %s AND comment_id = %s", (vote_type, user_id, comment_id))
                 if vote_type == 'like':
-                    execute_query("UPDATE comments SET comment_likes = comment_likes + 1, comment_dislikes = comment_dislikes - 1 WHERE id = %s", (comment_id,))
+                    execute_query("UPDATE comments SET comment_likes = comment_likes + 1, comment_dislikes = GREATEST(0, comment_dislikes - 1) WHERE id = %s", (comment_id,))
                 else:
-                    execute_query("UPDATE comments SET comment_dislikes = comment_dislikes + 1, comment_likes = comment_likes - 1 WHERE id = %s", (comment_id,))
+                    execute_query("UPDATE comments SET comment_dislikes = comment_dislikes + 1, comment_likes = GREATEST(0, comment_likes - 1) WHERE id = %s", (comment_id,))
                 return {"action": "changed", "type": vote_type}, None
         else:
             execute_query("INSERT INTO comment_votes (user_id, comment_id, vote_type) VALUES (%s, %s, %s)", (user_id, comment_id, vote_type))
@@ -368,7 +367,6 @@ def toggle_comment_vote_db(user_id, comment_id, vote_type='like'):
 def get_user_vote_status(user_id, comment_id):
     """
     It finds the user's rating (like/dislike) on a comment. 
-    It uses Raw SQL.
     """
     try:
         query = "SELECT vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
@@ -379,12 +377,11 @@ def get_user_vote_status(user_id, comment_id):
     except Exception as e:
         return None
         
-# comment_votes CRUD operations
 
 def create_vote(user_id, comment_id, vote_type):
     """
     Creates a new vote record in comment_votes table.
-    NOTE: This assumes the user hasn't voted on this comment yet.
+    Fails if the user has already voted on this comment.
     """
     try:
         query = """
@@ -404,21 +401,8 @@ def create_vote(user_id, comment_id, vote_type):
         return new_vote[0], None
 
     except Exception as e:
-        if "unique constraint" in str(e).lower():
+        if "unique" in str(e).lower() or "duplicate" in str(e).lower():
             return None, "User has already voted on this comment"
-        return None, str(e)
-
-
-def get_vote_by_id(vote_id):
-    """Gets a specific vote by its primary key ID"""
-    try:
-        query = "SELECT * FROM comment_votes WHERE id = %s"
-        vote = execute_query(query, (vote_id,), fetch=True)
-        
-        if vote:
-            return vote[0], None
-        return None, "Vote not found"
-    except Exception as e:
         return None, str(e)
 
 
@@ -445,18 +429,17 @@ def get_all_votes_for_comment(comment_id):
         return None, str(e)
 
 
-def update_vote(vote_id, new_vote_type):
+def update_vote(user_id, comment_id, new_vote_type):
     """
-    Updates the vote type (e.g., changing from 'like' to 'dislike').
+    Updates the vote type (e.g., changing from 'like' to 'dislike') using composite key.
     Automatically handles the count adjustments in the comments table.
     """
     try:
-        current_vote, err = get_vote_by_id(vote_id)
+        current_vote, err = get_vote_by_user_and_comment(user_id, comment_id)
         if err:
             return None, err
         
         old_type = current_vote['vote_type']
-        comment_id = current_vote['comment_id']
 
         if old_type == new_vote_type:
             return current_vote, None
@@ -464,10 +447,10 @@ def update_vote(vote_id, new_vote_type):
         update_query = """
             UPDATE comment_votes 
             SET vote_type = %s, created_at = NOW() 
-            WHERE id = %s 
+            WHERE user_id = %s AND comment_id = %s
             RETURNING *
         """
-        updated_vote = execute_query(update_query, (new_vote_type, vote_id), fetch=True)
+        updated_vote = execute_query(update_query, (new_vote_type, user_id, comment_id), fetch=True)
 
         if not updated_vote:
             return None, "Failed to update vote"
@@ -495,21 +478,20 @@ def update_vote(vote_id, new_vote_type):
         return None, str(e)
 
 
-def delete_vote(vote_id):
+def delete_vote(user_id, comment_id):
     """
-    Deletes a vote record.
+    Deletes a vote record using user_id and comment_id.
     Automatically decrements the relevant count in the comments table.
     """
     try:
-        vote_to_delete, err = get_vote_by_id(vote_id)
+        vote_to_delete, err = get_vote_by_user_and_comment(user_id, comment_id)
         if err:
             return None, err
 
         vote_type = vote_to_delete['vote_type']
-        comment_id = vote_to_delete['comment_id']
 
-        delete_query = "DELETE FROM comment_votes WHERE id = %s RETURNING *"
-        deleted_vote = execute_query(delete_query, (vote_id,), fetch=True)
+        delete_query = "DELETE FROM comment_votes WHERE user_id = %s AND comment_id = %s RETURNING *"
+        deleted_vote = execute_query(delete_query, (user_id, comment_id), fetch=True)
 
         if not deleted_vote:
             return None, "Failed to delete vote"
@@ -541,7 +523,7 @@ def get_controversial_movies():
                 COUNT(DISTINCT c.id) AS total_comments,
                 ROUND(AVG(c.rating), 1) AS avg_rating,
                 ROUND(VAR_POP(c.rating), 2) AS polarization_score,
-                COUNT(cv.id) AS community_tension
+                COUNT(cv.comment_id) AS community_tension
             FROM 
                 movies m
             JOIN 
