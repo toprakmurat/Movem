@@ -26,10 +26,6 @@ def create_comment(comment_data):
     try:
         user_id = comment_data.get('user_id')
         movie_id = comment_data.get('movie_id')
-        check_query = "SELECT id FROM comments WHERE user_id = %s AND movie_id = %s"
-        existing_comment = execute_query(check_query, (user_id, movie_id), fetch=True)
-        if existing_comment:
-            return None, "You have already reviewed this movie. Please edit your existing review."
         body = comment_data.get('body')
         if body == "": 
             body = None
