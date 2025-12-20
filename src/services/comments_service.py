@@ -11,9 +11,18 @@ def get_all_comments():
     
     
 def get_comment_by_id(comment_id):
-    """Gets a single comment by its ID"""
+    """Gets a single comment by its ID with LIVE vote counts (3NF Fix)"""
     try:
-        comment = execute_query("SELECT * FROM comments WHERE id = %s", (comment_id,), fetch=True)
+        query = """
+            SELECT 
+                c.*,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'like') as comment_likes,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'dislike') as comment_dislikes
+            FROM comments c 
+            WHERE c.id = %s
+        """
+        comment = execute_query(query, (comment_id,), fetch=True)
+        
         if comment:
             return comment[0], None
         return None, "Comment not found"
@@ -25,24 +34,23 @@ def create_comment(comment_data):
     """Creates a new comment AND updates the movie's average rating"""
     try:
         user_id = comment_data.get('user_id')
-        movie_id = comment_data.get('movie_id')
+        movie_id = comment_data.get('movie_id')        
         body = comment_data.get('body')
         if body == "": 
             body = None
         rating = comment_data.get('rating') 
         if rating is None:
             return None, "Rating is required"
-        comment_likes = comment_data.get('comment_likes', 0)
-        comment_dislikes = comment_data.get('comment_dislikes', 0)
+
         has_spoiler = comment_data.get('has_spoiler', False)
 
         new_comment_list = execute_query(
             """
-            INSERT INTO comments (user_id, movie_id, body, rating, comment_likes, comment_dislikes, has_spoiler)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO comments (user_id, movie_id, body, rating, has_spoiler)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING *
             """,
-            (user_id, movie_id, body, rating, comment_likes, comment_dislikes, has_spoiler),
+            (user_id, movie_id, body, rating, has_spoiler),
             fetch=True
         )
         
@@ -183,11 +191,16 @@ def delete_comment_by_id(comment_id):
 def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all', user_id=None):
     """
     Gets comments with filtering, sorting AND username (JOIN).
-    Also checks user vote status if user_id is provided.
+    3NF DEĞİŞİKLİĞİ: Like ve Dislike sayıları comment_votes tablosundan CANLI sayılıyor.
     """
     try:
         query = """
-            SELECT c.*, u.username as author, u.profile_picture as avatar
+            SELECT 
+                c.*, 
+                u.username as author, 
+                u.profile_picture as avatar,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'like') as comment_likes,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'dislike') as comment_dislikes
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.movie_id = %s
@@ -206,7 +219,7 @@ def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all', use
         elif sort_by == 'rating_asc':
             query += " ORDER BY c.rating ASC"
         elif sort_by == 'likes':
-            query += " ORDER BY c.comment_likes DESC"
+            query += " ORDER BY comment_likes DESC"
         else:
             query += " ORDER BY c.created_at DESC"
 
@@ -229,19 +242,24 @@ def get_comments_for_movie(movie_id, sort_by='newest', spoiler_filter='all', use
 
 
 def get_comments_for_movie_sorted(movie_id, sort_order="DESC"):
-    """Gets all comments for a movie, sorted by rating"""
+    """Gets all comments for a movie, sorted by rating, WITH LIVE VOTE COUNTS"""
     if sort_order.upper() not in ["ASC", "DESC"]:
         sort_order = "DESC"
         
     try:
-        comments = execute_query(
-            f"""
-            SELECT * FROM comments 
-            WHERE movie_id = %s AND rating IS NOT NULL
-            ORDER BY rating {sort_order}, created_at DESC
-            """,
-            (movie_id,), fetch=True
-        )
+
+        query = f"""
+            SELECT 
+                c.*,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'like') as comment_likes,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'dislike') as comment_dislikes
+            FROM comments c 
+            WHERE c.movie_id = %s AND c.rating IS NOT NULL
+            ORDER BY c.rating {sort_order}, c.created_at DESC
+        """
+        
+        comments = execute_query(query, (movie_id,), fetch=True)
+        
         if comments:
             return comments, None
         return None, "No rated comments found for this movie"
@@ -250,38 +268,23 @@ def get_comments_for_movie_sorted(movie_id, sort_order="DESC"):
 
 
 def like_comment(comment_id):
-    """Increments the 'comment_likes' count"""
-    try:
-        updated = execute_query(
-            "UPDATE comments SET comment_likes = comment_likes + 1 WHERE id = %s RETURNING *",
-            (comment_id,), fetch=True
-        )
-        if updated:
-            return updated[0], None
-        return None, "Comment not found"
-    except Exception as e:
-        return None, str(e)
+    """
+    DEPRECATED in 3NF: This function updates 'comment_likes' column which no longer exists.
+    Use 'toggle_comment_vote_db' instead.
+    """
+    return None, "This method is deprecated in 3NF structure."
 
 
 def dislike_comment(comment_id):
-    """Increments the 'comment_dislikes' count"""
-    try:
-        updated = execute_query(
-            "UPDATE comments SET comment_dislikes = comment_dislikes + 1 WHERE id = %s RETURNING *",
-            (comment_id,), fetch=True
-        )
-        if updated:
-            return updated[0], None
-        return None, "Comment not found"
-    except Exception as e:
-        return None, str(e)
+    """
+    DEPRECATED in 3NF: This function updates 'comment_dislikes' column which no longer exists.
+    Use 'toggle_comment_vote_db' instead.
+    """
+    return None, "This method is deprecated in 3NF structure."
     
 
 def get_comments_by_user(user_id):
-    """
-    Get all reviews/ratings made by a specific user.
-    Joins with movies table to show movie title and poster.
-    """
+    """Get all reviews/ratings made by a specific user."""
     try:
         query = """
             SELECT 
@@ -304,10 +307,6 @@ def get_comments_by_user(user_id):
     
 
 def get_top_reviewers(limit: int = 10):
-    """
-    Fetches the top reviewers based on the total number of comments made.
-    Joins with users table to get username and avatar.
-    """
     try:
         query = """
             SELECT
@@ -330,7 +329,7 @@ def get_top_reviewers(limit: int = 10):
 
 def toggle_comment_vote_db(user_id, comment_id, vote_type='like'):
     """
-    Toggles a vote. 
+    Toggles a vote. 3NF VERSION: Updates ONLY comment_votes table.
     """
     try:
         check_query = "SELECT vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
@@ -341,29 +340,18 @@ def toggle_comment_vote_db(user_id, comment_id, vote_type='like'):
             
             if current_type == vote_type:
                 execute_query("DELETE FROM comment_votes WHERE user_id = %s AND comment_id = %s", (user_id, comment_id))
-                col = "comment_likes" if vote_type == 'like' else "comment_dislikes"
-                execute_query(f"UPDATE comments SET {col} = GREATEST(0, {col} - 1) WHERE id = %s", (comment_id,))
                 return {"action": "removed", "type": vote_type}, None
             else:
                 execute_query("UPDATE comment_votes SET vote_type = %s WHERE user_id = %s AND comment_id = %s", (vote_type, user_id, comment_id))
-                if vote_type == 'like':
-                    execute_query("UPDATE comments SET comment_likes = comment_likes + 1, comment_dislikes = GREATEST(0, comment_dislikes - 1) WHERE id = %s", (comment_id,))
-                else:
-                    execute_query("UPDATE comments SET comment_dislikes = comment_dislikes + 1, comment_likes = GREATEST(0, comment_likes - 1) WHERE id = %s", (comment_id,))
                 return {"action": "changed", "type": vote_type}, None
         else:
             execute_query("INSERT INTO comment_votes (user_id, comment_id, vote_type) VALUES (%s, %s, %s)", (user_id, comment_id, vote_type))
-            col = "comment_likes" if vote_type == 'like' else "comment_dislikes"
-            execute_query(f"UPDATE comments SET {col} = {col} + 1 WHERE id = %s", (comment_id,))
             return {"action": "added", "type": vote_type}, None
     except Exception as e:
         return None, str(e)
     
 
 def get_user_vote_status(user_id, comment_id):
-    """
-    It finds the user's rating (like/dislike) on a comment. 
-    """
     try:
         query = "SELECT vote_type FROM comment_votes WHERE user_id = %s AND comment_id = %s"
         result = execute_query(query, (user_id, comment_id), fetch=True)
@@ -377,7 +365,7 @@ def get_user_vote_status(user_id, comment_id):
 def create_vote(user_id, comment_id, vote_type):
     """
     Creates a new vote record in comment_votes table.
-    Fails if the user has already voted on this comment.
+    3NF VERSION: Does NOT update comments table stats.
     """
     try:
         query = """
@@ -389,11 +377,6 @@ def create_vote(user_id, comment_id, vote_type):
         
         if not new_vote:
             return None, "Failed to create vote record"
-
-        col_to_inc = "comment_likes" if vote_type == 'like' else "comment_dislikes"
-        update_stats_query = f"UPDATE comments SET {col_to_inc} = {col_to_inc} + 1 WHERE id = %s"
-        execute_query(update_stats_query, (comment_id,))
-
         return new_vote[0], None
 
     except Exception as e:
@@ -427,8 +410,8 @@ def get_all_votes_for_comment(comment_id):
 
 def update_vote(user_id, comment_id, new_vote_type):
     """
-    Updates the vote type (e.g., changing from 'like' to 'dislike') using composite key.
-    Automatically handles the count adjustments in the comments table.
+    Updates the vote type.
+    3NF VERSION: Updates only comment_votes.
     """
     try:
         current_vote, err = get_vote_by_user_and_comment(user_id, comment_id)
@@ -450,24 +433,6 @@ def update_vote(user_id, comment_id, new_vote_type):
 
         if not updated_vote:
             return None, "Failed to update vote"
-
-        if new_vote_type == 'like':
-            stats_query = """
-                UPDATE comments 
-                SET comment_dislikes = GREATEST(0, comment_dislikes - 1), 
-                    comment_likes = comment_likes + 1 
-                WHERE id = %s
-            """
-        else:
-            stats_query = """
-                UPDATE comments 
-                SET comment_likes = GREATEST(0, comment_likes - 1), 
-                    comment_dislikes = comment_dislikes + 1 
-                WHERE id = %s
-            """
-        
-        execute_query(stats_query, (comment_id,))
-
         return updated_vote[0], None
 
     except Exception as e:
@@ -476,26 +441,19 @@ def update_vote(user_id, comment_id, new_vote_type):
 
 def delete_vote(user_id, comment_id):
     """
-    Deletes a vote record using user_id and comment_id.
-    Automatically decrements the relevant count in the comments table.
+    Deletes a vote record.
+    3NF VERSION: Updates only comment_votes.
     """
     try:
         vote_to_delete, err = get_vote_by_user_and_comment(user_id, comment_id)
         if err:
             return None, err
 
-        vote_type = vote_to_delete['vote_type']
-
         delete_query = "DELETE FROM comment_votes WHERE user_id = %s AND comment_id = %s RETURNING *"
         deleted_vote = execute_query(delete_query, (user_id, comment_id), fetch=True)
 
         if not deleted_vote:
             return None, "Failed to delete vote"
-
-        col_to_dec = "comment_likes" if vote_type == 'like' else "comment_dislikes"
-        stats_query = f"UPDATE comments SET {col_to_dec} = GREATEST(0, {col_to_dec} - 1) WHERE id = %s"
-        execute_query(stats_query, (comment_id,))
-
         return deleted_vote[0], None
 
     except Exception as e:
@@ -503,12 +461,6 @@ def delete_vote(user_id, comment_id):
     
 
 def get_controversial_movies():
-    """
-    COMPLEX QUERY:
-    Finds 'Polarizing' movies where users strongly disagree (high rating variance)
-    and engage heavily in comments (high comment votes).
-    Rules: Nested Query, 6 Table Joins, Group By, Outer Join, Aggregation (Variance).
-    """
     try:
         query = """
             SELECT 
@@ -519,15 +471,18 @@ def get_controversial_movies():
                 COUNT(DISTINCT c.id) AS total_comments,
                 ROUND(AVG(c.rating), 1) AS avg_rating,
                 ROUND(VAR_POP(c.rating), 2) AS polarization_score,
-                COUNT(cv.comment_id) AS community_tension
+                (
+                    SELECT COUNT(*) 
+                    FROM comment_votes cv
+                    JOIN comments c2 ON cv.comment_id = c2.id
+                    WHERE c2.movie_id = m.id
+                ) AS community_tension
             FROM 
                 movies m
             JOIN 
                 statistic s ON m.id = s.movie_id
             JOIN 
-                comments c ON m.id = c.movie_id
-            LEFT JOIN 
-                comment_votes cv ON c.id = cv.comment_id
+                comments c ON m.id = c.movie_id            
             JOIN 
                 movies_genres mg ON m.id = mg.movie_id
             JOIN 
@@ -553,14 +508,15 @@ def get_controversial_movies():
     except Exception as e:
         return None, str(e)
     
-# For Admin page
 
 def get_all_comments_detailed(page=1, per_page=20, search_query=None):
     offset = (page - 1) * per_page
     params = []
     
     sql = """
-        SELECT c.*, u.username, m.title as movie_title 
+        SELECT c.*, u.username, m.title as movie_title,
+        (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'like') as comment_likes,
+        (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'dislike') as comment_dislikes 
         FROM comments c
         JOIN users u ON c.user_id = u.id
         JOIN movies m ON c.movie_id = m.id

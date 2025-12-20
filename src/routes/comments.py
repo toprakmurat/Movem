@@ -8,16 +8,13 @@ from src.services.comments_service import (
     delete_comment_by_id,
     get_comments_for_movie,
     get_comments_for_movie_sorted,
-    like_comment,
-    dislike_comment,
     toggle_comment_vote_db,
     get_user_vote_status,
     create_vote,
     update_vote,
     delete_vote,
     get_vote_by_user_and_comment,
-    get_controversial_movies,
-    get_all_votes_detailed
+    get_controversial_movies
 )
 from src.services.movie_service import get_movies_paginated_db
 
@@ -121,23 +118,29 @@ def get_comments_worst_route(movie_id):
 
 
 @comments_bp.route('/<int:comment_id>/like', methods=['POST'])
+@login_required
 def like_comment_route(comment_id):
-    updated, err = like_comment(comment_id)
+    """
+    Refactored for 3NF: Uses toggle_comment_vote_db instead of deprecated column updates.
+    Requires login because user_id is mandatory for the votes table.
+    """
+    result, err = toggle_comment_vote_db(current_user.id, comment_id, 'like')
     if err:
-        if err == "Comment not found":
-            return jsonify({"message": err}), 404
         return jsonify({"error": err}), 500
-    return jsonify(dict(updated)), 200
+    return jsonify(result), 200
 
     
 @comments_bp.route('/<int:comment_id>/dislike', methods=['POST'])
+@login_required
 def dislike_comment_route(comment_id):
-    updated, err = dislike_comment(comment_id)
+    """
+    Refactored for 3NF: Uses toggle_comment_vote_db instead of deprecated column updates.
+    Requires login because user_id is mandatory for the votes table.
+    """
+    result, err = toggle_comment_vote_db(current_user.id, comment_id, 'dislike')
     if err:
-        if err == "Comment not found":
-            return jsonify({"message": err}), 404
         return jsonify({"error": err}), 500
-    return jsonify(dict(updated)), 200
+    return jsonify(result), 200
 
 
 @comments_bp.route('/<int:comment_id>/vote', methods=['POST'])
@@ -152,6 +155,7 @@ def vote_comment_route(comment_id):
     updated_comment, _ = get_comment_by_id(comment_id)
     comment_data = dict(updated_comment)
     status = get_user_vote_status(current_user.id, comment_id)
+    
     return jsonify({
         'success': True,
         'likes': comment_data.get('comment_likes', 0),
@@ -171,6 +175,7 @@ def battleground_page():
     top_movies = [dict(m) for m in movies] if (not err and movies) else []
     searched_movie = None
     search_error = False
+    
     if request.method == 'POST':
         query = request.form.get('search_query')
         if query:
@@ -182,14 +187,17 @@ def battleground_page():
                 found_items = result['items']
             elif isinstance(result, list): 
                 found_items = result
+            
             if found_items:
                 movie = found_items[0]
                 movie_dict = dict(movie) if not isinstance(movie, dict) else movie.copy()
                 comments, _ = get_comments_for_movie(movie_dict['id'])
                 if not comments: comments = []
+                
                 total_comments = len(comments)
                 interactions = 0
                 ratings = []
+                
                 for c in comments:
                     c_dict = dict(c)
                     likes = c_dict.get('comment_likes') or 0
@@ -197,12 +205,14 @@ def battleground_page():
                     interactions += (likes + dislikes)
                     if c_dict.get('rating') is not None:
                         ratings.append(float(c_dict['rating']))
+                
                 if len(ratings) > 1:
                     mean = sum(ratings) / len(ratings)
                     variance = sum((x - mean) ** 2 for x in ratings) / len(ratings)
                     score = variance
                 else:
                     score = 0.0
+                
                 movie_dict['movie_id'] = movie_dict['id']
                 movie_dict['total_comments'] = total_comments
                 movie_dict['community_tension'] = interactions
@@ -210,6 +220,7 @@ def battleground_page():
                 searched_movie = movie_dict
             else:
                 search_error = True
+                
     return render_template(
         'battleground.html', 
         movies=top_movies, 
@@ -217,7 +228,7 @@ def battleground_page():
         search_error=search_error
     )
 
-# COMMENT VOTES ROUTES
+# --- COMMENT VOTES ROUTES (ADMIN & API) ---
 
 @comments_bp.route('/votes', methods=['GET'])
 @login_required
@@ -241,7 +252,8 @@ def get_vote_route():
 @login_required
 def create_vote_route():
     """
-    Directly create a vote record
+    Directly create a vote record. 
+    Returns a success message instead of the object to prevent date serialization errors.
     """
     data = request.get_json()
     comment_id = data.get('comment_id')
@@ -261,35 +273,40 @@ def create_vote_route():
         if "already voted" in str(err) or "unique" in str(err) or "duplicate" in str(err):
              return jsonify({"error": "This user has already voted on this comment."}), 409
         return jsonify({"error": err}), 400
-        
-    return jsonify(dict(new_vote)), 201
+    
+    return jsonify({"message": "Vote created successfully", "success": True}), 201
 
 
 @comments_bp.route('/votes', methods=['PUT', 'PATCH'])
 @login_required
 def update_vote_route():
     """
-    Update a vote (e.g. change 'like' to 'dislike').
-    Expects JSON: { "user_id": 1, "comment_id": 2, "vote_type": "dislike" }
+    Update a vote (e.g., change 'like' to 'dislike').
+    Returns a success message instead of the object to prevent date serialization errors.
     """
     data = request.get_json()
-    user_id = data.get('user_id')
-    comment_id = data.get('comment_id')
+    try:
+        user_id = int(data.get('user_id'))
+        comment_id = int(data.get('comment_id'))
+    except (TypeError, ValueError):
+        return jsonify({"error": "User ID and Comment ID must be numbers"}), 400
+        
     new_type = data.get('vote_type')
 
-    if not user_id or not comment_id or not new_type:
-        return jsonify({"error": "Missing user_id, comment_id or vote_type"}), 400
+    if not new_type:
+        return jsonify({"error": "Missing vote_type"}), 400
 
     if new_type not in ['like', 'dislike']:
         return jsonify({"error": "Invalid vote type"}), 400
 
-    if int(user_id) != current_user.id and current_user.role != 'admin':
+    if user_id != current_user.id and current_user.role != 'admin':
         return jsonify({"error": "Unauthorized"}), 403
 
     updated_vote, err = update_vote(user_id, comment_id, new_type)
     if err:
         return jsonify({"error": err}), 500
-    return jsonify(dict(updated_vote)), 200
+    
+    return jsonify({"message": "Vote updated successfully", "success": True}), 200
 
 
 @comments_bp.route('/votes', methods=['DELETE'])
@@ -297,9 +314,15 @@ def update_vote_route():
 def delete_vote_route():
     """
     Delete a vote permanently using user_id and comment_id.
+    Returns a success message instead of the object to prevent date serialization errors.
     """
     user_id = request.args.get('user_id')
     comment_id = request.args.get('comment_id')
+
+    if not (user_id and comment_id):
+        data = request.get_json(silent=True) or {}
+        user_id = data.get('user_id')
+        comment_id = data.get('comment_id')
 
     if not user_id or not comment_id:
         return jsonify({"error": "Missing user_id or comment_id"}), 400
@@ -309,5 +332,6 @@ def delete_vote_route():
 
     deleted, err = delete_vote(user_id, comment_id)
     if err:
-        return jsonify({"error": err}), 500   
-    return jsonify({"message": "Vote deleted successfully", "vote": dict(deleted)}), 200
+        return jsonify({"error": err}), 500
+        
+    return jsonify({"message": "Vote deleted successfully", "success": True}), 200

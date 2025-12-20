@@ -22,7 +22,7 @@
 \copy movies_genres(movie_id, genre_id) FROM '/docker-entrypoint-initdb.d/csv/db_movies_genres.csv' DELIMITER ',' CSV HEADER
 
 -- comments
-\copy comments(user_id, movie_id, body, rating, created_at, comment_likes, comment_dislikes) FROM '/docker-entrypoint-initdb.d/csv/db_comments.csv' DELIMITER ',' CSV HEADER
+\copy comments(user_id, movie_id, body, rating, created_at) FROM '/docker-entrypoint-initdb.d/csv/db_comments.csv' DELIMITER ',' CSV HEADER
 
 -- Comment Votes
 \copy comment_votes(user_id, comment_id, vote_type) FROM '/docker-entrypoint-initdb.d/csv/db_comment_votes.csv' DELIMITER ',' CSV HEADER
