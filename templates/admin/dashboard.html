@@ -1264,19 +1264,45 @@
                 </div>
             </div>
 
-            <!-- Search Person by ID -->
+            <!-- Search Person -->
             <div class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 p-6 rounded-xl">
-                <h3 class="text-lg font-semibold text-white mb-4">🔍 Search Person by ID</h3>
-                <form onsubmit="searchPersonById(event)" class="space-y-4">
-                    <div class="flex gap-2">
-                        <input id="person-search-id" type="number" placeholder="Enter Person ID"
-                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
-                        <button type="submit"
-                            class="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition">
-                            Search
-                        </button>
+                <h3 class="text-lg font-semibold text-white mb-4">🔍 Search Person</h3>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Search by ID -->
+                    <form onsubmit="searchPersonById(event)" class="space-y-2">
+                        <label class="text-xs text-white/60 uppercase tracking-wider">By ID</label>
+                        <div class="flex gap-2">
+                            <input id="person-search-id" type="number" placeholder="Enter Person ID"
+                                class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
+                            <button type="submit"
+                                class="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Search by Name -->
+                    <form onsubmit="searchPersonByName(event)" class="space-y-2">
+                        <label class="text-xs text-white/60 uppercase tracking-wider">By Name</label>
+                        <div class="flex gap-2">
+                            <input id="person-search-name" type="text" placeholder="Enter Person Name"
+                                class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
+                            <button type="submit"
+                                class="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Search Results for Name Search -->
+                <div id="person-name-search-results" class="mt-4 hidden bg-black/40 border border-white/10 p-3 rounded-xl space-y-2 z-40">
+                    <h4 class="text-sm font-semibold text-purple-300 mb-2">Search Results:</h4>
+                    <div id="person-name-results-list" class="space-y-2 max-h-[400px] overflow-y-auto">
+                        <!-- Results will be populated here -->
                     </div>
-                </form>
+                </div>
 
                 <!-- Search Result Display -->
                 <div id="person-search-result" class="mt-4 hidden">
@@ -1367,32 +1393,26 @@
                         </thead>
                         <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-2 py-1 font-mono">id</td>
-                                <td class="px-2 py-1">SERIAL</td>
-                                <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">PK</td>
-                            </tr>
-                            <tr>
                                 <td class="px-2 py-1 font-mono">movie_id</td>
                                 <td class="px-2 py-1">INTEGER</td>
-                                <td class="px-2 py-1">YES</td>
-                                <td class="px-2 py-1">FK → movies</td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK, FK → movies</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">person_id</td>
                                 <td class="px-2 py-1">INTEGER</td>
-                                <td class="px-2 py-1">YES</td>
-                                <td class="px-2 py-1">FK → people</td>
-                            </tr>
-                            <tr>
-                                <td class="px-2 py-1 font-mono">role</td>
-                                <td class="px-2 py-1">VARCHAR(100)</td>
-                                <td class="px-2 py-1">YES</td>
-                                <td class="px-2 py-1"></td>
+                                <td class="px-2 py-1">NO</td>
+                                <td class="px-2 py-1">PK, FK → people</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">character_name</td>
                                 <td class="px-2 py-1">VARCHAR(1024)</td>
+                                <td class="px-2 py-1">NO (default 'Unknown')</td>
+                                <td class="px-2 py-1">PK</td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">role</td>
+                                <td class="px-2 py-1">VARCHAR(100)</td>
                                 <td class="px-2 py-1">YES</td>
                                 <td class="px-2 py-1"></td>
                             </tr>
@@ -1427,7 +1447,7 @@
                 <div
                     class="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 p-6 rounded-xl">
                     <h3 class="text-lg font-semibold text-white mb-4">👤 Search Person by Name</h3>
-                    <form onsubmit="searchPersonByName(event)" class="space-y-4">
+                    <form onsubmit="searchPersonByNameForCast(event)" class="space-y-4">
                         <input id="person-name-search" type="text" placeholder="Enter person name..."
                             class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white">
                         <button type="submit"
@@ -1436,7 +1456,7 @@
                         </button>
                     </form>
 
-                    <div id="person-search-results" class="mt-4 hidden">
+                    <div id="person-search-results" class="mt-4 hidden bg-black/40 border border-white/10 p-3 rounded-xl space-y-2 z-40">
                         <h4 class="text-sm font-semibold text-purple-300 mb-2">Results:</h4>
                         <div id="person-results-list" class="space-y-2 max-h-[300px] overflow-y-auto">
                             <!-- Results will be populated here -->
@@ -1468,18 +1488,20 @@
                 <!-- Update Movie Cast Form -->
                 <div class="bg-black/50 p-6 rounded-2xl border border-white/5">
                     <h4 class="text-lg font-semibold text-white mb-4">✏️ Update Cast Entry</h4>
+                    <p class="text-xs text-yellow-300/70 mb-3">⚠️ Only ROLE can be updated. To change movie_id, person_id, or character_name, delete and recreate.</p>
                     <form onsubmit="updateMovieCast(event)" class="space-y-4">
-                        <input id="update-cast-id" name="id" type="number" placeholder="Cast Entry ID (Required)"
+                        <input id="update-cast-movie-id" name="movie_id" type="number" placeholder="Movie ID (Required - PK)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <input id="update-cast-movie-id" name="movie_id" type="number" placeholder="Movie ID"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        <input id="update-cast-person-id" name="person_id" type="number" placeholder="Person ID"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        <input id="update-cast-role" name="role" placeholder="Role"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        <input id="update-cast-character" name="character_name" placeholder="Character Name"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input id="update-cast-person-id" name="person_id" type="number" placeholder="Person ID (Required - PK)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input id="update-cast-character" name="character_name" placeholder="Character Name (Required - PK)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input id="update-cast-role" name="role" placeholder="New Role (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
                         <button type="submit"
                             class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">
                             Update Cast Entry
@@ -1496,17 +1518,16 @@
                         <thead
                             class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-0 bg-black/80">
                             <tr>
-                                <th class="px-4 py-2">ID</th>
-                                <th class="px-4 py-2">Movie</th>
+                                <th class="px-4 py-2">Movie Title</th>
                                 <th class="px-4 py-2">Person</th>
-                                <th class="px-4 py-2">Role</th>
                                 <th class="px-4 py-2">Character</th>
+                                <th class="px-4 py-2">Role</th>
                                 <th class="px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="movie-cast-table-body" class="divide-y divide-white/5">
                             <tr>
-                                <td colspan="6" class="px-4 py-3 text-center text-white/40">
+                                <td colspan="5" class="px-4 py-3 text-center text-white/40">
                                     Click "Load Cast Entries" to view data
                                 </td>
                             </tr>
@@ -2498,7 +2519,66 @@
     function closePersonSearch() {
         document.getElementById('person-search-result').classList.add('hidden');
         document.getElementById('person-search-id').value = '';
+        // document.getElementById('person-search-name').value = '';
+        document.getElementById('person-name-search-results').classList.add('hidden');
         currentPersonId = null;
+    }
+
+    async function searchPersonByName(event) {
+        event.preventDefault();
+        const inputElement = document.getElementById('person-search-name');
+        const personName = inputElement ? inputElement.value.trim() : '';
+
+        if (!personName) {
+            alert('Please enter a person name');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/actors/?q=${encodeURIComponent(personName)}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+
+            if (response.ok && data.actors && data.actors.length > 0) {
+                displayPersonNameResults(data.actors);
+            } else {
+                alert('No people found matching "' + personName + '"');
+                document.getElementById('person-name-search-results').classList.add('hidden');
+            }
+        } catch (error) {
+            alert('Search failed: ' + error);
+            document.getElementById('person-name-search-results').classList.add('hidden');
+        }
+    }
+
+    function displayPersonNameResults(people) {
+        const resultsDiv = document.getElementById('person-name-results-list');
+        resultsDiv.innerHTML = '';
+
+        people.forEach(person => {
+            const resultCard = document.createElement('div');
+            resultCard.className = 'bg-black/40 border border-white/10 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition';
+            resultCard.onclick = () => {
+                currentPersonId = person.id;
+                displayPersonDetails(person);
+                document.getElementById('person-name-search-results').classList.add('hidden');
+            };
+
+            resultCard.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-1 min-w-0">
+                        <h5 class="text-white font-semibold truncate">${person.name}</h5>
+                        <p class="text-white/50 text-xs">ID: ${person.id} • ${person.movie_count || 0} movies</p>
+                        ${person.birth_date ? `<p class="text-white/40 text-xs mt-1">Born: ${person.birth_date}</p>` : ''}
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.appendChild(resultCard);
+        });
+
+        document.getElementById('person-name-search-results').classList.remove('hidden');
     }
 
     function editPerson() {
@@ -2640,15 +2720,16 @@
 
                 if (data.cast_entries && data.cast_entries.length > 0) {
                     data.cast_entries.forEach(entry => {
+                        const personName = `${entry.name || 'Person #' + entry.id} (${entry.id})`;
+                        const encodedCharName = encodeURIComponent(entry.character_name || 'Unknown');
                         const row = `
                             <tr class="hover:bg-white/5 transition">
-                                <td class="px-4 py-2 font-mono text-orange-300">${entry.cast_entry_id || '-'}</td>
                                 <td class="px-4 py-2">${movieTitle}</td>
-                                <td class="px-4 py-2">${entry.name || 'Person #' + entry.person_id}</td>
+                                <td class="px-4 py-2">${personName}</td>
+                                <td class="px-4 py-2 truncate max-w-xs" title="${entry.character_name || 'Unknown'}">${entry.character_name || 'Unknown'}</td>
                                 <td class="px-4 py-2">${entry.role || '-'}</td>
-                                <td class="px-4 py-2 truncate max-w-xs" title="${entry.character_name || ''}">${entry.character_name || '-'}</td>
                                 <td class="px-4 py-2">
-                                    <button onclick="deleteMovieCastFromTable(${entry.cast_entry_id})" 
+                                    <button onclick="deleteMovieCastFromTable(${movieId}, ${entry.id}, '${encodedCharName}')" 
                                         class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-2 py-1 rounded text-xs border border-red-500/20 transition">
                                         Delete
                                     </button>
@@ -2661,7 +2742,7 @@
                     // Clear pagination for movie-specific view
                     document.getElementById('movie-cast-pagination').innerHTML = '';
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-3 text-center text-white/40">No cast entries found for this movie</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-center text-white/40">No cast entries found for this movie</td></tr>';
                     document.getElementById('movie-cast-pagination').innerHTML = '';
                 }
             } else {
@@ -2689,15 +2770,17 @@
 
                 if (data.cast_entries && data.cast_entries.length > 0) {
                     data.cast_entries.forEach(entry => {
+                        const encodedCharName = encodeURIComponent(entry.character_name || 'Unknown');
+                        const movieName = `${entry.movie_title || 'Movie #' + entry.movie_id} (${entry.movie_id})`;
+                        const personName = `${entry.person_name || 'Person #' + entry.person_id} (${entry.person_id})`;
                         const row = `
                             <tr class="hover:bg-white/5 transition">
-                                <td class="px-4 py-2 font-mono text-orange-300">${entry.id}</td>
-                                <td class="px-4 py-2">${entry.movie_title || 'Movie #' + entry.movie_id}</td>
-                                <td class="px-4 py-2">${entry.person_name || 'Person #' + entry.person_id}</td>
+                                <td class="px-4 py-2">${movieName}</td>
+                                <td class="px-4 py-2">${personName}</td>
+                                <td class="px-4 py-2 truncate max-w-xs" title="${entry.character_name || 'Unknown'}">${entry.character_name || 'Unknown'}</td>
                                 <td class="px-4 py-2">${entry.role || '-'}</td>
-                                <td class="px-4 py-2 truncate max-w-xs" title="${entry.character_name || ''}">${entry.character_name || '-'}</td>
                                 <td class="px-4 py-2">
-                                    <button onclick="deleteMovieCastFromTable(${entry.id})" 
+                                    <button onclick="deleteMovieCastFromTable(${entry.movie_id}, ${entry.person_id}, '${encodedCharName}')" 
                                         class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-2 py-1 rounded text-xs border border-red-500/20 transition">
                                         Delete
                                     </button>
@@ -2714,7 +2797,7 @@
                         document.getElementById('movie-cast-pagination').innerHTML = '';
                     }
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-3 text-center text-white/40">No entries found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-center text-white/40">No entries found</td></tr>';
                 }
             } else {
                 alert('Error loading cast entries: ' + (data.error || 'Unknown error'));
@@ -2746,45 +2829,22 @@
 
     async function searchMovieCastById(event) {
         event.preventDefault();
-        const castId = document.getElementById('movie-cast-search-id').value;
-
-        if (!castId) {
-            alert('Please enter a cast entry ID');
-            return;
-        }
-
-        try {
-            const response = await fetch(`/movie_cast/${castId}`);
-            const data = await response.json();
-
-            if (response.ok && data.cast_entry) {
-                currentCastId = data.cast_entry[0].id;
-                displayMovieCastDetails(data.cast_entry[0]);
-            } else {
-                alert('Error: ' + (data.error || 'Cast entry not found'));
-                document.getElementById('movie-cast-search-result').classList.add('hidden');
-            }
-        } catch (error) {
-            alert('Search failed: ' + error);
-            document.getElementById('movie-cast-search-result').classList.add('hidden');
-        }
+        alert('Search by ID is no longer available. Movie cast uses composite primary key (movie_id, person_id, character_name). Please use movie search to find cast entries.');
+        return;
     }
 
     function displayMovieCastDetails(entry) {
         const detailsDiv = document.getElementById('movie-cast-details');
         detailsDiv.innerHTML = `
             <div class="grid grid-cols-2 gap-2">
-                <span class="text-white/50">ID:</span>
-                <span class="text-orange-300 font-mono">${entry.id}</span>
-                
-                <span class="text-white/50">Movie ID:</span>
-                <span class="text-white">${entry.movie_id}</span>
+                <span class="text-white/50">Movie ID (PK):</span>
+                <span class="text-orange-300 font-mono">${entry.movie_id}</span>
                 
                 <span class="text-white/50">Movie Title:</span>
                 <span class="text-white">${entry.movie_title || '-'}</span>
                 
-                <span class="text-white/50">Person ID:</span>
-                <span class="text-white">${entry.person_id}</span>
+                <span class="text-white/50">Person ID (PK):</span>
+                <span class="text-orange-300 font-mono">${entry.person_id}</span>
                 
                 <span class="text-white/50">Person Name:</span>
                 <span class="text-white">${entry.person_name || '-'}</span>
@@ -2824,33 +2884,16 @@
     }
 
     async function deleteMovieCastEntry() {
-        if (!currentCastId) return;
-
-        if (!confirm(`Are you sure you want to delete cast entry ID ${currentCastId}?`)) return;
-
-        try {
-            const response = await fetch(`/movie_cast/${currentCastId}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert('Cast entry deleted successfully!');
-                closeMovieCastSearch();
-                loadMovieCastEntries(1);
-            } else {
-                const data = await response.json();
-                alert('Error: ' + (data.error || 'Failed to delete cast entry'));
-            }
-        } catch (error) {
-            alert('Delete failed: ' + error);
-        }
+        alert('Delete from search is disabled. Use the delete button in the table view or search for the movie to see its cast.');
+        return;
     }
 
-    async function deleteMovieCastFromTable(castId) {
-        if (!confirm(`Are you sure you want to delete cast entry ID ${castId}?`)) return;
+    async function deleteMovieCastFromTable(movieId, personId, characterName) {
+        const decodedCharName = decodeURIComponent(characterName);
+        if (!confirm(`Are you sure you want to delete cast entry (Movie: ${movieId}, Person: ${personId}, Character: ${decodedCharName})?`)) return;
 
         try {
-            const response = await fetch(`/movie_cast/${castId}`, {
+            const response = await fetch(`/movie_cast/${movieId}/${personId}/${characterName}`, {
                 method: 'DELETE'
             });
 
@@ -2903,26 +2946,26 @@
         event.preventDefault();
 
         const formData = new FormData(event.target);
-        const castId = parseInt(formData.get('id'));
+        const movieId = parseInt(formData.get('movie_id'));
+        const personId = parseInt(formData.get('person_id'));
+        const characterName = formData.get('character_name') || 'Unknown';
+        const role = formData.get('role');
 
-        if (!castId) {
-            alert('Cast Entry ID is required');
+        if (!movieId || !personId || !characterName) {
+            alert('Movie ID, Person ID, and Character Name are required to identify the entry');
             return;
         }
 
-        const updateData = {};
-        if (formData.get('movie_id')) updateData.movie_id = parseInt(formData.get('movie_id'));
-        if (formData.get('person_id')) updateData.person_id = parseInt(formData.get('person_id'));
-        if (formData.get('role')) updateData.role = formData.get('role');
-        if (formData.get('character_name')) updateData.character_name = formData.get('character_name');
-
-        if (Object.keys(updateData).length === 0) {
-            alert('Please provide at least one field to update');
+        if (!role) {
+            alert('Role is required for update (only field that can be updated)');
             return;
         }
+
+        const updateData = { role: role };
 
         try {
-            const response = await fetch(`/movie_cast/${castId}`, {
+            const encodedCharName = encodeURIComponent(characterName);
+            const response = await fetch(`/movie_cast/${movieId}/${personId}/${encodedCharName}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updateData)
@@ -2931,7 +2974,7 @@
             const data = await response.json();
 
             if (response.ok) {
-                alert('Cast entry updated successfully!\n' + JSON.stringify(data, null, 2));
+                alert('Cast entry updated successfully!\nNote: Only role can be updated. To change movie_id, person_id, or character_name, delete and recreate the entry.\n' + JSON.stringify(data, null, 2));
                 event.target.reset();
                 loadMovieCastEntries(1);
             } else {
@@ -2998,8 +3041,8 @@
         });
     }
 
-    // Search People by Name
-    async function searchPersonByName(event) {
+    // Search People by Name (alternate/duplicate definition renamed to avoid collision)
+    async function searchPersonByName_alt(event) {
         event.preventDefault();
         const searchQuery = document.getElementById('person-name-search').value.trim();
 
@@ -3062,6 +3105,54 @@
             field.classList.remove('ring-2', 'ring-purple-500');
         }, 1500);
     }
+
+    // Search People by Name for Movie Cast section
+    async function searchPersonByNameForCast(event) {
+        event.preventDefault();
+        const searchQuery = document.getElementById('person-name-search').value.trim();
+
+        if (!searchQuery) {
+            alert('Please enter a person name');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/actors/?q=${encodeURIComponent(searchQuery)}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+
+            const resultsList = document.getElementById('person-results-list');
+            const resultsContainer = document.getElementById('person-search-results');
+
+            resultsList.innerHTML = '';
+
+            if (response.ok && data.actors && data.actors.length > 0) {
+                data.actors.forEach(person => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'bg-black/40 border border-purple-500/20 p-3 rounded-lg hover:bg-purple-500/10 transition cursor-pointer';
+                    resultItem.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="text-white font-medium">${person.name}</div>
+                                <div class="text-white/50 text-xs">${person.birth_date || 'Unknown'}</div>
+                            </div>
+                            <div class="text-purple-300 font-mono text-sm">ID: ${person.id}</div>
+                        </div>
+                    `;
+                    resultItem.onclick = () => usePersonId(person.id, person.name);
+                    resultsList.appendChild(resultItem);
+                });
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsList.innerHTML = '<div class="text-white/40 text-sm p-2">No people found</div>';
+                resultsContainer.classList.remove('hidden');
+            }
+        } catch (error) {
+            alert('Search failed: ' + error);
+        }
+    }
+
     async function handleUpdateComment(event) {
         const id = new FormData(event.target).get('id');
         if (!id) return alert("ID required");

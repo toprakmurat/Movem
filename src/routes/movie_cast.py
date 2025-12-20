@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, render_template
 from src.utils.decorators import admin_required
 from src.services.movie_cast_service import (
     get_movie_cast_paginated_db,
-    get_movie_cast_by_id_db,
+    get_movie_cast_by_composite_key_db,
     get_cast_by_movie_db,
     get_cast_by_person_db,
     create_movie_cast_db,
@@ -49,12 +49,11 @@ def get_movie_cast():
         'pagination': pagination
     })
 
-# USAGE IS NOT RECOMMENDED AS MOVIE CAST ID IS A SERIAL PRIMARY KEY
-@movie_cast_bp.route('/<int:cast_id>', methods=['GET'])
-def get_movie_cast_by_id(cast_id):
-    """Get a specific movie cast entry by ID - returns JSON only"""
+@movie_cast_bp.route('/<int:movie_id>/<int:person_id>/<string:character_name>', methods=['GET'])
+def get_movie_cast_by_composite_key(movie_id, person_id, character_name):
+    """Get a specific movie cast entry by composite key - returns JSON only"""
     # Get cast entry details
-    cast_entry, error = get_movie_cast_by_id_db(cast_id)
+    cast_entry, error = get_movie_cast_by_composite_key_db(movie_id, person_id, character_name)
     
     if error:
         return jsonify({'error': error}), 404
@@ -110,31 +109,34 @@ def create_movie_cast():
     return jsonify(dict(result)), 201
 
 
-@movie_cast_bp.route('/<int:cast_id>', methods=['PUT'])
+@movie_cast_bp.route('/<int:movie_id>/<int:person_id>/<string:character_name>', methods=['PUT'])
 @admin_required
-def update_movie_cast(cast_id):
-    """Update an existing movie cast entry - returns JSON only"""
+def update_movie_cast(movie_id, person_id, character_name):
+    """Update an existing movie cast entry - returns JSON only
+    Note: Only the role field can be updated. To change movie_id, person_id, or character_name,
+    you must delete the old entry and create a new one (since they form the primary key).
+    """
     data = request.get_json()
     
     # Update movie cast entry using service
-    result, error = update_movie_cast_db(cast_id, data)
+    result, error = update_movie_cast_db(movie_id, person_id, character_name, data)
     
     if error:
         if error == 'Movie cast entry not found':
             return jsonify({'error': error}), 404
-        elif error in ['No data provided', 'No valid fields to update']:
+        elif error in ['No data provided', 'No valid fields to update (movie_id, person_id, and character_name are part of primary key and cannot be updated directly)']:
             return jsonify({'error': error}), 400
         return jsonify({'error': error}), 500
     
     return jsonify(dict(result))
 
 
-@movie_cast_bp.route('/<int:cast_id>', methods=['DELETE'])
+@movie_cast_bp.route('/<int:movie_id>/<int:person_id>/<string:character_name>', methods=['DELETE'])
 @admin_required
-def delete_movie_cast(cast_id):
+def delete_movie_cast(movie_id, person_id, character_name):
     """Delete a movie cast entry - returns JSON only"""
     # Delete movie cast entry using service
-    result, error = delete_movie_cast_db(cast_id)
+    result, error = delete_movie_cast_db(movie_id, person_id, character_name)
     
     if error:
         status_code = 404 if error == 'Movie cast entry not found' else 500

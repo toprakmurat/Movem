@@ -94,7 +94,7 @@ def get_movie_actors(movie_id, limit=6):
         FROM people p
         JOIN movie_cast mc ON p.id = mc.person_id
         WHERE mc.movie_id = %s AND LOWER(mc.role) != 'director'
-        ORDER BY mc.id
+        ORDER BY collaborations DESC, mc.character_name ASC
         LIMIT %s
         """,
         (movie_id, limit),

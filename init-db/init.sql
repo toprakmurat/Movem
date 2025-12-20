@@ -81,13 +81,18 @@ CREATE TABLE IF NOT EXISTS people (
 -- movie_cast table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movie_cast (
-    id SERIAL PRIMARY KEY,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
-    person_id INTEGER REFERENCES people(id) ON DELETE SET NULL,
+    person_id INTEGER REFERENCES people(id) ON DELETE CASCADE,
     role VARCHAR(100),
-    character_name VARCHAR(1024)
+    character_name VARCHAR(1024) DEFAULT 'Unknown',
+    -- Same actor can play multiple roles in a movie
+    -- Or, a director might play in a movie as an actor, too.
+    -- To resolve this issue, character name is chosen to be ...
+    -- ... a part of primary key as well.
+    -- However, primary keys cannot be NULL, therefore it's ...
+    -- ... defaulted to 'Unknown'
+    PRIMARY KEY (movie_id, person_id, character_name)
 );
-
 ------------------------------------------------------------
 -- genres table
 ------------------------------------------------------------
