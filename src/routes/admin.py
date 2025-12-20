@@ -63,8 +63,15 @@ def require_admin():
 
 @admin_bp.route('/', methods=['GET', 'POST'])
 def dashboard():
+    # Role filter for users
+    role_filter = request.args.get('role_filter', '')
+    
     # Context data to show on the dashboard
-    users, _ = get_users_db()
+    if role_filter and role_filter != 'all':
+        users, _ = get_users_by_role_db(role_filter)
+    else:
+        users, _ = get_users_db()
+    
     active_curators, _ = get_most_active_curators_db()
     
     # Pagination Parameters
@@ -124,7 +131,8 @@ def dashboard():
         actors=actors,
         statistics=statistics_paginated,
         questions=questions_paginated,
-        favorites=favorites_paginated
+        favorites=favorites_paginated,
+        role_filter=role_filter
     )
 
 # --- USER MANAGEMENT ROUTES ---

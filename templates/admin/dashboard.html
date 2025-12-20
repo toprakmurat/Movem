@@ -291,7 +291,19 @@
         </div>
 
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 overflow-hidden">
-            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Users</h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-white">All Users</h2>
+                <form action="{{ url_for('admin.dashboard') }}" method="get" class="flex items-center gap-3">
+                    <label class="text-white/60 text-sm">Filter by Role:</label>
+                    <select name="role_filter" onchange="this.form.submit()"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm min-w-[120px]">
+                        <option value="all" {{ 'selected' if not role_filter or role_filter=='all' }}>All Roles</option>
+                        <option value="user" {{ 'selected' if role_filter=='user' }}>User</option>
+                        <option value="admin" {{ 'selected' if role_filter=='admin' }}>Admin</option>
+                        <option value="moderator" {{ 'selected' if role_filter=='moderator' }}>Moderator</option>
+                    </select>
+                </form>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-white/70">
                     <thead class="uppercase tracking-wider text-xs border-b border-white/10">
