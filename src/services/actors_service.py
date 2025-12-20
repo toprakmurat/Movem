@@ -138,20 +138,33 @@ def get_actor_filmography_db(person_id: int):
 
 
 def create_actor_db(actor_data: dict):
-    """Create a new actor"""
+    """Create a new actor with a specific ID"""
     try:
         # Validate required fields
         if not actor_data or 'name' not in actor_data:
             return None, "Name is required"
+        if 'id' not in actor_data:
+            return None, "ID is required"
         
-        # Insert new actor
+        # Check if ID already exists
+        existing = execute_query(
+            "SELECT id FROM people WHERE id = %s",
+            (actor_data['id'],),
+            fetch=True
+        )
+        
+        if existing:
+            return None, f"Person with ID {actor_data['id']} already exists"
+        
+        # Insert new actor with specific ID
         result = execute_query(
             """
-            INSERT INTO people (name, biography, birth_date, photo_url)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO people (id, name, biography, birth_date, photo_url)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING id, name, biography, birth_date, photo_url, created_at
             """,
             (
+                actor_data['id'],
                 actor_data['name'],
                 actor_data.get('biography'),
                 actor_data.get('birth_date'),

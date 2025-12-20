@@ -1153,6 +1153,8 @@
     <div id="tab-people" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">People Management</h2>
+            
+            <!-- Table Definition -->
             <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
                 <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: PEOPLE</h3>
                 <div class="overflow-x-auto">
@@ -1168,19 +1170,37 @@
                         <tbody class="divide-y divide-blue-500/10">
                             <tr>
                                 <td class="px-2 py-1 font-mono">id</td>
-                                <td class="px-2 py-1">integer</td>
+                                <td class="px-2 py-1">INTEGER</td>
                                 <td class="px-2 py-1">NO</td>
                                 <td class="px-2 py-1">PK</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">name</td>
-                                <td class="px-2 py-1">varchar(255)</td>
+                                <td class="px-2 py-1">VARCHAR(255)</td>
                                 <td class="px-2 py-1">NO</td>
                                 <td class="px-2 py-1"></td>
                             </tr>
                             <tr>
-                                <td class="px-2 py-1 font-mono">description</td>
-                                <td class="px-2 py-1">text</td>
+                                <td class="px-2 py-1 font-mono">biography</td>
+                                <td class="px-2 py-1">TEXT</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">birth_date</td>
+                                <td class="px-2 py-1">DATE</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">photo_url</td>
+                                <td class="px-2 py-1">VARCHAR(255)</td>
+                                <td class="px-2 py-1">YES</td>
+                                <td class="px-2 py-1"></td>
+                            </tr>
+                            <tr>
+                                <td class="px-2 py-1 font-mono">created_at</td>
+                                <td class="px-2 py-1">TIMESTAMP</td>
                                 <td class="px-2 py-1">YES</td>
                                 <td class="px-2 py-1"></td>
                             </tr>
@@ -1188,55 +1208,87 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Search Person by ID -->
+            <div class="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 p-6 rounded-xl">
+                <h3 class="text-lg font-semibold text-white mb-4">🔍 Search Person by ID</h3>
+                <form onsubmit="searchPersonById(event)" class="space-y-4">
+                    <div class="flex gap-2">
+                        <input id="person-search-id" type="number" placeholder="Enter Person ID"
+                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
+                            required>
+                        <button type="submit"
+                            class="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition">
+                            Search
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Search Result Display -->
+                <div id="person-search-result" class="mt-4 hidden">
+                    <div class="bg-black/40 border border-white/10 p-4 rounded-xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-md font-semibold text-white">Person Details</h4>
+                            <button onclick="closePersonSearch()" class="text-white/50 hover:text-white">✕</button>
+                        </div>
+                        <div id="person-details" class="space-y-2 text-sm text-white/70">
+                            <!-- Details will be populated here -->
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="editPerson()" 
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm transition">
+                                Edit
+                            </button>
+                            <button onclick="deletePerson()" 
+                                class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm transition">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-black/50 p-4 rounded-2xl border border-white/5">
-                    <h4 class="text-lg font-semibold text-white mb-4">Add Person</h4>
-                    <form onsubmit="handleApiSubmit(event, '/actors/', 'POST')" class="space-y-4">
-                        <input name="name" placeholder="Name (Required)"
+                <!-- Create Person Form -->
+                <div class="bg-black/50 p-6 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">➕ Create New Person</h4>
+                    <form onsubmit="createPerson(event)" class="space-y-4">
+                        <input id="create-person-id" name="id" type="number" placeholder="Person ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <textarea name="biography" placeholder="Biography"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"></textarea>
-                        <input name="photo_url" placeholder="Photo URL"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        <input name="birth_date" type="date" placeholder="Birth Date"
-                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        <button class="btn-primary w-full py-2 rounded-xl">Create Person</button>
-                    </form>
-                    <br>
-                    <h4 class="text-lg font-semibold text-white mb-4">Update Person</h4>
-                    <form onsubmit="handleUpdatePerson(event)" class="space-y-4 pt-4 border-t border-white/10">
-                        <input name="id" type="number" placeholder="Person ID for Update (Required)"
+                        <input id="create-person-name" name="name" placeholder="Name (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <input name="name" placeholder="Name"
+                        <textarea id="create-person-bio" name="biography" placeholder="Biography" rows="3"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full resize-none"></textarea>
+                        <input id="create-person-birthdate" name="birth_date" type="date" placeholder="Birth Date"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        <button
-                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
-                            Person</button>
+                        <input id="create-person-photo" name="photo_url" placeholder="Photo URL"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button type="submit" class="btn-primary w-full py-2 rounded-xl">Create Person</button>
                     </form>
                 </div>
-                <div
-                    class="overflow-x-auto bg-black/50 p-4 rounded-2xl border border-white/5 max-h-[500px] overflow-y-auto">
-                    <table class="w-full text-left text-sm text-white/70">
-                        <thead class="uppercase tracking-wider text-xs border-b border-white/10">
-                            <tr>
-                                <th class="px-4 py-2">ID</th>
-                                <th class="px-4 py-2">Name</th>
-                                <th class="px-4 py-2">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            {% for p in actors[:100] %}
-                            <tr>
-                                <td class="px-4 py-2">{{ p.id }}</td>
-                                <td class="px-4 py-2">{{ p.name }}</td>
-                                <td class="px-4 py-2"><button onclick="deleteResource('/actors/{{ p.id }}')"
-                                        class="text-red-400 text-xs">Delete</button></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+                <!-- Update Person Form -->
+                <div class="bg-black/50 p-6 rounded-2xl border border-white/5">
+                    <h4 class="text-lg font-semibold text-white mb-4">✏️ Update Person</h4>
+                    <form onsubmit="updatePerson(event)" class="space-y-4">
+                        <input id="update-person-id" name="id" type="number" placeholder="Person ID (Required)"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
+                            required>
+                        <input id="update-person-name" name="name" placeholder="Name"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <textarea id="update-person-bio" name="biography" placeholder="Biography" rows="3"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full resize-none"></textarea>
+                        <input id="update-person-birthdate" name="birth_date" type="date" placeholder="Birth Date"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <input id="update-person-photo" name="photo_url" placeholder="Photo URL"
+                            class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
+                        <button type="submit"
+                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">
+                            Update Person
+                        </button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -2209,6 +2261,188 @@
             }
         } catch (error) {
             alert('Delete failed: ' + error);
+        }
+    }
+
+    // --- PEOPLE MANAGEMENT FUNCTIONS ---
+    
+    let currentPersonId = null;
+
+    async function searchPersonById(event) {
+        event.preventDefault();
+        const personId = document.getElementById('person-search-id').value;
+        
+        if (!personId) {
+            alert('Please enter a person ID');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/actors/${personId}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                currentPersonId = data.actor.id;
+                displayPersonDetails(data.actor);
+            } else {
+                alert('Error: ' + (data.error || 'Person not found'));
+                document.getElementById('person-search-result').classList.add('hidden');
+            }
+        } catch (error) {
+            alert('Search failed: ' + error);
+            document.getElementById('person-search-result').classList.add('hidden');
+        }
+    }
+
+    function displayPersonDetails(person) {
+        const detailsDiv = document.getElementById('person-details');
+        detailsDiv.innerHTML = `
+            <div class="grid grid-cols-2 gap-2">
+                <span class="text-white/50">ID:</span>
+                <span class="text-purple-300 font-mono">${person.id}</span>
+                
+                <span class="text-white/50">Name:</span>
+                <span class="text-white">${person.name}</span>
+                
+                <span class="text-white/50">Birth Date:</span>
+                <span class="text-white/70">${person.birth_date || '-'}</span>
+                
+                <span class="text-white/50">Photo URL:</span>
+                <span class="text-white/70 truncate" title="${person.photo_url || ''}">${person.photo_url || '-'}</span>
+            </div>
+            ${person.biography ? `<div class="mt-3 pt-3 border-t border-white/10">
+                <span class="text-white/50 text-xs">Biography:</span>
+                <p class="text-white/70 text-sm mt-1">${person.biography}</p>
+            </div>` : ''}
+        `;
+        
+        document.getElementById('person-search-result').classList.remove('hidden');
+    }
+
+    function closePersonSearch() {
+        document.getElementById('person-search-result').classList.add('hidden');
+        document.getElementById('person-search-id').value = '';
+        currentPersonId = null;
+    }
+
+    function editPerson() {
+        if (!currentPersonId) return;
+        
+        // Populate update form with current person ID
+        document.getElementById('update-person-id').value = currentPersonId;
+        
+        // Scroll to update form
+        document.querySelector('#tab-people .bg-black\\/50:last-of-type').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        
+        // Highlight the form briefly
+        const updateForm = document.querySelector('#tab-people .bg-black\\/50:last-of-type');
+        updateForm.classList.add('ring-2', 'ring-blue-500');
+        setTimeout(() => {
+            updateForm.classList.remove('ring-2', 'ring-blue-500');
+        }, 2000);
+    }
+
+    async function deletePerson() {
+        if (!currentPersonId) return;
+        
+        if (!confirm(`Are you sure you want to delete person ID ${currentPersonId}?`)) return;
+
+        try {
+            const response = await fetch(`/actors/${currentPersonId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Person deleted successfully!');
+                closePersonSearch();
+                location.reload();
+            } else {
+                const data = await response.json();
+                alert('Error: ' + (data.error || 'Failed to delete person'));
+            }
+        } catch (error) {
+            alert('Delete failed: ' + error);
+        }
+    }
+
+    async function createPerson(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const personData = {
+            id: parseInt(formData.get('id')),
+            name: formData.get('name'),
+            biography: formData.get('biography') || null,
+            birth_date: formData.get('birth_date') || null,
+            photo_url: formData.get('photo_url') || null
+        };
+
+        try {
+            const response = await fetch('/actors/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(personData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Person created successfully!\n' + JSON.stringify(data, null, 2));
+                event.target.reset();
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to create person'));
+            }
+        } catch (error) {
+            alert('Create failed: ' + error);
+        }
+    }
+
+    async function updatePerson(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const personId = parseInt(formData.get('id'));
+        
+        if (!personId) {
+            alert('Person ID is required');
+            return;
+        }
+
+        const updateData = {};
+        if (formData.get('name')) updateData.name = formData.get('name');
+        if (formData.get('biography')) updateData.biography = formData.get('biography');
+        if (formData.get('birth_date')) updateData.birth_date = formData.get('birth_date');
+        if (formData.get('photo_url')) updateData.photo_url = formData.get('photo_url');
+
+        if (Object.keys(updateData).length === 0) {
+            alert('Please provide at least one field to update');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/actors/${personId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updateData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Person updated successfully!\n' + JSON.stringify(data, null, 2));
+                event.target.reset();
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to update person'));
+            }
+        } catch (error) {
+            alert('Update failed: ' + error);
         }
     }
 </script>
