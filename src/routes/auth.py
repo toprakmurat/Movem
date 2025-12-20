@@ -208,13 +208,17 @@ def public_profile(user_id):
     user_lists, _ = get_lists_by_user_db(user_id)
     if not user_lists: user_lists = []
 
+    favorites, _ = get_favorite_movies_detailed_for_user_db(user_id)
+    if not favorites:
+        favorites = []
+
     return render_template(
         'account.html', 
         user=target_user,
         user_reviews=user_reviews, 
         stats=stats, 
         is_public=True,
-        favorites=[],
+        favorites=favorites,
         genre_stats=genre_stats,
         actor_stats=actor_stats,
         user_lists=user_lists

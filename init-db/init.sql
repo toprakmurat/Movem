@@ -19,9 +19,18 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     game_score INTEGER,
-    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg',
-    reset_token VARCHAR(100),
-    reset_token_expiry TIMESTAMP
+    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg'
+);
+
+------------------------------------------------------------
+-- password_resets table (3NF normalization)
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    reset_token VARCHAR(100) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 ------------------------------------------------------------
@@ -91,19 +100,19 @@ CREATE TABLE IF NOT EXISTS genres (
 -- movies_genres table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS movies_genres (
-    id SERIAL PRIMARY KEY,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
-    genre_id INTEGER REFERENCES genres(id) ON DELETE CASCADE
+    genre_id INTEGER REFERENCES genres(id) ON DELETE CASCADE,
+    PRIMARY KEY (movie_id, genre_id)
 );
 
 ------------------------------------------------------------
 -- favorites table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS favorites (
-    id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, movie_id)
 );
 
 ------------------------------------------------------------
@@ -172,9 +181,8 @@ CREATE TABLE IF NOT EXISTS user_lists (
 -- list_items table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS list_items (
-    id SERIAL PRIMARY KEY,
     list_id INTEGER REFERENCES user_lists(id) ON DELETE CASCADE,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(list_id, movie_id)
+    PRIMARY KEY (list_id, movie_id)
 );

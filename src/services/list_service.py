@@ -65,7 +65,7 @@ def add_movie_to_list_db(list_id: int, movie_id: int):
         query = """
         INSERT INTO list_items (list_id, movie_id)
         VALUES (%s, %s)
-        RETURNING id, list_id, movie_id, added_at
+        RETURNING list_id, movie_id, added_at
         """
         result = execute_query(query, (list_id, movie_id), fetch=True)
 
@@ -85,7 +85,7 @@ def remove_movie_from_list_db(list_id: int, movie_id: int):
         query = """
         DELETE FROM list_items 
         WHERE list_id = %s AND movie_id = %s
-        RETURNING id
+        RETURNING list_id, movie_id
         """
         result = execute_query(query, (list_id, movie_id), fetch=True)
 

@@ -217,21 +217,38 @@ def update_password_db(user_id: int, new_hash: str):
         return False, str(e)
 
 def set_reset_token_db(email: str, token: str, expiry):
-    """Set reset token for user"""
+    """Set reset token for user (uses password_resets table)"""
     try:
-        query = "UPDATE users SET reset_token = %s, reset_token_expiry = %s WHERE email = %s RETURNING id"
-        result = execute_query(query, (token, expiry, email), fetch=True)
+        # First get the user_id from email
+        user, err = get_user_by_email_db(email)
+        if not user:
+            return False, "User not found"
+        
+        # Insert or update the reset token
+        query = """
+        INSERT INTO password_resets (user_id, reset_token, expires_at)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (user_id) DO UPDATE SET 
+            reset_token = EXCLUDED.reset_token,
+            expires_at = EXCLUDED.expires_at,
+            created_at = CURRENT_TIMESTAMP
+        RETURNING id
+        """
+        result = execute_query(query, (user['id'], token, expiry), fetch=True)
         if result:
             return True, None
-        return False, "User not found"
+        return False, "Failed to set reset token"
     except Exception as e:
         return False, str(e)
 
 def get_user_by_reset_token_db(token: str):
-    """Find user by valid reset token"""
+    """Find user by valid reset token (joins with password_resets table)"""
     try:
-        # Check if token exists and is not expired
-        query = "SELECT * FROM users WHERE reset_token = %s AND reset_token_expiry > CURRENT_TIMESTAMP"
+        query = """
+        SELECT u.* FROM users u
+        JOIN password_resets pr ON u.id = pr.user_id
+        WHERE pr.reset_token = %s AND pr.expires_at > CURRENT_TIMESTAMP
+        """
         users = execute_query(query, (token,), fetch=True)
         if users:
             return users[0], None
@@ -240,9 +257,9 @@ def get_user_by_reset_token_db(token: str):
         return None, str(e)
 
 def clear_reset_token_db(user_id: int):
-    """Clear reset token after successful reset"""
+    """Clear reset token after successful reset (deletes from password_resets table)"""
     try:
-        query = "UPDATE users SET reset_token = NULL, reset_token_expiry = NULL WHERE id = %s"
+        query = "DELETE FROM password_resets WHERE user_id = %s"
         execute_query(query, (user_id,), fetch=False)
         return True, None
     except Exception as e:

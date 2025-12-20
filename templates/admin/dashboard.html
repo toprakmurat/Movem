@@ -91,7 +91,8 @@
         <button onclick="openTab(event, 'tab-people')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">People</button>
         <button onclick="openTab(event, 'tab-movie-cast')"
-            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Movie Cast</button>
+            class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Movie
+            Cast</button>
         <button onclick="openTab(event, 'tab-stats')"
             class="tab-btn px-6 py-2 rounded-full text-sm font-medium transition text-white/60 hover:text-white hover:bg-white/5">Statistic</button>
         <button onclick="openTab(event, 'tab-game')"
@@ -290,7 +291,19 @@
         </div>
 
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 overflow-hidden">
-            <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">All Users</h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold uppercase tracking-widest text-white">All Users</h2>
+                <form action="{{ url_for('admin.dashboard') }}" method="get" class="flex items-center gap-3">
+                    <label class="text-white/60 text-sm">Filter by Role:</label>
+                    <select name="role_filter" onchange="this.form.submit()"
+                        class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm min-w-[120px]">
+                        <option value="all" {{ 'selected' if not role_filter or role_filter=='all' }}>All Roles</option>
+                        <option value="user" {{ 'selected' if role_filter=='user' }}>User</option>
+                        <option value="admin" {{ 'selected' if role_filter=='admin' }}>Admin</option>
+                        <option value="moderator" {{ 'selected' if role_filter=='moderator' }}>Moderator</option>
+                    </select>
+                </form>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-white/70">
                     <thead class="uppercase tracking-wider text-xs border-b border-white/10">
@@ -799,12 +812,6 @@
                         </thead>
                         <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-2 py-1 font-mono">id</td>
-                                <td class="px-2 py-1">integer</td>
-                                <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">PK (Serial)</td>
-                            </tr>
-                            <tr>
                                 <td class="px-2 py-1 font-mono">movie_id</td>
                                 <td class="px-2 py-1">integer</td>
                                 <td class="px-2 py-1">NO</td>
@@ -822,7 +829,10 @@
             </div>
             <form onsubmit="handleGetMovieGenreById(event)"
                 class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10">
-                <input name="id" type="number" placeholder="Get Relation by ID"
+                <input name="movie_id" type="number" placeholder="Movie ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
+                    required>
+                <input name="genre_id" type="number" placeholder="Genre ID"
                     class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
                     required>
                 <button
@@ -845,27 +855,14 @@
                             required>
                         <button class="btn-primary w-full py-2 rounded-xl">Link Genre</button>
                     </form>
-                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Relation
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Relation
                     </h4>
-                    <form onsubmit="handleUpdateMovieGenre(event)" class="space-y-4">
-                        <input name="id" type="number" placeholder="ID to Update (Required)"
+                    <form onsubmit="handleDeleteRestful(event, '/movies/{movie_id}/genres/{genre_id}', loadMovieGenres)"
+                        class="space-y-4">
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input name="movie_id" type="number" placeholder="New Movie ID"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                            <input name="genre_id" type="number" placeholder="New Genre ID"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        </div>
-                        <button
-                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
-                            Relation</button>
-                    </form>
-                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Relation
-                        by ID</h4>
-                    <form onsubmit="handleDeleteById(event, '/movies/movies-genres', loadMovieGenres)"
-                        class="space-y-4">
-                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                        <input name="genre_id" type="number" placeholder="Genre ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <button
@@ -882,7 +879,6 @@
                             <thead
                                 class="bg-black/90 text-xs uppercase tracking-wider font-bold border-b border-white/10 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-4 py-3 text-blue-300 w-24">id</th>
                                     <th class="px-4 py-3 text-blue-300">movie_id</th>
                                     <th class="px-4 py-3 text-blue-300">genre_id</th>
                                     <th class="px-4 py-3 text-blue-300 text-right w-32">Action</th>
@@ -1224,7 +1220,7 @@
     <div id="tab-people" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">People Management</h2>
-            
+
             <!-- Table Definition -->
             <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
                 <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: PEOPLE</h3>
@@ -1286,15 +1282,14 @@
                 <form onsubmit="searchPersonById(event)" class="space-y-4">
                     <div class="flex gap-2">
                         <input id="person-search-id" type="number" placeholder="Enter Person ID"
-                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white"
-                            required>
+                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white" required>
                         <button type="submit"
                             class="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-medium transition">
                             Search
                         </button>
                     </div>
                 </form>
-                
+
                 <!-- Search Result Display -->
                 <div id="person-search-result" class="mt-4 hidden">
                     <div class="bg-black/40 border border-white/10 p-4 rounded-xl">
@@ -1306,11 +1301,11 @@
                             <!-- Details will be populated here -->
                         </div>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="editPerson()" 
+                            <button onclick="editPerson()"
                                 class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm transition">
                                 Edit
                             </button>
-                            <button onclick="deletePerson()" 
+                            <button onclick="deletePerson()"
                                 class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm transition">
                                 Delete
                             </button>
@@ -1368,7 +1363,7 @@
     <div id="tab-movie-cast" class="tab-content hidden space-y-8">
         <section class="rounded-3xl border border-white/10 bg-black/60 p-6 space-y-6">
             <h2 class="text-xl font-semibold uppercase tracking-widest text-white mb-6">Movie Cast Management</h2>
-            
+
             <!-- Table Definition -->
             <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl mb-6">
                 <h3 class="text-blue-300 font-bold mb-2 uppercase text-sm">Table Definition: MOVIE_CAST</h3>
@@ -1431,7 +1426,7 @@
                             Search Movie
                         </button>
                     </form>
-                    
+
                     <div id="movie-search-results" class="mt-4 hidden">
                         <h4 class="text-sm font-semibold text-blue-300 mb-2">Results:</h4>
                         <div id="movie-results-list" class="space-y-2 max-h-[300px] overflow-y-auto">
@@ -1441,7 +1436,8 @@
                 </div>
 
                 <!-- Search People by Name -->
-                <div class="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 p-6 rounded-xl">
+                <div
+                    class="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 p-6 rounded-xl">
                     <h3 class="text-lg font-semibold text-white mb-4">👤 Search Person by Name</h3>
                     <form onsubmit="searchPersonByName(event)" class="space-y-4">
                         <input id="person-name-search" type="text" placeholder="Enter person name..."
@@ -1451,7 +1447,7 @@
                             Search Person
                         </button>
                     </form>
-                    
+
                     <div id="person-search-results" class="mt-4 hidden">
                         <h4 class="text-sm font-semibold text-purple-300 mb-2">Results:</h4>
                         <div id="person-results-list" class="space-y-2 max-h-[300px] overflow-y-auto">
@@ -1469,7 +1465,8 @@
                         <input id="create-cast-movie-id" name="movie_id" type="number" placeholder="Movie ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <input id="create-cast-person-id" name="person_id" type="number" placeholder="Person ID (Required)"
+                        <input id="create-cast-person-id" name="person_id" type="number"
+                            placeholder="Person ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <input id="create-cast-role" name="role" placeholder="Role (e.g., Actor, Director)"
@@ -1508,7 +1505,8 @@
                 <h4 class="text-lg font-semibold text-white mb-4">🎬 Movie Cast Entries</h4>
                 <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
                     <table class="w-full text-left text-sm text-white/70">
-                        <thead class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-0 bg-black/80">
+                        <thead
+                            class="uppercase tracking-wider text-xs border-b border-white/10 sticky top-0 bg-black/80">
                             <tr>
                                 <th class="px-4 py-2">ID</th>
                                 <th class="px-4 py-2">Movie</th>
@@ -1528,7 +1526,7 @@
                     </table>
                 </div>
                 <div id="movie-cast-pagination" class="mt-4"></div>
-                <button onclick="loadMovieCastEntries(1)" 
+                <button onclick="loadMovieCastEntries(1)"
                     class="mt-4 w-full bg-orange-600/80 hover:bg-orange-500 text-white rounded-xl py-2 font-medium transition">
                     Load Cast Entries
                 </button>
@@ -1949,22 +1947,16 @@
                         </thead>
                         <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-2 py-1 font-mono">id</td>
-                                <td class="px-2 py-1">integer</td>
-                                <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">PK (Serial)</td>
-                            </tr>
-                            <tr>
                                 <td class="px-2 py-1 font-mono">user_id</td>
                                 <td class="px-2 py-1">integer</td>
                                 <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">FK</td>
+                                <td class="px-2 py-1">PK</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">movie_id</td>
                                 <td class="px-2 py-1">integer</td>
                                 <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">FK</td>
+                                <td class="px-2 py-1">PK</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">created_at</td>
@@ -1977,9 +1969,17 @@
                 </div>
             </div>
 
+            <div class="hidden bg-white/5 p-4 rounded-xl border border-white/10 mb-6">
+                <!-- Search placeholder -->
+            </div>
+
+
             <form onsubmit="handleGetFavoriteById(event)"
                 class="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10 mb-6">
-                <input name="id" type="number" placeholder="Get Favorite by ID"
+                <input name="user_id" type="number" placeholder="User ID"
+                    class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
+                    required>
+                <input name="movie_id" type="number" placeholder="Movie ID"
                     class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-48 text-sm"
                     required>
                 <button
@@ -2003,26 +2003,14 @@
                             required>
                         <button class="btn-primary w-full py-2 rounded-xl">Add Favorite</button>
                     </form>
-                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Update Favorite
+                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Favorite
                     </h4>
-                    <form onsubmit="handleUpdateFavorite(event)" class="space-y-4">
-                        <input name="id" type="number" placeholder="ID to Update (Required)"
+                    <form onsubmit="handleDeleteRestful(event, '/movies/{movie_id}/favorites/{user_id}', loadFavorites)"
+                        class="space-y-4">
+                        <input name="user_id" type="number" placeholder="User ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input name="user_id" type="number" placeholder="New User ID"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                            <input name="movie_id" type="number" placeholder="New Movie ID"
-                                class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full">
-                        </div>
-                        <button
-                            class="w-full bg-blue-600/80 hover:bg-blue-500 text-white rounded-xl py-2 font-medium transition">Update
-                            Favorite</button>
-                    </form>
-                    <h4 class="text-lg font-semibold text-white mb-4 mt-8 pt-4 border-t border-white/10">Delete Favorite
-                        by ID</h4>
-                    <form onsubmit="handleDeleteById(event, '/movies/favorites', loadFavorites)" class="space-y-4">
-                        <input name="id" type="number" placeholder="ID to Delete (Required)"
+                        <input name="movie_id" type="number" placeholder="Movie ID (Required)"
                             class="form-field bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white w-full"
                             required>
                         <button
@@ -2039,7 +2027,6 @@
                             <thead
                                 class="bg-black/90 text-xs uppercase tracking-wider font-bold border-b border-white/10 sticky top-0 z-10">
                                 <tr>
-                                    <th class="px-4 py-3 text-blue-300 w-16">id</th>
                                     <th class="px-4 py-3 text-blue-300 w-32">user_id</th>
                                     <th class="px-4 py-3 text-blue-300 w-32">movie_id</th>
                                     <th class="px-4 py-3 text-blue-300 w-48">created_at</th>
@@ -2218,11 +2205,10 @@
 
     window.loadMovieGenres = (page = 1) => fetchData(`/movies/movies-genres?page=${page}&per_page=100`, 'movies-genres-table-body', 'movies-genres-pagination', (mg) => `
         <tr class="hover:bg-blue-500/10 transition duration-150 group">
-            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${mg.id}</td>
-            <td class="px-4 py-2">${mg.movie_id}</td>
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${mg.movie_id}</td>
             <td class="px-4 py-2">${mg.genre_id}</td>
             <td class="px-4 py-2 text-right">
-                <button onclick="deleteResource('/movies/movies-genres/${mg.id}', loadMovieGenres)"
+                <button onclick="deleteResource('/movies/${mg.movie_id}/genres/${mg.genre_id}', loadMovieGenres)"
                     class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
             </td>
         </tr>
@@ -2230,12 +2216,11 @@
 
     window.loadFavorites = (page = 1) => fetchData(`/movies/favorites?page=${page}&per_page=100`, 'favorites-table-body', 'favorites-pagination', (f) => `
         <tr class="hover:bg-blue-500/10 transition duration-150 group">
-            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${f.id}</td>
-            <td class="px-4 py-2">${f.user_id}</td>
+            <td class="px-4 py-2 font-mono text-white/50 group-hover:text-blue-200">${f.user_id}</td>
             <td class="px-4 py-2">${f.movie_id}</td>
             <td class="px-4 py-2 text-white/60 text-xs">${f.created_at || '-'}</td>
             <td class="px-4 py-2 text-right">
-                <button onclick="deleteResource('/movies/favorites/${f.id}', loadFavorites)"
+                <button onclick="deleteResource('/movies/${f.movie_id}/favorites/${f.user_id}', loadFavorites)"
                     class="text-red-400 hover:text-red-300 hover:bg-red-900/20 px-3 py-1 rounded transition text-xs border border-red-500/20">Delete</button>
             </td>
         </tr>
@@ -2297,11 +2282,21 @@
         }
 
         try {
-            const response = await fetch(url, {
+            const options = {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(jsonData)
-            });
+                headers: { 'Content-Type': 'application/json' }
+            };
+
+            // Only add body for non-GET/HEAD methods
+            if (method !== 'GET' && method !== 'HEAD') {
+                options.body = JSON.stringify(jsonData);
+            } else if (Object.keys(jsonData).length > 0) {
+                // For GET, append params to URL if provided (though usually handled by caller)
+                // We won't auto-append here to avoid double-query strings if caller already did it,
+                // but strictly preventing body is the fix for the TypeError.
+            }
+
+            const response = await fetch(url, options);
 
             if (response.ok) {
                 // Determine which loader to call based on the URL or explicitly passed callback
@@ -2408,9 +2403,19 @@
     async function handleGetPlatformById(e) { e.preventDefault(); showDataInDiv('/movies/platforms/', new FormData(e.target).get('id'), 'result-container-platforms'); }
     async function handleGetCommentById(e) { e.preventDefault(); showDataInDiv('/admin/api/comments/', new FormData(e.target).get('id'), 'result-container-comments'); }
     async function handleGetVoteById(e) { e.preventDefault(); showDataInDiv('/admin/api/votes/', new FormData(e.target).get('id'), 'result-container-votes'); }
-    async function handleGetFavoriteById(e) { e.preventDefault(); showDataInDiv('/movies/favorites/', new FormData(e.target).get('id'), 'result-container-favorites'); }
+    async function handleGetFavoriteById(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const url = `/movies/${fd.get('movie_id')}/favorites/${fd.get('user_id')}`;
+        showDataInDiv(url, '', 'result-container-favorites');
+    }
     async function handleGetGenreById(e) { e.preventDefault(); showDataInDiv('/movies/genre/', new FormData(e.target).get('id'), 'result-container-genres'); }
-    async function handleGetMovieGenreById(e) { e.preventDefault(); showDataInDiv('/movies/movies-genres/', new FormData(e.target).get('id'), 'result-container-movie-genres'); }
+    async function handleGetMovieGenreById(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const url = `/movies/${fd.get('movie_id')}/genres/${fd.get('genre_id')}`;
+        showDataInDiv(url, '', 'result-container-movie-genres');
+    }
     async function handleGetStatisticById(e) { e.preventDefault(); showDataInDiv('/statistic/', new FormData(e.target).get('movie_id'), 'statistic-result'); }
     async function handleGetQuestionById(e) { e.preventDefault(); showDataInDiv('/game/questions/', new FormData(e.target).get('id'), 'question-result'); }
 
@@ -2446,13 +2451,13 @@
     }
 
     // --- PEOPLE MANAGEMENT FUNCTIONS ---
-    
+
     let currentPersonId = null;
 
     async function searchPersonById(event) {
         event.preventDefault();
         const personId = document.getElementById('person-search-id').value;
-        
+
         if (!personId) {
             alert('Please enter a person ID');
             return;
@@ -2498,7 +2503,7 @@
                 <p class="text-white/70 text-sm mt-1">${person.biography}</p>
             </div>` : ''}
         `;
-        
+
         document.getElementById('person-search-result').classList.remove('hidden');
     }
 
@@ -2510,16 +2515,16 @@
 
     function editPerson() {
         if (!currentPersonId) return;
-        
+
         // Populate update form with current person ID
         document.getElementById('update-person-id').value = currentPersonId;
-        
+
         // Scroll to update form
-        document.querySelector('#tab-people .bg-black\\/50:last-of-type').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+        document.querySelector('#tab-people .bg-black\\/50:last-of-type').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
-        
+
         // Highlight the form briefly
         const updateForm = document.querySelector('#tab-people .bg-black\\/50:last-of-type');
         updateForm.classList.add('ring-2', 'ring-blue-500');
@@ -2530,7 +2535,7 @@
 
     async function deletePerson() {
         if (!currentPersonId) return;
-        
+
         if (!confirm(`Are you sure you want to delete person ID ${currentPersonId}?`)) return;
 
         try {
@@ -2553,7 +2558,7 @@
 
     async function createPerson(event) {
         event.preventDefault();
-        
+
         const formData = new FormData(event.target);
         const personData = {
             id: parseInt(formData.get('id')),
@@ -2586,10 +2591,10 @@
 
     async function updatePerson(event) {
         event.preventDefault();
-        
+
         const formData = new FormData(event.target);
         const personId = parseInt(formData.get('id'));
-        
+
         if (!personId) {
             alert('Person ID is required');
             return;
@@ -2628,7 +2633,7 @@
     }
 
     // --- MOVIE CAST MANAGEMENT FUNCTIONS ---
-    
+
     let currentCastId = null;
 
     async function loadMovieCastByMovie(movieId, movieTitle) {
@@ -2664,7 +2669,7 @@
                         `;
                         tbody.innerHTML += row;
                     });
-                    
+
                     // Clear pagination for movie-specific view
                     document.getElementById('movie-cast-pagination').innerHTML = '';
                 } else {
@@ -2754,7 +2759,7 @@
     async function searchMovieCastById(event) {
         event.preventDefault();
         const castId = document.getElementById('movie-cast-search-id').value;
-        
+
         if (!castId) {
             alert('Please enter a cast entry ID');
             return;
@@ -2803,7 +2808,7 @@
                 <span class="text-white/70">${entry.character_name || '-'}</span>
             </div>
         `;
-        
+
         document.getElementById('movie-cast-search-result').classList.remove('hidden');
     }
 
@@ -2815,14 +2820,14 @@
 
     function editMovieCast() {
         if (!currentCastId) return;
-        
+
         document.getElementById('update-cast-id').value = currentCastId;
-        
-        document.querySelector('#tab-movie-cast .bg-black\\/50:last-of-type').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+
+        document.querySelector('#tab-movie-cast .bg-black\\/50:last-of-type').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
-        
+
         const updateForm = document.querySelector('#tab-movie-cast .bg-black\\/50:last-of-type');
         updateForm.classList.add('ring-2', 'ring-orange-500');
         setTimeout(() => {
@@ -2832,7 +2837,7 @@
 
     async function deleteMovieCastEntry() {
         if (!currentCastId) return;
-        
+
         if (!confirm(`Are you sure you want to delete cast entry ID ${currentCastId}?`)) return;
 
         try {
@@ -2876,7 +2881,7 @@
 
     async function createMovieCast(event) {
         event.preventDefault();
-        
+
         const formData = new FormData(event.target);
         const castData = {
             movie_id: parseInt(formData.get('movie_id')),
@@ -2908,10 +2913,10 @@
 
     async function updateMovieCast(event) {
         event.preventDefault();
-        
+
         const formData = new FormData(event.target);
         const castId = parseInt(formData.get('id'));
-        
+
         if (!castId) {
             alert('Cast Entry ID is required');
             return;
@@ -2953,7 +2958,7 @@
     async function searchMovieByName(event) {
         event.preventDefault();
         const searchQuery = document.getElementById('movie-name-search').value.trim();
-        
+
         if (!searchQuery) {
             alert('Please enter a movie title');
             return;
@@ -2965,7 +2970,7 @@
 
             const resultsList = document.getElementById('movie-results-list');
             const resultsContainer = document.getElementById('movie-search-results');
-            
+
             resultsList.innerHTML = '';
 
             if (response.ok && data.items && data.items.length > 0) {
@@ -2997,11 +3002,11 @@
     function useMovieId(movieId, movieTitle) {
         // Load cast entries for this movie
         loadMovieCastByMovie(movieId, movieTitle);
-        
+
         // Scroll to the cast entries table
-        document.querySelector('#movie-cast-table-body').closest('.bg-black\\/50').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+        document.querySelector('#movie-cast-table-body').closest('.bg-black\\/50').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
     }
 
@@ -3009,7 +3014,7 @@
     async function searchPersonByName(event) {
         event.preventDefault();
         const searchQuery = document.getElementById('person-name-search').value.trim();
-        
+
         if (!searchQuery) {
             alert('Please enter a person name');
             return;
@@ -3023,7 +3028,7 @@
 
             const resultsList = document.getElementById('person-results-list');
             const resultsContainer = document.getElementById('person-search-results');
-            
+
             resultsList.innerHTML = '';
 
             if (response.ok && data.actors && data.actors.length > 0) {
@@ -3055,13 +3060,13 @@
     function usePersonId(personId, personName) {
         document.getElementById('create-cast-person-id').value = personId;
         document.getElementById('create-cast-person-id').placeholder = `Person ID (${personName})`;
-        
+
         // Scroll to create form
-        document.querySelector('#tab-movie-cast .bg-black\\/50:first-of-type').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
+        document.querySelector('#tab-movie-cast .bg-black\\/50:first-of-type').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
-        
+
         // Highlight the field
         const field = document.getElementById('create-cast-person-id');
         field.classList.add('ring-2', 'ring-purple-500');

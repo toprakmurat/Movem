@@ -316,6 +316,20 @@ def get_movies_by_genre(genre_id):
     return jsonify([dict(movie) for movie in movies]),200
 
 ######## movies_genres
+@movies_bp.route("/<int:movie_id>/genres/<int:genre_id>", methods=["GET"])
+def get_movies_genres_details(movie_id, genre_id):
+    """Get a movie-genre relation by composite keys"""
+
+    if not movie_id or not genre_id:
+        return jsonify({"error": "movie_id and genre_id required"}), 400
+
+    mg, err = get_movie_genre_by_keys_db(movie_id, genre_id)
+    if err:
+        return jsonify({"error": err}), 500
+    if not mg:
+        return jsonify({"message": "Movie-Genre relation not found"}), 404
+    return jsonify(dict(mg)), 200
+
 @movies_bp.route('/movies-genres', methods=['GET'])
 def get_movies_genres():
     """Get all movie-genre relations with optional pagination"""
@@ -341,15 +355,6 @@ def get_movies_genres():
         return jsonify({"error": err}), 500
     return jsonify([dict(movie_genre) for movie_genre in movies_genres]), 200
 
-@movies_bp.route("/movies-genres/<int:id>", methods=["GET"])
-def get_movies_genres_by_id(id):
-    """Get a movie-genre relation by id"""
-    mg, err = get_movies_genres_by_id_db(id)
-    if err:
-        return jsonify({"error": err}), 500
-    if not mg:
-        return jsonify({"message": "Movie-Genre relation not found"}), 404
-    return jsonify(dict(mg)), 200
 
 @movies_bp.route("/movies-genres", methods=["POST"])
 @admin_required
@@ -365,28 +370,16 @@ def create_movies_genres():
 
     return jsonify(dict(new_mg)), 201
 
-@movies_bp.route("/movies-genres/<int:id>", methods=["PUT"])
+
+
+@movies_bp.route("/<int:movie_id>/genres/<int:genre_id>", methods=["DELETE"])
 @admin_required
-def update_movies_genres(id):
-    """Update movie-genre relation"""
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
-
-    updated, err = update_movie_genre_db(id, data)
-    if err:
-        return jsonify({"error": err}), 500
-    if not updated:
-        return jsonify({"message": "Movie-Genre relation not found"}), 404
-
-    return jsonify(dict(updated)), 200
-
-
-@movies_bp.route("/movies-genres/<int:id>", methods=["DELETE"])
-@admin_required
-def delete_movies_genres(id):
+def delete_movies_genres(movie_id, genre_id):
     """Delete movie-genre relation"""
-    deleted, err = delete_movie_genre_db(id)
+    if not movie_id or not genre_id:
+         return jsonify({"error": "movie_id and genre_id required"}), 400
+
+    deleted, err = delete_movie_genre_db(movie_id, genre_id)
     if err and err == "Not found":
         return jsonify({"message": "Movie-Genre relation not found"}), 404
     if err:
@@ -420,13 +413,17 @@ def get_favorites():
     return jsonify([dict(f) for f in favorites]), 200
 
 
-@movies_bp.route("/favorites/<int:id>", methods=["GET"])
-def get_favorite(id):
-    fav, err = get_favorite_by_id_db(id)
+@movies_bp.route("/<int:movie_id>/favorites/<int:user_id>", methods=["GET"])
+def get_favorite(movie_id, user_id):
+    if not user_id or not movie_id:
+        return jsonify({"error": "user_id and movie_id required"}), 400
+
+    fav, err = get_favorite_by_keys_db(user_id, movie_id)
     if err:
         return jsonify({"error": err}), 500
     if not fav:
         return jsonify({"message": "Favorite not found"}), 404
+
     return jsonify(fav), 200
 
 
@@ -444,26 +441,15 @@ def create_favorite():
     return jsonify(fav), 201
 
 
-@movies_bp.route("/favorites/<int:id>", methods=["PUT"])
+
+
+@movies_bp.route("/<int:movie_id>/favorites/<int:user_id>", methods=["DELETE"])
 @admin_required
-def update_favorite(id):
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
+def delete_favorite(movie_id, user_id):
+    if not user_id or not movie_id:
+        return jsonify({"error": "user_id and movie_id required"}), 400
 
-    updated, err = update_favorite_db(id, data)
-    if err:
-        return jsonify({"error": err}), 500
-    if not updated:
-        return jsonify({"message": "Favorite not found"}), 404
-
-    return jsonify(updated), 200
-
-
-@movies_bp.route("/favorites/<int:id>", methods=["DELETE"])
-@admin_required
-def delete_favorite(id):
-    deleted, err = delete_favorite_db(id)
+    deleted, err = delete_favorite_db(user_id, movie_id)
     if err:
         return jsonify({"error": err}), 500
     if not deleted:

@@ -6,12 +6,13 @@ def get_favorites_db():
     """Get all favorites"""
     try:
         favorites = execute_query(
-            "SELECT * FROM favorites ORDER BY id",
+            "SELECT * FROM favorites ORDER BY created_at DESC",
             fetch=True
         )
         return favorites, None
     except Exception as e:
         return None, str(e)
+
 
 
 def create_favorite_db(data: dict):
@@ -21,8 +22,9 @@ def create_favorite_db(data: dict):
             """
             INSERT INTO favorites (user_id, movie_id)
             VALUES (%s, %s)
-            RETURNING id, user_id, movie_id, created_at
+            RETURNING user_id, movie_id, created_at
             """,
+
             (
                 data.get("user_id"),
                 data.get("movie_id")
@@ -36,55 +38,14 @@ def create_favorite_db(data: dict):
         return None, str(e)
 
 
-def update_favorite_db(id: int, data: dict):
-    """Update an existing favorite"""
-    try:
-        existing, err = get_favorite_by_id_db(id)
-        if err:
-            return None, err
-        if not existing:
-            return None, None
-        
-        update_fields = []
-        params = []
-
-        if "user_id" in data:
-            update_fields.append("user_id = %s")
-            params.append(data["user_id"])
-
-        if "movie_id" in data:
-            update_fields.append("movie_id = %s")
-            params.append(data["movie_id"])
-
-        if not update_fields:
-            return existing, None
-        
-        params.append(id)
-
-        updated = execute_query(
-            f"""
-            UPDATE favorites
-            SET {", ".join(update_fields)}
-            WHERE id = %s
-            RETURNING id, user_id, movie_id, created_at
-            """,
-            tuple(params),
-            fetch=True
-        )
-
-        if updated:
-            return updated[0], None
-        return None, "Failed to update"
-    except Exception as e:
-        return None, str(e)
 
 
-def delete_favorite_db(id: int):
-    """Delete favorite by id"""
+def delete_favorite_db(user_id: int, movie_id: int):
+    """Delete favorite by composite key"""
     try:
         deleted = execute_query(
-            "DELETE FROM favorites WHERE id = %s RETURNING *",
-            (id,),
+            "DELETE FROM favorites WHERE user_id = %s AND movie_id = %s RETURNING *",
+            (user_id, movie_id),
             fetch=True
         )
         if deleted:
@@ -104,7 +65,7 @@ def get_favorites_paginated_db(page: int = 1, per_page: int = 20):
         total = count_res[0]['count'] if count_res else 0
 
         favorites = execute_query(
-            "SELECT * FROM favorites ORDER BY id LIMIT %s OFFSET %s",
+            "SELECT * FROM favorites ORDER BY created_at DESC LIMIT %s OFFSET %s",
             (per_page, offset),
             fetch=True
         ) or []
@@ -114,19 +75,6 @@ def get_favorites_paginated_db(page: int = 1, per_page: int = 20):
         return None, str(e)
 
 
-def get_favorite_by_id_db(id: int):
-    """Get favorite by id"""
-    try:
-        fav = execute_query(
-            "SELECT * FROM favorites WHERE id = %s",
-            (id,),
-            fetch=True
-        )
-        if fav:
-            return fav[0], None
-        return None, None
-    except Exception as e:
-        return None, str(e)
 
 
 def is_movie_favorite_for_user(user_id: int, movie_id: int) -> bool:
@@ -150,7 +98,6 @@ def get_favorite_movies_detailed_for_user_db(user_id: int):
         favs = execute_query(
             """
             SELECT
-                f.id AS favorite_id,
                 f.user_id,
                 f.movie_id,
                 m.title AS movie_title,
@@ -174,7 +121,6 @@ def get_favorite_movies_detailed_for_user_db(user_id: int):
         fav_list = []
         for f in favs:
             fav_list.append({
-                "favorite_id": f["favorite_id"],
                 "user_id": f["user_id"],
                 "movie_id": f["movie_id"],
                 "movie_title": f["movie_title"],
@@ -208,7 +154,7 @@ def toggle_favorite_db(user_id: int, movie_id: int):
                 break
 
         if existing:
-            deleted, err = delete_favorite_db(existing["id"])
+            deleted, err = delete_favorite_db(user_id, movie_id)
             if err:
                 return None, err
             return {
@@ -229,5 +175,20 @@ def toggle_favorite_db(user_id: int, movie_id: int):
         }, None
 
 
+    except Exception as e:
+        return None, str(e)
+
+
+def get_favorite_by_keys_db(user_id: int, movie_id: int):
+    """Get favorite by composite keys"""
+    try:
+        fav = execute_query(
+            "SELECT * FROM favorites WHERE user_id = %s AND movie_id = %s",
+            (user_id, movie_id),
+            fetch=True
+        )
+        if fav:
+            return fav[0], None
+        return None, None
     except Exception as e:
         return None, str(e)
