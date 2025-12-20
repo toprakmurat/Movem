@@ -98,7 +98,6 @@ def get_favorite_movies_detailed_for_user_db(user_id: int):
         favs = execute_query(
             """
             SELECT
-                f.id AS favorite_id,
                 f.user_id,
                 f.movie_id,
                 m.title AS movie_title,
@@ -122,7 +121,6 @@ def get_favorite_movies_detailed_for_user_db(user_id: int):
         fav_list = []
         for f in favs:
             fav_list.append({
-                "favorite_id": f["favorite_id"],
                 "user_id": f["user_id"],
                 "movie_id": f["movie_id"],
                 "movie_title": f["movie_title"],

@@ -182,9 +182,8 @@ CREATE TABLE IF NOT EXISTS user_lists (
 -- list_items table
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS list_items (
-    id SERIAL PRIMARY KEY,
     list_id INTEGER REFERENCES user_lists(id) ON DELETE CASCADE,
     movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(list_id, movie_id)
+    PRIMARY KEY (list_id, movie_id)
 );
