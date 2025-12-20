@@ -19,9 +19,18 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     game_score INTEGER,
-    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg',
-    reset_token VARCHAR(100),
-    reset_token_expiry TIMESTAMP
+    profile_picture VARCHAR(255) DEFAULT 'img/placeholder_avatar.svg'
+);
+
+------------------------------------------------------------
+-- password_resets table (3NF normalization)
+------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    reset_token VARCHAR(100) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 ------------------------------------------------------------
