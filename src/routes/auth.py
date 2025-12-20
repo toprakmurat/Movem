@@ -334,16 +334,19 @@ def delete_account():
         flash(f'Error deleting account: {err}', 'error')
         return redirect(url_for('auth.account'))
 
-@auth_bp.route('/account/favorites', methods=['GET'])
-@login_required
-def favorites_page():
+@auth_bp.route('/user/<int:user_id>/favorites', methods=['GET'])
+def favorites_page(user_id):
     """
     Return favorites for user
     """
+    target_user, err = get_user_by_id_db(user_id)
+    if not target_user:
+        return redirect(url_for('home.home'))
+
     page = request.args.get('page', 1, type=int)
     per_page = 10  
 
-    all_favorites, err = get_favorite_movies_detailed_for_user_db(int(current_user.id))
+    all_favorites, err = get_favorite_movies_detailed_for_user_db(user_id)
     
     if err or not all_favorites:
         all_favorites = []
@@ -369,7 +372,8 @@ def favorites_page():
     return render_template(
         'favorites.html',  
         favorites=current_page_favorites,
-        pagination=pagination
+        pagination=pagination,
+        user=target_user
     )
 
 @auth_bp.route('/user/<int:user_id>/reviews')
