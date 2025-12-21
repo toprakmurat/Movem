@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS comment_votes (
     comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
     vote_type VARCHAR(10) CHECK (vote_type IN ('like', 'dislike')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, comment_id)
+    PRIMARY KEY (user_id, comment_id)
 );
 
 ------------------------------------------------------------
