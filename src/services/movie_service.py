@@ -9,7 +9,7 @@ from src.utils.pagination_utils import Pagination
 ######################### CRUD FOR MOVIES ##########################
 
 def get_movies_db():
-    """Get all movies"""
+    """Get all movies from db"""
     try:
         movies = execute_query(
             """
@@ -24,35 +24,15 @@ def get_movies_db():
     except Exception as e:
         return None, str(e)
 
-    
-def get_movie_by_id_db(id: int):
-    """Get movie by id"""
-    try:
-        movies = execute_query(
-            """
-            SELECT *
-            FROM movies
-            WHERE id = %s
-            """,
-            (id,),
-            fetch=True
-        )
-        
-        if movies and isinstance(movies, list):
-            return movies[0], None
-        return None, None
-    except Exception as e:
-        return None, str(e)
-
 
 def create_movie_db(movie_data: dict):
-    """Create a new movie"""
+    """Create a new movie in db"""
     try:
         new_movie = execute_query(
             """
             INSERT INTO movies(id, title, overview, tagline, release_date, poster_file, banner_file, platform_id)
             VALUES(%s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id, title, overview, tagline, release_date, poster_file, banner_file, platform_id, created_at
+            RETURNING *
             """,
             (   
                 movie_data.get
@@ -68,9 +48,8 @@ def create_movie_db(movie_data: dict):
             fetch=True
         )
 
-        if new_movie:
-            return new_movie[0], None
-        return None, "Failed to create movie"
+        return new_movie[0], None
+
     except Exception as e:
         return None, str(e)
 
@@ -78,22 +57,16 @@ def create_movie_db(movie_data: dict):
 def update_movie_db(id: int, movie_data: dict):
     """Update the movie with given id and return updated one"""
     try:
-        existing_movie, err = get_movie_by_id_db(id)
-        if err:
-            return None, err
-        if not existing_movie:
-            return None, None
-        
         update_fields = []
         params = []
 
-        for key in ['title', 'overview', 'tagline', 'release_date', 'poster_file', 'banner_file', 'platform_id', 'created_at']:
+        for key in ['title', 'overview', 'tagline', 'release_date', 'poster_file', 'banner_file', 'platform_id']:
             if key in movie_data:
                 update_fields.append(f"{key} = %s")
                 params.append(movie_data[key])
 
         if not update_fields:
-            return existing_movie, None
+            return get_movie_by_id_db(id)
         
         params.append(id) 
 
@@ -102,11 +75,14 @@ def update_movie_db(id: int, movie_data: dict):
             UPDATE movies
             SET {', '.join(update_fields)}
             WHERE id = %s
-            RETURNING id, title, overview, tagline, release_date, poster_file, banner_file, platform_id, created_at
+            RETURNING *
             """,
             tuple(params),
             fetch=True
         )
+
+        if not updated_movie:
+            return None, "Movie not found"
 
         return updated_movie[0], None
 
@@ -121,22 +97,43 @@ def delete_movie_db(id: int):
             """
             DELETE FROM movies
             WHERE id = %s
-            RETURNING id, title, overview, tagline, release_date, poster_file, banner_file, platform_id, created_at
+            RETURNING *
             """,
             (id,),
             fetch=True
         )
 
-        if deleted_movie:
-            return deleted_movie[0], None
-        return None, None
+        if not deleted_movie:
+            return None, "Movie not found"
+
+        return deleted_movie[0], None
 
     except Exception as e:
         return None, str(e)
 
 
 ######################### COMPLEX ONES ##########################
+def get_movie_by_id_db(id: int):
+    """Get movie by id from db"""
+    try:
+        movies = execute_query(
+            """
+            SELECT *
+            FROM movies
+            WHERE id = %s
+            """,
+            (id,),
+            fetch=True
+        )
+        
+        if not movies:
+            return None, "Movie not found"
 
+        return movies[0], None
+    
+    except Exception as e:
+        return None, str(e)
+    
 def get_movies_paginated_db(page: int = 1, per_page: int = 8, 
                             genre_id: int = None, sort_by: str = None, 
                             search: str = None, 
@@ -145,8 +142,9 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
     try:
         offset = (page - 1) * per_page
         
-        where_clauses = ["1=1"] 
+        where_clauses = [] 
         where_params = []
+
         order_params = []
         order_parts = []
         
@@ -185,7 +183,10 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
             where_clauses.append("s.runtime <= %s")
             where_params.append(runtime_max)
 
-        where_sql = "WHERE " + " AND ".join(where_clauses)
+        where_sql = (
+            "WHERE " + " AND ".join(where_clauses)
+            if where_clauses else ""
+        )
 
         if sort_by in ("rating_desc", "rating"):
             order_parts.append("s.vote_avg DESC")
@@ -229,7 +230,6 @@ def get_movies_paginated_db(page: int = 1, per_page: int = 8,
                           total_count=total_count), None
 
     except Exception as e:
-        print("DB Error:", e)
         return Pagination(items=[], page=page, per_page=per_page, total_count=0), str(e)
 
 def get_movie_details_full_db(movie_id: int, current_user_id: int):
@@ -281,7 +281,6 @@ def get_movie_details_full_db(movie_id: int, current_user_id: int):
             """
             SELECT 
                 g.genre_name 
-
             FROM genres g
             JOIN movies_genres mg 
                 ON g.id = mg.genre_id
@@ -342,7 +341,7 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
     # 2. Same Director: +30 points
     # 3. Same Genre:    +10 points (Cumulative for each matching genre)
     # 4. Same Platform: +3 points
-    # 5. Same Actor:    +5 points
+    # 5. Same Actor:    +5 points (Cumulative for each matching actor)
     # Max score is 100
     
     try:
@@ -365,7 +364,8 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
                 -- Other favorites of favorited users
                 SELECT f2.movie_id, 5 as score
                 FROM favorites f1
-                JOIN favorites f2 ON f1.user_id = f2.user_id
+                JOIN favorites f2
+                    ON f1.user_id = f2.user_id
                 WHERE f1.movie_id = %s AND f2.movie_id != %s
                 
                 UNION ALL
@@ -373,7 +373,8 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
                 -- Same director
                 SELECT mc2.movie_id, 30 as score
                 FROM movie_cast mc1
-                JOIN movie_cast mc2 ON mc1.person_id = mc2.person_id
+                JOIN movie_cast mc2
+                    ON mc1.person_id = mc2.person_id
                 WHERE mc1.movie_id = %s 
                 AND mc2.movie_id != %s
                 AND mc1.role = 'Director' 
@@ -384,7 +385,8 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
                 -- Same genres
                 SELECT mg2.movie_id, 10 as score
                 FROM movies_genres mg1
-                JOIN movies_genres mg2 ON mg1.genre_id = mg2.genre_id
+                JOIN movies_genres mg2
+                    ON mg1.genre_id = mg2.genre_id
                 WHERE mg1.movie_id = %s AND mg2.movie_id != %s
 
                 UNION ALL
@@ -392,7 +394,8 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
                 -- Same platform
                 SELECT m2.id as movie_id, 3 as score
                 FROM movies m1
-                JOIN movies m2 ON m1.platform_id = m2.platform_id
+                JOIN movies m2
+                    ON m1.platform_id = m2.platform_id
                 WHERE m1.id = %s AND m2.id != %s
 
                 UNION ALL
@@ -406,7 +409,7 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
                 AND mc2.movie_id != %s
                 AND mc1.role != 'Director'
                 AND mc2.role != 'Director'
-            ) raw_scores
+            )AS raw_scores
             GROUP BY movie_id
         ) AS final_scores
         
@@ -423,7 +426,7 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
             SELECT movie_id FROM favorites WHERE user_id = %s
         ) AND s.vote_count>1000
         
-        GROUP BY m.id, m.title, m.poster_file, m.release_date, s.vote_avg, final_scores.total_score
+        GROUP BY m.id, s.vote_avg, final_scores.total_score
         ORDER BY match_score DESC, s.vote_avg DESC
         LIMIT 5;
         """
@@ -434,7 +437,7 @@ def get_recommendations_db(movie_id: int, current_user_id: int):
         return recommendations, None
 
     except Exception as e:
-        return [], str(e)
+        return None, str(e)
 
 def get_best_movies_detailed_db(limit: int = 10):
     """
@@ -447,7 +450,7 @@ def get_best_movies_detailed_db(limit: int = 10):
             m.poster_file as poster_url, m.banner_file as backdrop_url,
             m.release_date, s.vote_avg, s.runtime
         FROM movies m
-        JOIN statistic s
+        LEFT JOIN statistic s
             ON m.id = s.movie_id
         WHERE s.vote_count > 1000
         ORDER BY s.vote_avg DESC, s.vote_count DESC
@@ -524,7 +527,7 @@ def get_best_movies_for_genres_detailed_db(limit_per_genre: int = 10, top_genres
             FROM movies m
             LEFT JOIN statistic s
                 ON m.id = s.movie_id
-            LEFT JOIN movies_genres mg
+            JOIN movies_genres mg
                 ON m.id = mg.movie_id
             JOIN genres g
                 ON mg.genre_id = g.id
@@ -534,7 +537,7 @@ def get_best_movies_for_genres_detailed_db(limit_per_genre: int = 10, top_genres
             ) 
             AND s.vote_count > 1000
             
-            GROUP BY m.id, s.id
+            GROUP BY m.id, s.vote_avg, s.runtime, s.budget, s.revenue
             ORDER BY s.vote_avg DESC
             LIMIT %s;
             """
@@ -566,7 +569,7 @@ def get_tonights_pick_director_detailed_db():
             WHERE mc.role = 'Director'
             GROUP BY mc.person_id, p.name
             HAVING COUNT(DISTINCT mc.movie_id) >= 4 
-               AND AVG(s.vote_avg) >= 7.0
+               AND AVG(s.vote_avg) >= 7.3
                AND SUM(s.vote_count) >= 1000
         ),
         daily_selection AS (

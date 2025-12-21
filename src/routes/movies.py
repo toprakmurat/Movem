@@ -480,6 +480,7 @@ def get_platform_route(platform_id):
 
 
 @movies_bp.route('/platforms/', methods=['POST'])
+@admin_required
 def create_platform_route():
     """Creates a new platform"""
     data = request.get_json()
@@ -493,6 +494,7 @@ def create_platform_route():
 
 
 @movies_bp.route('/platforms/<int:platform_id>', methods=['PUT', 'PATCH'])
+@admin_required
 def update_platform_route(platform_id):
     """Updates an existing platform"""
     data = request.get_json()
@@ -510,6 +512,7 @@ def update_platform_route(platform_id):
 
 
 @movies_bp.route('/platforms/<int:platform_id>', methods=['DELETE'])
+@admin_required
 def delete_platform_route(platform_id):
     """Deletes a platform"""
     deleted, err = delete_platform_by_id(platform_id)
