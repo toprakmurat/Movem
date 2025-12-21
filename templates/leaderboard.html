@@ -5,7 +5,7 @@
   <header class="text-center">
     <p class="text-sm uppercase tracking-[0.3em] text-brand-300">Competitive</p>
     <h1 class="mt-2 text-3xl font-semibold">Leaderboard</h1>
-    <p class="mt-2 text-slate-400">Top players ranked by accuracy, streaks, and total score.</p>
+    <p class="mt-2 text-slate-400">Top players ranked by total score.</p>
   </header>
   <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60">
     <table class="min-w-full divide-y divide-slate-800 text-sm">
@@ -22,7 +22,8 @@
           <td class="px-4 py-4 font-semibold text-brand-200">#{{ loop.index }}</td>
           <td class="px-4 py-4">
             <div class="flex items-center gap-3">
-              <img src="{{ user.avatar or url_for('static', filename='img/placeholder_avatar.svg') }}"
+              <img
+                src="{{ url_for('static', filename=user.avatar) if user.avatar else url_for('static', filename='img/placeholder_avatar.svg') }}"
                 class="h-10 w-10 rounded-full object-cover" alt="{{ user.username }} avatar" />
               <div>
                 <p class="font-semibold text-white">{{ user.username }}</p>
