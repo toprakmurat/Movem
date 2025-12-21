@@ -479,9 +479,9 @@ def get_controversial_movies():
                 ) AS community_tension
             FROM 
                 movies m
-            JOIN 
+            LEFT JOIN 
                 statistic s ON m.id = s.movie_id
-            JOIN 
+            LEFT JOIN 
                 comments c ON m.id = c.movie_id            
             JOIN 
                 movies_genres mg ON m.id = mg.movie_id
