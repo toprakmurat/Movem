@@ -291,7 +291,9 @@ def get_comments_by_user(user_id):
                 c.*, 
                 m.title as movie_title, 
                 m.poster_file as movie_poster,
-                m.id as movie_id
+                m.id as movie_id,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'like') as comment_likes,
+                (SELECT COUNT(*) FROM comment_votes v WHERE v.comment_id = c.id AND v.vote_type = 'dislike') as comment_dislikes
             FROM comments c
             JOIN movies m ON c.movie_id = m.id
             WHERE c.user_id = %s
