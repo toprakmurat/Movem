@@ -569,7 +569,7 @@ def get_tonights_pick_director_detailed_db():
             WHERE mc.role = 'Director'
             GROUP BY mc.person_id, p.name
             HAVING COUNT(DISTINCT mc.movie_id) >= 4 
-               AND AVG(s.vote_avg) >= 7.3
+               AND AVG(s.vote_avg) >= 7.0
                AND SUM(s.vote_count) >= 1000
         ),
         daily_selection AS (
