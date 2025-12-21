@@ -176,10 +176,11 @@
             {% if actor_stats %}
             <div class="space-y-3">
               {% for actor in actor_stats %}
+              {% set actor_placeholder = url_for('static', filename='img/placeholder_avatar.svg') %}
               <div class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-full bg-black overflow-hidden ring-1 ring-white/20">
                   <img src="{{ url_for('static', filename='img/people/' ~ actor.id ~ '.jpg') }}"
-                    class="h-full w-full object-cover">
+                    onerror="this.onerror=null;this.src='{{ actor_placeholder }}';" class="h-full w-full object-cover">
                 </div>
                 <div>
                   <p class="text-white font-medium">{{ actor.name }}</p>
