@@ -385,6 +385,9 @@ def delete_movies_genres(movie_id, genre_id):
     if err:
         return jsonify({"error": err}), 500
     
+    if not deleted:
+        return jsonify({"message": "Movie-Genre relation not found"}), 404
+
     return jsonify(dict(deleted)), 200
 
 #########favorites
