@@ -57,12 +57,12 @@ SELECT setval('question_types_id_seq', (SELECT MAX(id) FROM question_types));
 
 -- Index for title search
 CREATE INDEX IF NOT EXISTS idx_movies_title ON movies(title);
+-- Index for overview search
+CREATE INDEX IF NOT EXISTS idx_movies_overview ON movies(overview);
 -- Index for finding movies by platform 
 CREATE INDEX IF NOT EXISTS idx_movies_platform_id ON movies(platform_id);
 -- Index for finding movies by genre 
 CREATE INDEX IF NOT EXISTS idx_movies_genres_genre_id ON movies_genres(genre_id);
--- Index for finding who favorited a movie 
-CREATE INDEX IF NOT EXISTS idx_favorites_movie_id ON favorites(movie_id);
 -- Index for searching actors/directors by name
 CREATE INDEX IF NOT EXISTS idx_people_name ON people(name);
 -- Index for finding a person's filmography (reverse lookup)
