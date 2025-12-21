@@ -15,6 +15,7 @@ from src.services.game_service import (
     delete_question_type_db
 )
 from flask_login import current_user
+from src.utils.decorators import admin_required
 
 game_bp = Blueprint('game', __name__)
 
@@ -148,6 +149,7 @@ def get_question(id):
 
 
 @game_bp.route('/questions', methods=['POST'])
+@admin_required
 def create_question():
     """Create a new question"""
     data = request.get_json()
@@ -161,6 +163,7 @@ def create_question():
 
 
 @game_bp.route('/questions/<int:id>', methods=['PUT'])
+@admin_required
 def update_question(id):
     """Update question"""
     data = request.get_json()
@@ -176,6 +179,7 @@ def update_question(id):
 
 
 @game_bp.route('/questions/<int:id>', methods=['DELETE'])
+@admin_required
 def delete_question(id):
     """Delete question"""
     deleted, err = delete_question_db(id)
@@ -196,6 +200,7 @@ def get_question_types():
 
 
 @game_bp.route('/question-types', methods=['POST'])
+@admin_required
 def create_question_type():
     """Create a question type"""
     data = request.get_json()
@@ -209,6 +214,7 @@ def create_question_type():
 
 
 @game_bp.route('/question-types/<int:id>', methods=['PUT'])
+@admin_required
 def update_question_type(id):
     """Update a question type"""
     data = request.get_json()
@@ -224,6 +230,7 @@ def update_question_type(id):
 
 
 @game_bp.route('/question-types/<int:id>', methods=['DELETE'])
+@admin_required
 def delete_question_type(id):
     """Delete a question type"""
     deleted, err = delete_question_type_db(id)

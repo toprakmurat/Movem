@@ -1560,16 +1560,10 @@
                         </thead>
                         <tbody class="divide-y divide-blue-500/10">
                             <tr>
-                                <td class="px-2 py-1 font-mono">id</td>
-                                <td class="px-2 py-1">integer</td>
-                                <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">PK</td>
-                            </tr>
-                            <tr>
                                 <td class="px-2 py-1 font-mono">movie_id</td>
                                 <td class="px-2 py-1">integer</td>
                                 <td class="px-2 py-1">NO</td>
-                                <td class="px-2 py-1">FK</td>
+                                <td class="px-2 py-1">PK, FK</td>
                             </tr>
                             <tr>
                                 <td class="px-2 py-1 font-mono">revenue</td>
@@ -1681,7 +1675,6 @@
                     <table class="w-full text-left text-sm text-white/70">
                         <thead class="uppercase tracking-wider text-xs border-b border-white/10">
                             <tr>
-                                <th class="px-4 py-2">ID</th>
                                 <th class="px-4 py-2">Movie ID</th>
                                 <th class="px-4 py-2">Budget</th>
                                 <th class="px-4 py-2">Revenue</th>
@@ -1694,7 +1687,6 @@
                         <tbody class="divide-y divide-white/5">
                             {% for s in statistics.items %}
                             <tr>
-                                <td class="px-4 py-2">{{ s.id }}</td>
                                 <td class="px-4 py-2">{{ s.movie_id }}</td>
                                 <td class="px-4 py-2 font-mono text-xs">{{ s.budget }}</td>
                                 <td class="px-4 py-2 font-mono text-xs">{{ s.revenue }}</td>

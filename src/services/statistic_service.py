@@ -15,7 +15,7 @@ def get_statistics_paginated_db(page=1, per_page=20):
         
         # get data
         query = """
-            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count, id
+            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count
             FROM statistic
             ORDER BY movie_id
             LIMIT %s OFFSET %s
@@ -33,7 +33,7 @@ def get_statistics_db():
     """Get all statistics (Legacy/Non-paginated)"""
     try:
         query = """
-            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count, id
+            SELECT movie_id, budget, revenue, runtime, vote_avg, vote_count
             FROM statistic
             ORDER BY movie_id
         """

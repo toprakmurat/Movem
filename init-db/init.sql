@@ -149,8 +149,7 @@ CREATE TABLE IF NOT EXISTS comment_votes (
 -- statistic table 
 ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS statistic (
-    id SERIAL PRIMARY KEY,
-    movie_id INTEGER UNIQUE REFERENCES movies(id) ON DELETE CASCADE,
+    movie_id INTEGER PRIMARY KEY REFERENCES movies(id) ON DELETE CASCADE,
     revenue BIGINT,
     runtime NUMERIC,
     vote_avg NUMERIC(4,1), -- to store ratings avg from 0,0 to 10,0

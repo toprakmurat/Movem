@@ -14,6 +14,7 @@ from src.services.statistic_service import (
     get_seasonal_revenue_db,
     get_bankable_stars_db
 )
+from src.utils.decorators import admin_required
 
 statistic_bp = Blueprint('statistic', __name__)
 
@@ -69,6 +70,7 @@ def get_statistic(movie_id):
     return jsonify(dict(stat)), 200
 
 @statistic_bp.route('/', methods=['POST'])
+@admin_required
 def create_statistic():
     """Create a new statistic"""
     data = request.get_json()
@@ -81,6 +83,7 @@ def create_statistic():
     return jsonify(dict(new_stat)), 201
 
 @statistic_bp.route('/<int:movie_id>', methods=['PUT'])
+@admin_required
 def update_statistic(movie_id):
     """Update statistic"""
     data = request.get_json()
@@ -95,6 +98,7 @@ def update_statistic(movie_id):
     return jsonify(dict(updated)), 200
 
 @statistic_bp.route('/<int:movie_id>', methods=['DELETE'])
+@admin_required
 def delete_statistic(movie_id):
     """Delete statistic"""
     deleted, err = delete_statistic_db(movie_id)
