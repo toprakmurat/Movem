@@ -44,7 +44,8 @@ from src.services.comments_service import (
     create_vote,
     update_vote,
     delete_vote,
-    get_comment_by_id
+    get_comment_by_id,
+    get_vote_by_user_and_comment
 )
 
 from src.services.actors_service import get_actors_paginated_db
@@ -107,6 +108,7 @@ def dashboard():
     user_stats = {}
     genre_stats = None
     actor_stats = None
+
     
     # Handle simple lookups via GET parameters (for result persistence after action)
     if request.args.get('view_user_id'):
@@ -403,7 +405,7 @@ def api_create_vote():
     
     if error:
         return jsonify({'error': error}), 400
-    return jsonify({'id': new_vote['id']}), 201
+    return jsonify({'success': True, 'user_id': user_id, 'comment_id': comment_id}), 201
 
 @admin_bp.route('/api/comments/votes', methods=['PUT'])
 def api_update_vote():
@@ -441,3 +443,24 @@ def api_delete_vote():
     if error:
         return jsonify({'error': error}), 400
     return jsonify({'success': True}), 200
+
+@admin_bp.route('/api/comments/votes', methods=['GET'])
+def api_get_vote_single():
+    """
+    Tek bir oyu User ID ve Comment ID ile API üzerinden çeker.
+    Bu eksik olduğu için 405 hatası alıyordun.
+    """
+    user_id = request.args.get('user_id')
+    comment_id = request.args.get('comment_id')
+
+    if not (user_id and comment_id):
+        return jsonify({'error': 'User ID and Comment ID required'}), 400
+
+    # Servisten oyu çek (Bu fonksiyonu import ettiğinden emin ol)
+    vote, err = get_vote_by_user_and_comment(user_id, comment_id)
+
+    if err:
+        return jsonify({'message': 'Vote not found', 'error': err}), 404
+        
+    # Sözlük (dict) formatına çevirip gönder
+    return jsonify(dict(vote)), 200
