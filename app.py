@@ -26,15 +26,27 @@ def create_app(config_name=None):
     app.config.from_object(config[config_name])
     
     # Initialize database connection pool
-    try:
-        app.db_pool = psycopg2.pool.SimpleConnectionPool(
-            app.config['DB_MIN_CONNECTIONS'],
-            app.config['DB_MAX_CONNECTIONS'],
-            app.config['DATABASE_URL']
-        )
-        print(f"Database connection pool created successfully")
-    except Exception as e:
-        print(f"Error creating database pool: {e}")
+    # Initialize database connection pool with retry logic
+    import time
+    pool_created = False
+    retries = 5
+    while not pool_created and retries > 0:
+        try:
+            app.db_pool = psycopg2.pool.SimpleConnectionPool(
+                app.config['DB_MIN_CONNECTIONS'],
+                app.config['DB_MAX_CONNECTIONS'],
+                app.config['DATABASE_URL']
+            )
+            print(f"Database connection pool created successfully")
+            pool_created = True
+        except Exception as e:
+            print(f"Error creating database pool: {e}. Retrying in 2 seconds... ({retries} left)")
+            retries -= 1
+            time.sleep(2)
+            
+    if not pool_created:
+        print("Could not connect to database after multiple retries.")
+        # We start anyway, but requests will fail.
         app.db_pool = None
     # Flask login setup
     login_manager = LoginManager()
